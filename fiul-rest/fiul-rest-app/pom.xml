@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fiul-rest</artifactId>
+        <groupId>io.finarkein.fiu</groupId>
+        <version>0.4.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fiul-rest-app</artifactId>
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <banner-name>fiul-server-banner.txt</banner-name>
+        <server.name>fiul-server</server.name>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-aa-webclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-service-consent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-rest-consent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-rest-dataflow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-rest-notification</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${version.spring-boot}</version>
+                <configuration>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
+                    <mainClass>io.finarkein.fiul.FiulServerApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

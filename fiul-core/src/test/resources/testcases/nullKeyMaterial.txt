@@ -1,0 +1,367 @@
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        }
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": ""
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": ""
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "",
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": ""
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2021-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "-----BEGIN PUBLIC KEY-----MIIBMTCB6gYHKoZIzj0CATCB3gIBATArBgcqhkjOPQEBAiB/////////////////////////////////////////7TBEBCAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqYSRShRAQge0Je0Je0Je0Je0Je0Je0Je0Je0Je0Je0JgtenHcQyGQEQQQqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq0kWiCuGaG4oIa04B7dLHdI0UySPU1+bXxhsinpxaJ+ztPZAiAQAAAAAAAAAAAAAAAAAAAAFN753qL3nNZYEmMaXPXT7QIBCANCAAQGJ/pd1lftQJPMW2QoZh+oZ/KFOb3Q1U/g7QfjtRNEN3OaV8/YlfKSuvBZpCwsg1RbKiDhw4Y0c+DZNC4Qx4Ev-----END PUBLIC KEY-----"
+        },
+        "Nonce": ""
+    }
+}
+*
+    {
+        "ver": "1.0",
+        "timestamp": "{{CurrentdateTime}}",
+        "txnid": "{{UUID}}",
+        "FIDataRange": {
+      "from": "2020-04-07T07:14:37.183+0000",
+      "to": "2021-04-06T07:14:16.676+0000"
+        },
+        "Consent": {
+      "id": "2503a18c-c7f2-4112-9830-44cc63e91252",
+      "digitalSignature": "d8umo2BKiMtRSceTPqsQW0VTzyeysjw0Czn5V89QMVTu1M9XF1VQ7OX8DSfC9NQC_Ktuf4R3I5qubozsGS161xsh0YuT-uFRktj4fM1eAHq0xGWN2ubn1yXZclyd8hEGSGqI8xybZfyZvqt3E7L_JlrCbwkqgt8QWgQWhen00syxVgdTZdAEUN3rabmi5Po4qRFPzHR7uYVrcJPwpHVq7hHsosUMjp-zGii0uNKKwLgu22p0LgqHYyte8hEDpm2RsJci3sXy56XRtgfERuBpkKTBcPB9LR6bA0t0LfPAChhWjw3-_kfEokLo-2LEGjSIUBevBb485ENYXKCGbw_5jg"
+        },
+        "KeyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "Curve25519",
+      "params": "params",
+      "DHPublicKey": {
+          "expiry": "2021-04-06T07:14:16.676+0000",
+          "Parameters": "params",
+          "KeyValue": ""
+      },
+      "Nonce": "UzU4ashLJj3FAYKVeb3wmMoHqn+eo98uS1tUq10RNrs="
+        }
+    }

@@ -1,0 +1,411 @@
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "0M",
+        "consentExpiryDuration": "1M",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "1"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "0M",
+        "consentExpiryDuration": "1M",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "0"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "0M",
+        "consentExpiryDuration": "1M",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1M",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1M",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "1"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1M",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "0"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1w",
+        "consentExpiryDuration": "1M",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1w",
+        "consentExpiryDuration": "1M",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "1"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1w",
+        "consentExpiryDuration": "1M",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "0"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "2M",
+        "consentExpiryDuration": "2y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "2M",
+        "consentExpiryDuration": "2y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "1"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "2M",
+        "consentExpiryDuration": "2y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "3M",
+        "consentTemplateDataRange": {
+            "type": "FINANCIAL_YEAR",
+            "year": "0"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}

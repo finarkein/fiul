@@ -1,0 +1,11 @@
+{
+  "txnId": "4a4adbbe-29ae-11e8-a8d7-0289437bf010",
+  "customerAAId": "xxxxxxxxxxx@finvu",
+  "dataRageFrom": "2018-12-06T11:39:57.153Z",
+  "dataRageTo": "2020-07-03T14:25:33.440Z",
+  "consentHandleId": "3de4707f-64dc-4e8b-b564-da8a7cba70e0",
+  "consentId": "15268b9a-2fb3-4436-beb6-d8999deeeeb9",
+  "callback": {
+    "url": "http://localhost:8080/callback"
+  }
+}

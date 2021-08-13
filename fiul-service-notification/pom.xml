@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fiul</artifactId>
+        <groupId>io.finarkein.fiu</groupId>
+        <version>0.4.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fiul-service-notification</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>fiul-notification-core</module>
+        <module>fiul-notification-callback-core</module>
+        <module>fiul-notification-callbacks-jpa</module>
+        <module>fiul-notification-callbacks-pubsub-core</module>
+        <module>fiul-notification-pubsub</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-activemq</artifactId>
+                <version>${version.spring-boot}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-pool</artifactId>
+                <version>5.15.13</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-callback-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-callbacks-jpa</artifactId>
+                <version>${project.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-callbacks-pubsub-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-pubsub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Account linkedAccRef="56ca23de-2a85-4c70-9300-c7fd1fd416f6" maskedAccNumber="XXXXXXXX3666"
+         xmlns="http://api.rebit.org.in/FISchema/deposit"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://api.rebit.org.in/FISchema/deposit ../FISchema/deposit.xsd" type="deposit"
+         version="1.1">
+    <Profile>
+        <Holders type="SINGLE">
+            <Holder address="8/1190, 5th Cross, 3rd Main, 7th Block, Jayanagar, Bangalore - 560011"
+                    ckycCompliance="true" dob="1947-08-15" email="akshayku@gmail.com" landline="" mobile="9850466666"
+                    name="Akshay Kumar" nominee="REGISTERED" pan="AIMPN5746M"/>
+        </Holders>
+    </Profile>
+    <Summary currentBalance="528973.17" currency="INR" branch="Jayanagar 4th Block"
+             balanceDateTime="2020-12-04T18:30:00+00:00" currentODLimit="0" drawingLimit="0" exchgeRate=" "
+             facility="OD" ifscCode="ICIC0001124" micrCode="500240246" openingDate="2004-08-06" status="ACTIVE"
+             type="SAVINGS">
+        <Pending transactionType="DEBIT" amount="0"/>
+    </Summary>
+    <Transactions startDate="2019-04-06" endDate="2020-12-29">
+        <Transaction amount="0.00" currentBalance="498549.11" mode="OTHERS" narration="AMAZON 6 EMI MIAMI IN"
+                     reference="RFN00013416" transactionTimestamp="2019-05-03T18:30:00+00:00" txnId="M11160078"
+                     type="CREDIT" valueDate="2019-05-04"/>
+        <Transaction amount="7.17" currentBalance="493441.94" mode="OTHERS" narration="CGST-CI@9%"
+                     reference="RFN00013418" transactionTimestamp="2019-05-05T18:30:00+00:00" txnId="M11160080"
+                     type="DEBIT" valueDate="2019-05-06"/>
+        <Transaction amount="79.73" currentBalance="493362.21" mode="OTHERS"
+                     narration="Interest Amount Amortization - <1/6>AMAZON 6 EMI" reference="RFN00013419"
+                     transactionTimestamp="2019-05-05T18:30:00+00:00" txnId="M11160081" type="DEBIT"
+                     valueDate="2019-05-06"/>
+        <Transaction amount="7.17" currentBalance="493355.04" mode="OTHERS" narration="SGST-CI@9%"
+                     reference="RFN00013420" transactionTimestamp="2019-05-05T18:30:00+00:00" txnId="M11160082"
+                     type="DEBIT" valueDate="2019-05-06"/>
+        <Transaction amount="1193.85" currentBalance="492161.19" mode="OTHERS" narration="Principal Amount Amortization -
+<1/6> AMAZON 6 EMI" reference="RFN00013421" transactionTimestamp="2019-05-05T18:30:00+00:00" txnId="M11160083"
+                     type="DEBIT" valueDate="2019-05-06"/>
+        <Transaction amount="1206.78" currentBalance="510398.06" mode="OTHERS" narration="Principal Amount Amortization -
+<2/6> AMAZON 6 EMI" reference="RFN00013471" transactionTimestamp="2019-06-05T18:30:00+00:00" txnId="M11160133"
+                     type="DEBIT" valueDate="2019-06-06"/>
+        <Transaction amount="53.73" currentBalance="155786.8" mode="OTHERS" narration="Interest Amount Amortization -
+<3/6>AMAZON 6 EMI" reference="RFN00013527" transactionTimestamp="2019-07-04T18:30:00+00:00" txnId="M11160189"
+                     type="DEBIT" valueDate="2019-07-05"/>
+        <Transaction amount="1219.85" currentBalance="154562.11" mode="OTHERS" narration="Principal Amount Amortization -
+<3/6> AMAZON 6 EMI" reference="RFN00013529" transactionTimestamp="2019-07-04T18:30:00+00:00" txnId="M11160191"
+                     type="DEBIT" valueDate="2019-07-05"/>
+        <Transaction amount="5125.50" currentBalance="179435.86" mode="OTHERS" narration="CREDIT---"
+                     reference="RFN00013559" transactionTimestamp="2019-07-28T18:30:00+00:00" txnId="M11160221"
+                     type="CREDIT" valueDate="2019-07-29"/>
+        <Transaction amount="679.15" currentBalance="106429.96" mode="OTHERS" narration="NETFLIX (PGSI) MIAMI IN"
+                     reference="RFN00013571" transactionTimestamp="2019-08-04T18:30:00+00:00" txnId="M11160233"
+                     type="DEBIT" valueDate="2019-08-05"/>
+        <Transaction amount="40.51" currentBalance="113649.08" mode="OTHERS" narration="Interest Amount Amortization -
+<4/6>AMAZON 6 EMI" reference="RFN00013577" transactionTimestamp="2019-08-05T18:30:00+00:00" txnId="M11160239"
+                     type="DEBIT" valueDate="2019-08-06"/>
+        <Transaction amount="53.03" currentBalance="1798.89999999988" mode="OTHERS" narration="Interest Amount Amortization -
+<1/6>FLIPKART PAYMENTS" reference="RFN00013589" transactionTimestamp="2019-08-11T18:30:00+00:00" txnId="M11160251"
+                     type="DEBIT" valueDate="2019-08-12"/>
+        <Transaction amount="27.15" currentBalance="103535.15" mode="OTHERS" narration="Interest Amount Amortization -
+<5/6>AMAZON 6 EMI" reference="RFN00013626" transactionTimestamp="2019-09-05T18:30:00+00:00" txnId="M11160288"
+                     type="DEBIT" valueDate="2019-09-06"/>
+        <Transaction amount="1246.43" currentBalance="102288.72" mode="OTHERS" narration="Principal Amount Amortization -
+<5/6> AMAZON 6 EMI" reference="RFN00013627" transactionTimestamp="2019-09-05T18:30:00+00:00" txnId="M11160289"
+                     type="DEBIT" valueDate="2019-09-06"/>
+        <Transaction amount="802.64" currentBalance="94643.5999999999" mode="OTHERS" narration="Principal Amount Amortization -
+<2/6> FLIPKART PAYMENTS" reference="RFN00013641" transactionTimestamp="2019-09-11T18:30:00+00:00" txnId="M11160303"
+                     type="DEBIT" valueDate="2019-09-12"/>
+    </Transactions>
+</Account>
