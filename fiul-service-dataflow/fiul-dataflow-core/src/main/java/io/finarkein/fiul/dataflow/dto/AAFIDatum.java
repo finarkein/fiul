@@ -30,16 +30,22 @@ import java.time.Instant;
         })
 public class AAFIDatum {
     @Id
+    @Column(length = 36)
     private String consentId;
     @Id
+    @Column(length = 36)
     private String sessionId;
     @Id
+    @Column(length = 20)
     private String aaName;
     @Id
+    @Column(length = 36)
     private String fipId;
     @Id
+    @Column(length = 36)
     private String linkRefNumber;
     @Id
+    @Column(length = 36)
     private String maskedAccNumber;
 
     @Lob
@@ -68,16 +74,22 @@ public class AAFIDatum {
     @AllArgsConstructor
     public static class Key implements Serializable {
         @Id
+        @Column(length = 36)
         private String consentId;
         @Id
+        @Column(length = 36)
         private String sessionId;
         @Id
+        @Column(length = 20)
         private String aaName;
         @Id
+        @Column(length = 36)
         private String fipId;
         @Id
+        @Column(length = 36)
         private String linkRefNumber;
         @Id
+        @Column(length = 36)
         private String maskedAccNumber;
     }
 }

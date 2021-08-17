@@ -28,16 +28,22 @@ import java.time.Instant;
         })
 public final class FIDataRecord {
     @Id
+    @Column(length = 36)
     private String consentId;
     @Id
+    @Column(length = 36)
     private String sessionId;
     @Id
+    @Column(length = 20)
     private String aaName;
     @Id
+    @Column(length = 36)
     private String fipId;
     @Id
+    @Column(length = 36)
     private String linkRefNumber;
     @Id
+    @Column(length = 36)
     private String maskedAccNumber;
 
     @Lob
@@ -60,16 +66,22 @@ public final class FIDataRecord {
     @AllArgsConstructor
     public static class Key implements Serializable {
         @Id
+        @Column(length = 36)
         private String consentId;
         @Id
+        @Column(length = 36)
         private String sessionId;
         @Id
+        @Column(length = 20)
         private String aaName;
         @Id
+        @Column(length = 36)
         private String fipId;
         @Id
+        @Column(length = 36)
         private String linkRefNumber;
         @Id
+        @Column(length = 36)
         private String maskedAccNumber;
     }
 }

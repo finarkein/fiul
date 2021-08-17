@@ -31,10 +31,14 @@ import java.time.Instant;
 public class FIFetchMetadata {
 
     @Id
+    @Column(length = 36)
     protected String sessionId;
 
+    @Column(length = 36)
     protected String consentId;
+    @Column(length = 36)
     protected String txnId;
+    @Column(length = 20)
     protected String aaName;
 
     @Column(columnDefinition = "DATETIME(6)")
@@ -46,7 +50,9 @@ public class FIFetchMetadata {
     @Column(columnDefinition = "DATETIME(6)")
     protected Timestamp fiRequestSubmittedOn;
 
+    @Column(length = 36)
     protected String fipId;
+    @Column(length = 36)
     protected String linkRefNumbers;
 
     @Column(columnDefinition = "DATETIME(6)")
@@ -73,8 +79,10 @@ public class FIFetchMetadata {
     @AllArgsConstructor
     public static class Key implements Serializable {
         @Id
+        @Column(length = 36)
         String consentId;
         @Id
+        @Column(length = 36)
         String sessionId;
     }
 }
