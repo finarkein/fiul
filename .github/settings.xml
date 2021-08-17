@@ -20,7 +20,7 @@
                 <repository>
                     <id>repo.finarkein.jfrog</id>
                     <name>Finarkein JFrog Repository</name>
-                    <url>https://finarkein.jfrog.io/artifactory/maven/</url>
+                    <url>${env.JFROG_REPO}</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
