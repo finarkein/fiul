@@ -6,7 +6,7 @@ COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
 # the second stage of our build will copy the extracted layers
-FROM gcr.io/distroless/java:11
+FROM gcr.io/distroless/java:11-debug
 LABEL "vendor"="Finarkein Analytics Private Limited"
 LABEL "component"="NBFC-AA Financial Information User Layer (FIUL) "
 LABEL "version"="0.4.0"

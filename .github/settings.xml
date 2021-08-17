@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <servers>
+        <server>
+            <id>repo.finarkein.jfrog</id>
+            <username>${env.JFROG_USERNAME}</username>
+            <password>${env.JFROG_PASSWORD}</password>
+        </server>
+    </servers>
+    <profiles>
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2/</url>
+                </repository>
+                <repository>
+                    <id>repo.finarkein.jfrog</id>
+                    <name>Finarkein JFrog Repository</name>
+                    <url>${env.JFROG_REPO}</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+</settings>
