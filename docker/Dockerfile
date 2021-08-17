@@ -17,7 +17,6 @@ COPY --from=builder /app/spring-boot-loader/ ./
 COPY --from=builder /app/snapshot-dependencies/ ./
 COPY --from=builder /app/application/ ./
 ENV JDK_JAVA_OPTIONS="-XX:+UseG1GC -XX:+UseContainerSupport -XX:+UnlockExperimentalVMOptions"
-ENV SPRING_FLAGS=
 ENV SECRET_KEYSET=
-EXPOSE 8082
+EXPOSE 7065
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
