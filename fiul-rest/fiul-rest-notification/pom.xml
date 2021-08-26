@@ -14,10 +14,6 @@
     <dependencies>
         <dependency>
             <groupId>io.finarkein.fiu</groupId>
-            <artifactId>fiul-dataflow-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.finarkein.fiu</groupId>
             <artifactId>fiul-notification-pubsub</artifactId>
         </dependency>
     </dependencies>

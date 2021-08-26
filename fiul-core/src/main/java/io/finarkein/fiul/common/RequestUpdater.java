@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
@@ -153,10 +152,10 @@ public class RequestUpdater {
             return first.orElseThrow(() -> new IllegalArgumentException("Invalid value for TimestampUpdater:" + value));
         }
 
-        static final Function<java.util.Date, String> dateToUTCString = date -> timestampFormat.format(date);
+        static final Function<Date, String> dateToUTCString = date -> timestampFormat.format(date);
 
         public static String currentTimestamp() {
-            return dateToUTCString.apply(java.util.Date.from(Instant.now()));
+            return dateToUTCString.apply(Date.from(Instant.now()));
         }
     }
 

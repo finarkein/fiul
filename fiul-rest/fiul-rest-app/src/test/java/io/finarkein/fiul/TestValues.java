@@ -541,7 +541,7 @@ public final class TestValues {
         NotificationResponse notificationResponse = new NotificationResponse();
         notificationResponse.setVer("1.0");
         notificationResponse.setTxnId(txnId);
-        notificationResponse.setTimestamp(timestamp);
+        notificationResponse.setTimestamp(timestamp1);
         notificationResponse.getResponse();
         return notificationResponse;
     }
