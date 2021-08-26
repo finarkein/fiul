@@ -37,7 +37,6 @@
         <version.plugin-gpg>1.6</version.plugin-gpg>
         <version.plugin-gitflow>1.12.0</version.plugin-gitflow>
 
-        <pmd.skip>false</pmd.skip>
         <jacoco.haltOnFailure>false</jacoco.haltOnFailure>
         <license.dir>license</license.dir>
         <project.inceptionYear>2019</project.inceptionYear>

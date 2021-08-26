@@ -50,11 +50,11 @@ public abstract class Functions {
 
     public static final Supplier<String> currentTimestampSupplier = () -> createFormat().format(Date.from(Instant.now()));
 
-    public static final Function<String, java.sql.Timestamp> timestampToSqlDate = timestamp -> {
+    public static final Function<String, Timestamp> timestampToSqlDate = timestamp -> {
         if (timestamp == null)
             return null;
         try {
-            return new java.sql.Timestamp(timestampFormat.parse(timestamp).getTime());
+            return new Timestamp(timestampFormat.parse(timestamp).getTime());
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }

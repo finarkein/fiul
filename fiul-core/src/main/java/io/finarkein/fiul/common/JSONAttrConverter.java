@@ -48,7 +48,7 @@ public abstract class JSONAttrConverter<T> implements AttributeConverter<T, Stri
         }
     }
 
-    @javax.persistence.Converter
+    @Converter
     public static class OfKeyMaterial extends JSONAttrConverter<KeyMaterial> {
 
         @Override
@@ -57,7 +57,7 @@ public abstract class JSONAttrConverter<T> implements AttributeConverter<T, Stri
         }
     }
 
-    @javax.persistence.Converter
+    @Converter
     public static class OfCallback extends JSONAttrConverter<Callback> {
 
         @Override

@@ -10,7 +10,6 @@ package io.finarkein.fiul.controller;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.api.aa.notification.NotificationResponse;
-import io.finarkein.fiul.common.RequestUpdater;
 import io.finarkein.fiul.notification.NotificationPublisher;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/")
@@ -36,17 +38,14 @@ public class NotificationController {
     public Mono<NotificationResponse> consentResponseMono(@RequestBody ConsentNotification consentNotification) {
         log.debug("ConsentNotification received:{}", consentNotification);
         try {
-            log.debug("NotificationPublisher.publish(consentNotification) in-progress");
             publisher.publishConsentNotification(consentNotification);
             log.debug("NotificationPublisher.publish(consentNotification) done");
         } catch (Exception e) {
-            log.error("Error while publishing ConsentNotification for callback handling:{}", e.getMessage(), e);
+            log.error("Error while publishing ConsentNotification for handling:{}", e.getMessage(), e);
             throw new IllegalStateException(e);
         }
 
-        var response = NotificationResponse.okResponse(consentNotification.getTxnid(),
-                RequestUpdater.TimestampUpdaters.currentTimestamp());
-        return Mono.just(response);
+        return Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now())));
     }
 
     @PostMapping("/FI/Notification")
@@ -55,11 +54,12 @@ public class NotificationController {
 
         try {
             publisher.publishFINotification(fiNotification);
+            log.debug("FINotification.publish(fiNotification) done");
         } catch (Exception e) {
-            log.error("Error while publishing fiNotification callback:{}", e.getMessage(), e);
+            log.error("Error while publishing fiNotification for handling:{}", e.getMessage(), e);
             throw new IllegalStateException(e);
         }
 
-        return Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), RequestUpdater.TimestampUpdaters.currentTimestamp()));
+        return Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now())));
     }
 }

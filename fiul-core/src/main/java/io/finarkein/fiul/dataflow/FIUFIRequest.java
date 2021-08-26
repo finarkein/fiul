@@ -16,7 +16,6 @@ import io.finarkein.api.aa.dataflow.Consent;
 import io.finarkein.api.aa.dataflow.FIRequest;
 import io.finarkein.fiul.ext.Callback;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 /**
  */

@@ -28,14 +28,18 @@ class GuavaInMemCache implements CacheService {
     private final Cache<String, ConsentArtefact> consentArtefactCache;
 
     GuavaInMemCache(Properties properties) {
+
+        final String concurrencyLevelStr = properties.getProperty("concurrencyLevel", "8");
+        int concurrencyLevel = Integer.parseInt(concurrencyLevelStr);
+
         signedConsents = CacheBuilder.newBuilder()
-                .concurrencyLevel(8)
+                .concurrencyLevel(concurrencyLevel)
                 .initialCapacity(16)
                 .maximumSize(1024)
                 .build();
 
         consentArtefactCache = CacheBuilder.newBuilder()
-                .concurrencyLevel(8)
+                .concurrencyLevel(concurrencyLevel)
                 .initialCapacity(16)
                 .expireAfterAccess(60, TimeUnit.SECONDS)
                 .maximumSize(1024)

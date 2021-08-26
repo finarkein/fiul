@@ -44,6 +44,6 @@ class NotificationPublisherJMSImpl implements NotificationPublisher {
     }
 
     public void publishFINotification(FINotification fiNotification) {
-        jms.convertAndSend(CHANNEL_NAME_FI, fiNotification);
+        jms.convertAndSend(new ActiveMQTopic(CHANNEL_NAME_FI), fiNotification);
     }
 }

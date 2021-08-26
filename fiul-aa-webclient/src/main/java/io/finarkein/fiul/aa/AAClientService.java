@@ -146,12 +146,12 @@ class AAClientService implements AAFIUClient {
         log.debug("ConsentHandle status is {}, ConsentArtefactId is:{}", consentStatus.getStatus(), consentStatus.getId());
 
         FIUFIRequest fiRequest = createFIRequest(fetchDataRequest, consentStatus);
-        FIRequestResponse requestDataResponse = createFIRequest(fiRequest, aaName).doOnSuccess(AAClientService::await).toProcessor().block();
+        FIRequestResponse requestDataResponse = createFIRequest(fiRequest, aaName).doOnSuccess(response -> await()).toProcessor().block();
         Objects.requireNonNull(requestDataResponse, "FIRequestResponse cannot be null");
         return fiFetch(requestDataResponse.getSessionId(), aaName);
     }
 
-    private static void await(FIRequestResponse fiRequestResponse) {
+    private static void await() {
         try {
             //It seems AA needs some time to prepare after FIFetch request is raised successfully,
             //because if we raise FIFetch request immediately after FIRequest it is observed that AA's response is 404
