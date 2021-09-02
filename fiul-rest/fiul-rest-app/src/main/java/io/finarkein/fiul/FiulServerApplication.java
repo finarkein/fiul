@@ -34,14 +34,17 @@ public class FiulServerApplication {
                                  JWSSigner signer) {
         final var props = new Properties();
         aaClientProperties.entrySet().stream()
-                .filter(entry -> entry.getKey().toString().startsWith("aa-client") || entry.getKey().toString().startsWith("aa-properties"))
+                .filter(entry -> entry.getKey().toString().startsWith("aa-client")
+                        || entry.getKey().toString().startsWith("aa-properties")
+                        || entry.getKey().toString().startsWith("aa.common")
+                )
                 .forEach(entry -> props.put(entry.getKey(), entry.getValue()));
         return new FiulWebClientBuilder().build(props, signer);
     }
 
     @Bean
     @ConfigurationProperties
-    Properties aaClientProperties(){
+    Properties aaClientProperties() {
         return new Properties();
     }
 }
