@@ -34,19 +34,17 @@
     </Appenders>
     <Loggers>
         <Root level="info">
-<!--            <AppenderRef ref="Console" level="debug"/>-->
+            <AppenderRef ref="Console" level="debug"/>
             <AppenderRef ref="FIULServiceLogFile"/>
         </Root>
 
         <Logger name="io.finarkein" level="debug" additivity="false">
-<!--            <AppenderRef ref="Console" level="debug"/>-->
+            <AppenderRef ref="Console" level="debug"/>
             <AppenderRef ref="FIULServiceLogFile"/>
         </Logger>
-
 
         <Logger name="io.finarkein.fiul.dataflow.easy.dto.FIDataKeyEntityListener" level="info" additivity="false">
             <AppenderRef ref="FIULDataFlowAudit"/>
         </Logger>
-
     </Loggers>
 </Configuration>
