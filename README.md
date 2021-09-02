@@ -17,7 +17,7 @@ Docker image for `fiul` is hosted on Github Packages. Refer following steps for 
 ```shell
 docker pull ghcr.io/finarkein/fiul:dev
 ```
-2. Configure your docker environment with required [environment variables](#required-environment-variables).
+2. Configure your docker environment with required [environment variables](#environment-variables).
 ```shell
 # Export environment variables to run the docker image
 export SECRET_KEYSET=$(cat path_to_keypairset.json)
@@ -31,13 +31,13 @@ docker run -e AA_API_CREDENTIALS -e SECRET_KEYSET -p 7065:7065 /
  --name fiul ghcr.io/finarkein/fiul:dev
 ```
 
-Replace `path_to_keypairset` & `local_path_to_aa_credentials` to file paths available in your environment.
+Replace `path_to_keypairset.json` & `local_path_to_aa_credentials.json` to file paths available in your environment.
 
 ## Configuration
 
 Checkout the complete available configuration [here](fiul-rest/fiul-rest-app/src/main/resources/application.properties).
 
-### Required Environment Variables
+### Environment Variables
 
 Variable            | Comment
 ------------------- | -------
