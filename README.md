@@ -26,9 +26,7 @@ export AA_API_CREDENTIALS=/etc/secret/aa_credentials.json
 ```
 3. Run the following command to start your FIU instance:
 ```shell
-docker run -e AA_API_CREDENTIALS -e SECRET_KEYSET -p 7065:7065 /
- -v local_path_to_aa_credentials.json:/etc/secret/aa_credentials.json /
- --name fiul ghcr.io/finarkein/fiul:dev
+docker run -e AA_API_CREDENTIALS -e SECRET_KEYSET -p 7065:7065 -v local_path_to_aa_credentials.json:/etc/secret/aa_credentials.json --name fiul ghcr.io/finarkein/fiul:dev
 ```
 
 Replace `path_to_keypairset.json` & `local_path_to_aa_credentials.json` to file paths available in your environment.
