@@ -43,8 +43,6 @@ public class SignedConsentArtefactFetcher implements RequestUpdater.DigitalSignU
 
     @Override
     public boolean updateIfNeededAndCache(DigitalSigConsumer consumer, String aaName) {
-        if(!aaName.equalsIgnoreCase("finvu"))
-            return false;
         String signedConsentArtefact = cache.getIfSignedConsentArtefactPresent(consumer.getId());
         if (signedConsentArtefact == null) {
             try {
