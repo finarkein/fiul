@@ -22,6 +22,8 @@ public interface CacheService {
 
     String getSignedConsentArtefact(String consentId, Callable<? extends String> callable) throws ExecutionException;
 
+    void putSignedConsentArtefact(String consentId, String signature);
+
     String getIfSignedConsentArtefactPresent(String consentId);
 
 }
