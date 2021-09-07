@@ -6,15 +6,12 @@
  */
 package io.finarkein.fiul.common;
 
-import io.finarkein.api.aa.common.DigitalSigConsumer;
 import io.finarkein.api.aa.common.KeyMaterialConsumer;
 import io.finarkein.api.aa.common.TimestampConsumer;
 import io.finarkein.api.aa.common.TxnIdConsumer;
 import io.finarkein.api.aa.crypto.KeyMaterial;
 import io.finarkein.fiul.CryptoServiceAdapter;
 import io.finarkein.fiul.Functions.Strings;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.text.SimpleDateFormat;
@@ -26,9 +23,6 @@ import java.util.function.Function;
 public class RequestUpdater {
     protected TimestampUpdater timestampUpdater;
     protected TxnIdUpdater txnIdUpdater;
-    @Setter
-    @Getter
-    protected DigitalSignUpdater digitalSigUpdater;
 
     public RequestUpdater(String requestTimestampSetter, String requestTxnIdSetter) {
         try {
@@ -50,13 +44,6 @@ public class RequestUpdater {
             txnIdUpdater = TxnIdUpdaters.noop;
             log.warn("Invalid TxnIdUpdater:{}, hence using default:noop", requestTxnIdSetter);
         }
-
-        digitalSigUpdater = new DigitalSignUpdater() {
-            @Override
-            public boolean updateIfNeededAndCache(DigitalSigConsumer consumer, String aaName) {
-                return false;
-            }
-        };
     }
 
     public boolean updateTxnIdIfNeeded(TxnIdConsumer txnIdConsumer) {
@@ -110,12 +97,6 @@ public class RequestUpdater {
 
     private interface TxnIdUpdater {
         default boolean updateIfNeeded(TxnIdConsumer consumer) {
-            return false;
-        }
-    }
-
-    public interface DigitalSignUpdater {
-        default boolean updateIfNeededAndCache(DigitalSigConsumer consumer, String aaName) {
             return false;
         }
     }

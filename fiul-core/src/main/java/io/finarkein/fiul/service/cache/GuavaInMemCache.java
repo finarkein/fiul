@@ -63,6 +63,11 @@ class GuavaInMemCache implements CacheService {
     }
 
     @Override
+    public void putSignedConsentArtefact(String consentId, String signature) {
+        signedConsents.put(consentId, signature);
+    }
+
+    @Override
     public String getIfSignedConsentArtefactPresent(String consentId) {
         return signedConsents.getIfPresent(consentId);
     }

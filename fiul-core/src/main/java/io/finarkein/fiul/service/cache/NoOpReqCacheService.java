@@ -36,6 +36,11 @@ class NoOpReqCacheService implements CacheService {
     }
 
     @Override
+    public void putSignedConsentArtefact(String consentId, String signature) {
+
+    }
+
+    @Override
     public String getIfSignedConsentArtefactPresent(String consentId) {
         return null;
     }

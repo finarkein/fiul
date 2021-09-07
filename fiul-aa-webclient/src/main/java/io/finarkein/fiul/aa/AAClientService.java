@@ -57,19 +57,6 @@ class AAClientService implements AAFIUClient {
         log.info("Using RequestCacheService:{}", config.getFiRequestCacheServiceName());
 
         crypto = buildCryptoService(config);
-        setDigitalSignatureUpdater(config);
-    }
-
-    private void setDigitalSignatureUpdater(FiulWebClientConfig config) {
-        final String propertyName = "aa-client.firequest-digital-sign-auto-update";
-        String value = config.getProperties().getPropertyIgnoreCase(propertyName, "true");
-        final boolean isValueTrue = Boolean.parseBoolean(value);
-        String message = "Server will not update FIRequest.Consent.DigitalSignature value automatically";
-        if (isValueTrue) {
-            requestUpdater.setDigitalSigUpdater(new SignedConsentArtefactFetcher(this, cache));
-            message = "Server will update FIRequest.Consent.DigitalSignature value automatically";
-        }
-        log.info("property {}={} : {}", propertyName, isValueTrue, message);
     }
 
     private CryptoServiceAdapter buildCryptoService(FiulWebClientConfig config) {
@@ -116,11 +103,30 @@ class AAClientService implements AAFIUClient {
     public Mono<FIRequestResponse> createFIRequest(FIUFIRequest fiRequest, String aaName) {
         requestUpdater.updateTxnIdIfNeeded(fiRequest);
         requestUpdater.updateTimestampIfNeeded(fiRequest);
-        requestUpdater.getDigitalSigUpdater().updateIfNeededAndCache(fiRequest.getConsent(), aaName);
 
-        fiRequestValidator.validateFIRequestBody(fiRequest);
+        Mono<String> signatureMono;
+        if (fiRequest.getConsent().getDigitalSignature() == null
+                || "NA".equalsIgnoreCase(fiRequest.getConsent().getDigitalSignature())) {
 
-        return aaClient.createFIRequest(fiRequest.toAAFIRequest(), aaName);
+            final String signedConsentArtefact = cache.getIfSignedConsentArtefactPresent(fiRequest.getConsent().getId());
+            if (signedConsentArtefact == null) {
+                signatureMono = getConsentArtefact(fiRequest.getConsent().getId(), aaName)
+                        .flatMap(consentArtefact -> {
+                            cache.putSignedConsentArtefact(fiRequest.getConsent().getId(), consentArtefact.getSignedConsent());
+                            return Mono.just(Functions.getSignature(consentArtefact.getSignedConsent()));
+                        });
+            } else {
+                signatureMono = Mono.just(Functions.getSignature(signedConsentArtefact));
+            }
+        } else {
+            signatureMono = Mono.just(fiRequest.getConsent().getDigitalSignature());
+        }
+        return signatureMono
+                .flatMap(signature -> {
+                    fiRequest.getConsent().setDigitalSignature(signature);
+                    fiRequestValidator.validateFIRequestBody(fiRequest);
+                    return aaClient.createFIRequest(fiRequest.toAAFIRequest(), aaName);
+                });
     }
 
     @Override
