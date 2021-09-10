@@ -16,10 +16,7 @@ import io.finarkein.api.aa.notification.ConsentStatusNotification;
 import io.finarkein.api.aa.notification.Notifier;
 import io.finarkein.api.aa.util.Functions;
 import io.finarkein.fiul.consent.FIUConsentRequest;
-import io.finarkein.fiul.consent.model.ConsentNotificationLog;
-import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentRequestLog;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.*;
 import io.finarkein.fiul.consent.repo.*;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.consent.service.PurposeFetcher;
@@ -48,6 +45,9 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
     private ConsentTemplateRepository consentTemplateRepository;
+
+    @Autowired
+    private CreateConsentStateRepository createConsentStateRepository;
 
     @Autowired
     private PurposeFetcher purposeFetcher;
@@ -166,5 +166,30 @@ class ConsentStoreImpl implements ConsentStore {
     @Override
     public ConsentState getConsentStateById(String consentId) {
         return consentStateRepository.findByConsentId(consentId).orElse(null);
+    }
+
+    @Override
+    public void saveCreateConsentState(String txnId, boolean state, String aaId, String consentHandle) {
+        createConsentStateRepository.save(CreateConsentState.builder()
+        .txnId(txnId)
+        .wasSuccessful(state)
+        .aaId(aaId)
+        .consentHandle(consentHandle)
+        .build());
+    }
+
+    @Override
+    public void setConsentStateConsentId(String consentHandle, String consentId) {
+        Optional<CreateConsentState> optionalCreateConsentState = createConsentStateRepository.findByConsentHandle(consentHandle);
+        if (optionalCreateConsentState.isPresent()) {
+            CreateConsentState createConsentState = optionalCreateConsentState.get();
+            createConsentState.setConsentId(consentId);
+            createConsentStateRepository.save(createConsentState);
+        }
+    }
+
+    @Override
+    public CreateConsentState getCreateConsentState(String txnId) {
+        return createConsentStateRepository.findById(txnId).orElse(null);
     }
 }

@@ -16,5 +16,13 @@
             <groupId>io.finarkein.fiu</groupId>
             <artifactId>fiul-notification-pubsub</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-service-consent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.aa</groupId>
+            <artifactId>aa-validators</artifactId>
+        </dependency>
     </dependencies>
 </project>

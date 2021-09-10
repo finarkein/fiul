@@ -10,9 +10,11 @@ package io.finarkein.fiul.controller;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.api.aa.notification.NotificationResponse;
+import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.notification.NotificationPublisher;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,13 +31,18 @@ public class NotificationController {
 
     private final NotificationPublisher publisher;
 
+    private final ConsentService consentService;
+
     @Autowired
-    public NotificationController(NotificationPublisher publisher) {
+    public NotificationController(NotificationPublisher publisher, ConsentService consentService) {
         this.publisher = publisher;
+        this.consentService = consentService;
     }
 
     @PostMapping("/Consent/Notification")
-    public Mono<NotificationResponse> consentResponseMono(@RequestBody ConsentNotification consentNotification) {
+    public ResponseEntity<Mono<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification) {
+        if (!consentService.isCreateConsentSuccessful(consentNotification.getTxnid()))
+            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), "Consent creation was failed")));
         log.debug("ConsentNotification received:{}", consentNotification);
         try {
             publisher.publishConsentNotification(consentNotification);
@@ -45,7 +52,7 @@ public class NotificationController {
             throw new IllegalStateException(e);
         }
 
-        return Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now())));
+        return ResponseEntity.ok().body(Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()))));
     }
 
     @PostMapping("/FI/Notification")

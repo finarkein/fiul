@@ -19,6 +19,7 @@ import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.CreateConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.notification.callback.CallbackRegistry;
@@ -73,7 +74,14 @@ class ConsentServiceImpl implements ConsentService {
                             callback.setCallbackUrl(consentRequest.getCallback().getUrl());
                             callbackRegistry.registerConsentCallback(callback);
                         }
-                ).doOnSuccess(response -> consentStore.saveConsentRequest(response.getConsentHandle(), consentRequest));
+                ).doOnSuccess(response -> {
+                    consentStore.saveConsentRequest(response.getConsentHandle(), consentRequest);
+//                    String txnId, boolean state, String aaId, String consentHandle
+                    consentStore.saveCreateConsentState(consentRequest.getTxnid(), true,
+                            aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()), response.getConsentHandle());
+                })
+                .doOnError(throwable -> consentStore.saveCreateConsentState(consentRequest.getTxnid(), false,
+                        "aaIdNotSet", "consentHandleNotSet"));
     }
 
     @Override
@@ -89,7 +97,10 @@ class ConsentServiceImpl implements ConsentService {
                                 .orElseThrow(() -> Errors
                                         .NoDataFound
                                         .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaName"))
-                ).doOnSuccess(consentHandleResponse -> log.debug("GetConsentStatus: success: response:{}", consentHandleResponse))
+                ).doOnSuccess(consentHandleResponse -> {
+                    log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
+                    consentStore.setConsentStateConsentId(consentHandle, consentHandleResponse.getConsentStatus().getId());
+                })
                 .doOnError(error -> log.error("GetConsentStatus: error:{}", error.getMessage(), error));
     }
 
@@ -168,6 +179,14 @@ class ConsentServiceImpl implements ConsentService {
                 .orElseGet(() -> fetchConsentStatus(consentHandle, customerAAId))
                 .doOnSuccess(artefact -> log.debug("GetConsentState: success: consentHandle:{}, customerAAId:{}", consentHandle, customerAAId))
                 .doOnError(error -> log.error("GetConsentState: error:{}", error.getMessage(), error));
+    }
+
+    @Override
+    public boolean isCreateConsentSuccessful(String txnId) {
+        CreateConsentState createConsentState = consentStore.getCreateConsentState(txnId);
+        if (createConsentState == null || !createConsentState.isWasSuccessful())
+            return false;
+        return true;
     }
 
     private Mono<ConsentState> fetchConsentStatus(String consentHandle, Optional<String> customerAAId) {

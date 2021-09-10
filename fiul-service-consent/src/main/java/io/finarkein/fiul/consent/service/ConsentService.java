@@ -33,4 +33,7 @@ public interface ConsentService {
     void handleConsentNotification(ConsentNotificationLog consentNotificationLog);
 
     Mono<ConsentState> getConsentState(String consentHandle, Optional<String> customerAAId);
+
+    //TODO given txnId return if successful
+    boolean isCreateConsentSuccessful(String txnId);
 }
