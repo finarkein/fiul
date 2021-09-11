@@ -42,7 +42,8 @@ class ConsentTemplateDefinitionValidatorImpl implements ConsentTemplateDefinitio
         consentValidatorImpl.validateConsentTypes(txnId, consentTemplateDefinition.getConsentTypes());
         consentValidatorImpl.validateFITypes(txnId, consentTemplateDefinition.getFiTypes());
         consentValidatorImpl.validateFetchType(txnId, consentTemplateDefinition.getFetchType());
-        validateDataFilters(txnId, consentTemplateDefinition.getDataFilter());
+        if(consentTemplateDefinition.getDataFilter() != null)
+            validateDataFilters(txnId, consentTemplateDefinition.getDataFilter());
         validateConsentTemplateDataRange(consentTemplateDefinition.getConsentTemplateDataRange(), txnId);
     }
 
@@ -67,15 +68,16 @@ class ConsentTemplateDefinitionValidatorImpl implements ConsentTemplateDefinitio
     private void isNumber(String txnId, String number) {
         try {
             Integer.parseInt(number);
-        }
-        catch (Exception e) {
+        }catch (Exception e) {
             throw Errors.InvalidRequest.with(txnId, "FI DataRange Value is not a number");
         }
     }
 
     private void validateDataFilters(String txnId, List<DataFilter> dataFilterList) {
-        dataFilterList.forEach(e -> consentValidatorImpl.validateDataFilterType(txnId, e.getType()));
-        dataFilterList.forEach(e -> consentValidatorImpl.validateDataFilterOperator(txnId, e.getOperator()));
+        dataFilterList.forEach(e -> {
+            consentValidatorImpl.validateDataFilterType(txnId, e.getType());
+            consentValidatorImpl.validateDataFilterOperator(txnId, e.getOperator());
+        });
     }
 
     @Override
