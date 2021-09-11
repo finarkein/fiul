@@ -34,7 +34,7 @@ class ConsentTemplateDefinitionValidatorImpl implements ConsentTemplateDefinitio
         ArgsValidator.checkNotEmpty(txnId, consentTemplateDefinition.getDataLife(), "Consent Data Life");
         ArgsValidator.checkNotEmpty(txnId, consentTemplateDefinition.getConsentTemplateDataRange(), "Consent Template DataRange");
         ArgsValidator.checkNotEmpty(txnId, consentTemplateDefinition.getConsentTemplateDataRange().getDataRangeType(), "Consent Template DataRangeType");
-        ArgsValidator.checkNotEmpty(txnId, consentTemplateDefinition.getDataFilter(), "Consent Data Filter");
+//        ArgsValidator.checkNotEmpty(txnId, consentTemplateDefinition.getDataFilter(), "Consent Data Filter");
     }
 
     private void valueValidations(ConsentTemplateDefinition consentTemplateDefinition, String txnId) {
