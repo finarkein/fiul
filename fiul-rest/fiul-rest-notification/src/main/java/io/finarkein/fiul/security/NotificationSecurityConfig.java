@@ -1,5 +1,6 @@
 package io.finarkein.fiul.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,9 @@ import static io.finarkein.fiul.config.NotificationConfig.NOTIFICATION_API_PATTE
 
 @Configuration
 public class NotificationSecurityConfig {
+
+    @Autowired
+    private CustomAuthenticationEntryPoint unauthorizedHandler;
 
     @Bean
     protected SecurityWebFilterChain configure(ServerHttpSecurity http,
@@ -45,7 +49,10 @@ public class NotificationSecurityConfig {
                     tokenConverter.setTokenHeaderName(tokenHeaderName);
                     oauth2.bearerTokenConverter(tokenConverter);
                     oauth2.authenticationManagerResolver(new JwtIssuerReactiveAuthenticationManagerResolver(tokenIssuer));
-                });
+                })
+                .exceptionHandling()
+                .authenticationEntryPoint(unauthorizedHandler)
+        ;
 
         return http.build();
     }
