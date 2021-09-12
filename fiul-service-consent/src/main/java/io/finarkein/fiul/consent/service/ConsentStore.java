@@ -31,13 +31,13 @@ public interface ConsentStore {
 
     ConsentNotification getConsentNotification(String consentHandle);
 
+    void saveConsentState(ConsentState consentState);
+
     Optional<ConsentState> getConsentStateByHandle(String consentHandle);
 
     ConsentState getConsentStateById(String consentId);
 
-    void saveCreateConsentState(String txnId, boolean state, String aaId, String consentHandle);
+    ConsentState getConsentStateByTxnId(String txnId);
 
-    void setConsentStateConsentId(String consentHandle, String consentId);
-
-    CreateConsentState getCreateConsentState(String txnId);
+    ConsentState updateConsentState(ConsentState consentState);
 }

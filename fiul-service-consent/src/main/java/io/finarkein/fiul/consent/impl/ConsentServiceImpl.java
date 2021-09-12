@@ -13,13 +13,13 @@ import io.finarkein.api.aa.consent.handle.ConsentStatus;
 import io.finarkein.api.aa.consent.request.ConsentDetail;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.api.aa.exception.Errors;
+import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.util.Functions;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentState;
-import io.finarkein.fiul.consent.model.CreateConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.notification.callback.CallbackRegistry;
@@ -76,12 +76,19 @@ class ConsentServiceImpl implements ConsentService {
                         }
                 ).doOnSuccess(response -> {
                     consentStore.saveConsentRequest(response.getConsentHandle(), consentRequest);
-//                    String txnId, boolean state, String aaId, String consentHandle
-                    consentStore.saveCreateConsentState(consentRequest.getTxnid(), true,
-                            aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()), response.getConsentHandle());
+                    consentStore.saveConsentState(ConsentState.builder()
+                            .txnId(response.getTxnid())
+                            .wasSuccessful(true)
+                            .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                            .consentHandle(response.getConsentHandle())
+                            .build());
                 })
-                .doOnError(throwable -> consentStore.saveCreateConsentState(consentRequest.getTxnid(), false,
-                        "aaIdNotSet", "consentHandleNotSet"));
+                .doOnError(throwable -> consentStore.saveConsentState(ConsentState.builder()
+                        .consentHandle(((SystemException) throwable).getParams().get("consentHandle"))
+                        .txnId(consentRequest.getTxnid())
+                        .wasSuccessful(false)
+                        .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                        .build()));
     }
 
     @Override
@@ -99,9 +106,18 @@ class ConsentServiceImpl implements ConsentService {
                                         .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaName"))
                 ).doOnSuccess(consentHandleResponse -> {
                     log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
-                    consentStore.setConsentStateConsentId(consentHandle, consentHandleResponse.getConsentStatus().getId());
+                    consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(), consentHandleResponse.getConsentStatus().getStatus());
                 })
                 .doOnError(error -> log.error("GetConsentStatus: error:{}", error.getMessage(), error));
+    }
+
+    private void consentStateUpdateHelper(String txnId, String consentId, String consentStatus) {
+        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
+        if (consentState != null) {
+            consentState.setConsentId(consentId);
+            consentState.setConsentStatus(consentStatus);
+            consentStore.updateConsentState(consentState);
+        }
     }
 
     private Supplier<Optional<String>> consentRequestAANameByConsentHandle(final String consentHandle) {
@@ -182,11 +198,36 @@ class ConsentServiceImpl implements ConsentService {
     }
 
     @Override
-    public boolean isCreateConsentSuccessful(String txnId) {
-        CreateConsentState createConsentState = consentStore.getCreateConsentState(txnId);
-        if (createConsentState == null || !createConsentState.isWasSuccessful())
-            return false;
-        return true;
+    public ConsentState getConsentStateByTxnId(String txnId) {
+        return consentStore.getConsentStateByTxnId(txnId);
+    }
+
+    @Override
+    public ConsentState getConsentStateByConsentHandle(String consentHandle) {
+        return consentStore.getConsentStateByHandle(consentHandle).orElse(null);
+    }
+
+    @Override
+    public void updateConsentStateDataSession(String txnId, String dataSessionId) {
+        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
+        if (consentState != null) {
+            consentState.setDataSessionId(dataSessionId);
+            consentStore.updateConsentState(consentState);
+        }
+    }
+
+    @Override
+    public void updateConsentStateNotifier(String txnId, String notifierId) {
+        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
+        if (consentState != null) {
+            consentState.setNotifierId(notifierId);
+            consentStore.updateConsentState(consentState);
+        }
+    }
+
+    @Override
+    public void updateConsentState(ConsentState consentState) {
+        consentStore.updateConsentState(consentState);
     }
 
     private Mono<ConsentState> fetchConsentStatus(String consentHandle, Optional<String> customerAAId) {

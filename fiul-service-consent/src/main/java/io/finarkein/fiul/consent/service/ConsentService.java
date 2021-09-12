@@ -34,6 +34,13 @@ public interface ConsentService {
 
     Mono<ConsentState> getConsentState(String consentHandle, Optional<String> customerAAId);
 
-    //TODO given txnId return if successful
-    boolean isCreateConsentSuccessful(String txnId);
+    ConsentState getConsentStateByTxnId(String txnId);
+
+    ConsentState getConsentStateByConsentHandle(String consentHandle);
+
+    void updateConsentStateDataSession(String txnId, String dataSessionId);
+
+    void updateConsentStateNotifier(String txnId, String notifierId);
+
+    void updateConsentState(ConsentState consentState);
 }

@@ -47,9 +47,6 @@ class ConsentStoreImpl implements ConsentStore {
     private ConsentTemplateRepository consentTemplateRepository;
 
     @Autowired
-    private CreateConsentStateRepository createConsentStateRepository;
-
-    @Autowired
     private PurposeFetcher purposeFetcher;
 
     @Autowired
@@ -159,6 +156,11 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
+    public void saveConsentState(ConsentState consentState) {
+        consentStateRepository.save(consentState);
+    }
+
+    @Override
     public Optional<ConsentState> getConsentStateByHandle(String consentHandle) {
         return consentStateRepository.findById(consentHandle);
     }
@@ -169,27 +171,12 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
-    public void saveCreateConsentState(String txnId, boolean state, String aaId, String consentHandle) {
-        createConsentStateRepository.save(CreateConsentState.builder()
-        .txnId(txnId)
-        .wasSuccessful(state)
-        .aaId(aaId)
-        .consentHandle(consentHandle)
-        .build());
+    public ConsentState getConsentStateByTxnId(String txnId) {
+        return consentStateRepository.findByTxnId(txnId).orElse(null);
     }
 
     @Override
-    public void setConsentStateConsentId(String consentHandle, String consentId) {
-        Optional<CreateConsentState> optionalCreateConsentState = createConsentStateRepository.findByConsentHandle(consentHandle);
-        if (optionalCreateConsentState.isPresent()) {
-            CreateConsentState createConsentState = optionalCreateConsentState.get();
-            createConsentState.setConsentId(consentId);
-            createConsentStateRepository.save(createConsentState);
-        }
-    }
-
-    @Override
-    public CreateConsentState getCreateConsentState(String txnId) {
-        return createConsentStateRepository.findById(txnId).orElse(null);
+    public ConsentState updateConsentState(ConsentState consentState) {
+        return consentStateRepository.save(consentState);
     }
 }
