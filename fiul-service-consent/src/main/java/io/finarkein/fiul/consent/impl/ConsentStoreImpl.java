@@ -16,10 +16,7 @@ import io.finarkein.api.aa.notification.ConsentStatusNotification;
 import io.finarkein.api.aa.notification.Notifier;
 import io.finarkein.api.aa.util.Functions;
 import io.finarkein.fiul.consent.FIUConsentRequest;
-import io.finarkein.fiul.consent.model.ConsentNotificationLog;
-import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentRequestLog;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.*;
 import io.finarkein.fiul.consent.repo.*;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.consent.service.PurposeFetcher;
@@ -159,6 +156,11 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
+    public void saveConsentState(ConsentState consentState) {
+        consentStateRepository.save(consentState);
+    }
+
+    @Override
     public Optional<ConsentState> getConsentStateByHandle(String consentHandle) {
         return consentStateRepository.findById(consentHandle);
     }
@@ -166,5 +168,15 @@ class ConsentStoreImpl implements ConsentStore {
     @Override
     public ConsentState getConsentStateById(String consentId) {
         return consentStateRepository.findByConsentId(consentId).orElse(null);
+    }
+
+    @Override
+    public ConsentState getConsentStateByTxnId(String txnId) {
+        return consentStateRepository.findByTxnId(txnId).orElse(null);
+    }
+
+    @Override
+    public ConsentState updateConsentState(ConsentState consentState) {
+        return consentStateRepository.save(consentState);
     }
 }

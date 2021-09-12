@@ -177,16 +177,6 @@
             </dependency>
             <dependency>
                 <groupId>io.finarkein.fiu</groupId>
-                <artifactId>fiul-javaclient</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.finarkein.fiu</groupId>
-                <artifactId>fiul-rest-app</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.finarkein.fiu</groupId>
                 <artifactId>fiul-rest-consent</artifactId>
                 <version>${project.version}</version>
             </dependency>

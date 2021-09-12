@@ -13,23 +13,18 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.util.pattern.PathPattern;
-import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class NotificationJwsWebFilter extends JwsResponseWebFilter {
 
-    List<PathPattern> applicablePaths;
+    private final List<PathPattern> pathPatterns;
 
-    public NotificationJwsWebFilter(JWSSigner signer, List<String> paths) {
+    public NotificationJwsWebFilter(JWSSigner signer, List<PathPattern> pathPatterns) {
         super(signer);
-        PathPatternParser parser = new PathPatternParser();
-        parser.setCaseSensitive(false);
-        parser.setMatchOptionalTrailingSeparator(false);
-        applicablePaths = paths.stream().map(parser::parse).collect(Collectors.toList());
+        this.pathPatterns = pathPatterns;
     }
 
     @Nonnull
@@ -37,7 +32,7 @@ public class NotificationJwsWebFilter extends JwsResponseWebFilter {
     public Mono<Void> filter(@Nonnull ServerWebExchange exchange, WebFilterChain chain) {
         final ServerHttpRequest request = exchange.getRequest();
         PathContainer requestPath = request.getPath().pathWithinApplication();
-        for (PathPattern pattern : applicablePaths) {
+        for (PathPattern pattern : pathPatterns) {
             if (pattern.matches(requestPath)) { // if any path matches
                 return super.filter(exchange, chain); // attach x-jws-signature header
             }
