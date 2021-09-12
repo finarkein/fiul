@@ -71,6 +71,7 @@ public class TestConfig {
     ConsentTemplateService consentTemplateService;
 
     FIUConsentRequest consentRequestWithCallback = consentRequestCallback();
+    FIUConsentRequest consentRequestError = consentRequestError();
     FIUConsentRequest finvuConsentRequest = TestValues.getFinvuConsentRequest();
 
     @Bean
@@ -88,9 +89,9 @@ public class TestConfig {
 
         Mockito.when(consentStore1.logConsentRequest(consentRequestWithCallback)).thenReturn(getConsentRequestLogCallback());
 
-        Mockito.when(consentStore1.logConsentRequest(consentRequestError())).thenReturn(getConsentRequestLog());
+        Mockito.when(consentStore1.logConsentRequest(consentRequestError)).thenReturn(getConsentRequestLog());
 
-        Mockito.when(aafiuClient.createConsent(consentRequestError())).thenReturn(Mono.error(exception));
+        Mockito.when(aafiuClient.createConsent(consentRequestError)).thenReturn(Mono.error(exception));
 
         Mockito.when(aafiuClient.generateJWS("abcd")).thenReturn(Mono.just(expectedValue));
 
