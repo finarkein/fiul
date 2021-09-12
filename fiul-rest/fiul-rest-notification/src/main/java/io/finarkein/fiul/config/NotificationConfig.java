@@ -8,14 +8,32 @@ package io.finarkein.fiul.config;
 
 import io.finarkein.api.aa.jws.JWSSigner;
 import io.finarkein.fiul.filter.NotificationJwsWebFilter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 public class NotificationConfig {
+
+    public static final String NOTIFICATION_API_PATTERNS = "fiul.aa.notification.pathPatterns";
+
+    @Bean(NOTIFICATION_API_PATTERNS)
+    public List<PathPattern> notificationsPaths() {
+        var paths = Arrays.asList(
+                "/Consent/Notification",
+                "/FI/Notification"
+        );
+        PathPatternParser parser = new PathPatternParser();
+        parser.setCaseSensitive(false);
+        parser.setMatchOptionalTrailingSeparator(false);
+        return paths.stream().map(parser::parse).collect(Collectors.toList());
+    }
 
     /**
      * Define a {@link org.springframework.web.server.WebFilter} for attaching body signature
@@ -25,12 +43,8 @@ public class NotificationConfig {
      * @return instance configured to sign body
      */
     @Bean // Attach a web filter for server response header: x-jws-signature
-    public NotificationJwsWebFilter jwsFilter(JWSSigner signer) {
-        List<String> paths = Arrays.asList(
-                "/Consent/Notification",
-                "/FI/Notification"
-        );
-        return new NotificationJwsWebFilter(signer, paths);
+    public NotificationJwsWebFilter jwsFilter(JWSSigner signer, @Qualifier(NOTIFICATION_API_PATTERNS) List<PathPattern> pathPatterns) {
+        return new NotificationJwsWebFilter(signer, pathPatterns);
     }
 
 }

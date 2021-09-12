@@ -9,10 +9,7 @@ package io.finarkein.fiul.consent.service;
 import io.finarkein.api.aa.consent.request.ConsentRequest;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.fiul.consent.FIUConsentRequest;
-import io.finarkein.fiul.consent.model.ConsentNotificationLog;
-import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentRequestLog;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.*;
 
 import java.util.Optional;
 
@@ -34,7 +31,13 @@ public interface ConsentStore {
 
     ConsentNotification getConsentNotification(String consentHandle);
 
+    void saveConsentState(ConsentState consentState);
+
     Optional<ConsentState> getConsentStateByHandle(String consentHandle);
 
     ConsentState getConsentStateById(String consentId);
+
+    ConsentState getConsentStateByTxnId(String txnId);
+
+    ConsentState updateConsentState(ConsentState consentState);
 }

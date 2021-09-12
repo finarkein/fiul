@@ -13,6 +13,7 @@ import io.finarkein.api.aa.consent.handle.ConsentStatus;
 import io.finarkein.api.aa.consent.request.ConsentDetail;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.api.aa.exception.Errors;
+import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.util.Functions;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.FIUConsentRequest;
@@ -73,7 +74,24 @@ class ConsentServiceImpl implements ConsentService {
                             callback.setCallbackUrl(consentRequest.getCallback().getUrl());
                             callbackRegistry.registerConsentCallback(callback);
                         }
-                ).doOnSuccess(response -> consentStore.saveConsentRequest(response.getConsentHandle(), consentRequest));
+                ).doOnSuccess(response -> {
+                    consentStore.saveConsentRequest(response.getConsentHandle(), consentRequest);
+                    consentStore.saveConsentState(ConsentState.builder()
+                            .txnId(response.getTxnid())
+                            .wasSuccessful(true)
+                            .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                            .consentHandle(response.getConsentHandle())
+                            .build());
+                }).doOnError(SystemException.class, e -> {
+                            if (e.getParamValue("consentHandle") != null)
+                                consentStore.saveConsentState(ConsentState.builder()
+                                        .consentHandle(e.getParamValue("consentHandle"))
+                                        .txnId(consentRequest.getTxnid())
+                                        .wasSuccessful(false)
+                                        .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                                        .build());
+                        }
+                );
     }
 
     @Override
@@ -89,8 +107,20 @@ class ConsentServiceImpl implements ConsentService {
                                 .orElseThrow(() -> Errors
                                         .NoDataFound
                                         .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaName"))
-                ).doOnSuccess(consentHandleResponse -> log.debug("GetConsentStatus: success: response:{}", consentHandleResponse))
+                ).doOnSuccess(consentHandleResponse -> {
+                    log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
+                    consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(), consentHandleResponse.getConsentStatus().getStatus());
+                })
                 .doOnError(error -> log.error("GetConsentStatus: error:{}", error.getMessage(), error));
+    }
+
+    private void consentStateUpdateHelper(String txnId, String consentId, String consentStatus) {
+        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
+        if (consentState != null) {
+            consentState.setConsentId(consentId);
+            consentState.setConsentStatus(consentStatus);
+            consentStore.updateConsentState(consentState);
+        }
     }
 
     private Supplier<Optional<String>> consentRequestAANameByConsentHandle(final String consentHandle) {
@@ -168,6 +198,39 @@ class ConsentServiceImpl implements ConsentService {
                 .orElseGet(() -> fetchConsentStatus(consentHandle, customerAAId))
                 .doOnSuccess(artefact -> log.debug("GetConsentState: success: consentHandle:{}, customerAAId:{}", consentHandle, customerAAId))
                 .doOnError(error -> log.error("GetConsentState: error:{}", error.getMessage(), error));
+    }
+
+    @Override
+    public ConsentState getConsentStateByTxnId(String txnId) {
+        return consentStore.getConsentStateByTxnId(txnId);
+    }
+
+    @Override
+    public ConsentState getConsentStateByConsentHandle(String consentHandle) {
+        return consentStore.getConsentStateByHandle(consentHandle).orElse(null);
+    }
+
+    @Override
+    public void updateConsentStateDataSession(String txnId, String dataSessionId) {
+        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
+        if (consentState != null) {
+            consentState.setDataSessionId(dataSessionId);
+            consentStore.updateConsentState(consentState);
+        }
+    }
+
+    @Override
+    public void updateConsentStateNotifier(String txnId, String notifierId) {
+        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
+        if (consentState != null) {
+            consentState.setNotifierId(notifierId);
+            consentStore.updateConsentState(consentState);
+        }
+    }
+
+    @Override
+    public void updateConsentState(ConsentState consentState) {
+        consentStore.updateConsentState(consentState);
     }
 
     private Mono<ConsentState> fetchConsentStatus(String consentHandle, Optional<String> customerAAId) {

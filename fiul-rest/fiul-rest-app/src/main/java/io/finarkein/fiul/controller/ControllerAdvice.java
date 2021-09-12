@@ -8,12 +8,14 @@ package io.finarkein.fiul.controller;
 
 import io.finarkein.api.aa.exception.Error;
 import io.finarkein.api.aa.exception.SystemException;
-import io.finarkein.fiul.Functions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @RestControllerAdvice
 @Log4j2
@@ -23,7 +25,7 @@ public class ControllerAdvice {
     public ResponseEntity<Error> handleBaseError(SystemException exception) {
         Error err = new Error();
         err.setTxnId(exception.txnId());
-        err.setTimestamp(Functions.currentTimestampSupplier.get());
+        err.setTimestamp(Timestamp.from(Instant.now()));
         err.setErrorCode(exception.errorCode().name());
         err.setErrorMessage(exception.getMessage());
         HttpStatus resolve = HttpStatus.resolve(exception.errorCode().httpStatusCode());

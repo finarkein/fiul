@@ -15,4 +15,5 @@ import java.util.Optional;
 @Repository
 public interface ConsentStateRepository extends JpaRepository<ConsentState, String> {
     Optional<ConsentState> findByConsentId(String consentId);
+    Optional<ConsentState> findByTxnId(String txnId);
 }

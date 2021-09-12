@@ -6,7 +6,10 @@
  */
 package io.finarkein.fiul.consent.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
@@ -15,6 +18,9 @@ import java.time.Instant;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(indexes = {
         @Index(name = "cs_consentId_idx", columnList = "consentId"),
         @Index(name = "cs_consentStatus_idx", columnList = "consentStatus")
@@ -26,6 +32,10 @@ public class ConsentState {
     private String consentId;
     private String consentStatus;
     private String txnId;
+    private boolean wasSuccessful;
+    private String aaId;
+    private String notifierId;
+    private String dataSessionId;
     @LastModifiedDate
     @Column(columnDefinition = "DATETIME(6)")
     private Timestamp updatedOn;

@@ -13,20 +13,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 
-import java.io.IOException;
 import java.util.Properties;
 
 @Log4j2
 @EntityScan(basePackages = {"io.finarkein.fiul", "io.finarkein.api.aa"})
 @ComponentScan(basePackages = {"io.finarkein.fiul", "io.finarkein.api.aa"})
-@SpringBootApplication
+@SpringBootApplication(exclude = ReactiveUserDetailsServiceAutoConfiguration.class)
 public class FiulServerApplication {
 
     public static void main(String[] args) {
@@ -38,14 +35,17 @@ public class FiulServerApplication {
                                  JWSSigner signer) {
         final var props = new Properties();
         aaClientProperties.entrySet().stream()
-                .filter(entry -> entry.getKey().toString().startsWith("aa-client") || entry.getKey().toString().startsWith("aa-properties"))
+                .filter(entry -> entry.getKey().toString().startsWith("aa-client")
+                        || entry.getKey().toString().startsWith("aa-properties")
+                        || entry.getKey().toString().startsWith("aa.common")
+                )
                 .forEach(entry -> props.put(entry.getKey(), entry.getValue()));
         return new FiulWebClientBuilder().build(props, signer);
     }
 
     @Bean
     @ConfigurationProperties
-    Properties aaClientProperties(){
+    Properties aaClientProperties() {
         return new Properties();
     }
 }
