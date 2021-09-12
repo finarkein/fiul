@@ -11,8 +11,12 @@ import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.fiul.consent.model.ConsentState;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NotificationValidator {
+
 
 
     public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState) {

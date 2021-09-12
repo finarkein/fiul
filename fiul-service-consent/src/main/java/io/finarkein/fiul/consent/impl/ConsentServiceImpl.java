@@ -82,13 +82,16 @@ class ConsentServiceImpl implements ConsentService {
                             .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
                             .consentHandle(response.getConsentHandle())
                             .build());
-                })
-                .doOnError(throwable -> consentStore.saveConsentState(ConsentState.builder()
-                        .consentHandle(((SystemException) throwable).getParams().get("consentHandle"))
-                        .txnId(consentRequest.getTxnid())
-                        .wasSuccessful(false)
-                        .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
-                        .build()));
+                }).doOnError(SystemException.class, e -> {
+                            if (e.getParamValue("consentHandle") != null)
+                                consentStore.saveConsentState(ConsentState.builder()
+                                        .consentHandle(e.getParamValue("consentHandle"))
+                                        .txnId(consentRequest.getTxnid())
+                                        .wasSuccessful(false)
+                                        .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                                        .build());
+                        }
+                );
     }
 
     @Override
