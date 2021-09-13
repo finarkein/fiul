@@ -46,6 +46,5 @@
         <Logger name="io.finarkein.fiul.dataflow.easy.dto.FIDataKeyEntityListener" level="info" additivity="false">
             <AppenderRef ref="FIULDataFlowAudit"/>
         </Logger>
-
     </Loggers>
 </Configuration>
