@@ -6,22 +6,23 @@
  */
 package io.finarkein.fiul.aa;
 
-import io.finarkein.fiul.common.CommonConfig;
-import io.finarkein.fiul.common.Properties;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class FiulWebClientConfig extends CommonConfig {
+@Configuration
+@Getter
+public class FiulWebClientConfig {
 
-    private final String fiRequestCacheServiceName;
+    @Value("${aa-client.request-cache-service-name}")
+    private String fiRequestCacheServiceName;
 
-    private final Properties properties;
+    @Value("${aa-client.request-txn-id-setter}")
+    private String requestTimestampSetter;
 
-    public FiulWebClientConfig(Properties properties) {
-        super(properties);
-        fiRequestCacheServiceName = properties.getPropertyIgnoreCase("aa-client.request-cache-service-name", "in-mem");
-        this.properties = properties;
-    }
+    @Value("${aa-client.request-timestamp-setter}")
+    private String requestTxnIdSetter;
+
+    @Value("${aa-client.crypto-service}")
+    private String cryptoServiceName;
 }

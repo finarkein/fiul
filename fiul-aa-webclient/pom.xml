@@ -28,5 +28,10 @@
             <groupId>io.finarkein.aa</groupId>
             <artifactId>aa-webclient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>${version.spring-boot}</version>
+        </dependency>
     </dependencies>
 </project>

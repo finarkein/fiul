@@ -7,22 +7,17 @@
 package io.finarkein.fiul.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.aa.registry.RegistryService;
-import io.finarkein.aa.registry.RegistryServiceImpl;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.api.aa.notification.NotificationResponse;
-import io.finarkein.api.aa.webclient.helpers.AAInfoRegistry;
-import io.finarkein.api.aa.webclient.jws.Signer;
 import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.notification.NotificationPublisher;
 import io.finarkein.fiul.validator.NotificationValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,30 +28,24 @@ import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.Properties;
-
-import static io.finarkein.aa.registry.RegistryService.REGISTRY_URL_PROPERTY_NAME;
 
 @RestController
 @RequestMapping("/")
 @Log4j2
 public class NotificationController {
 
-
     private final NotificationPublisher publisher;
 
     private final ConsentService consentService;
 
-    private final AAInfoRegistry helperRegistry;
-
+    private final RegistryService registryService;
 
     @Autowired
-    public NotificationController(NotificationPublisher publisher, ConsentService consentService, @Value("${aa.common.central-registry.base-url}") final String REGISTRY_URL_PROPERTY_NAME) {
+    public NotificationController(NotificationPublisher publisher, ConsentService consentService,
+                                  RegistryService registryService) {
         this.publisher = publisher;
         this.consentService = consentService;
-        RegistryService registryService = new RegistryServiceImpl(REGISTRY_URL_PROPERTY_NAME);
-        helperRegistry = new AAInfoRegistry(registryService);
+        this.registryService = registryService;
     }
 
     @PostMapping("/Consent/Notification")
@@ -66,7 +55,7 @@ public class NotificationController {
             consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
         if (consentState != null) {
             try {
-                NotificationValidator.validateConsentNotification(consentNotification, consentState, helperRegistry.getEntityInfoByAAName(consentState.getAaId()));
+                NotificationValidator.validateConsentNotification(consentNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
@@ -92,7 +81,7 @@ public class NotificationController {
         ConsentState consentState = consentService.getConsentStateByTxnId(fiNotification.getTxnid());
         if (consentState != null) {
             try {
-                NotificationValidator.validateFINotification(fiNotification, consentState, helperRegistry.getEntityInfoByAAName(consentState.getAaId()));
+                NotificationValidator.validateFINotification(fiNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
