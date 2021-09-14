@@ -211,10 +211,11 @@ class ConsentServiceImpl implements ConsentService {
     }
 
     @Override
-    public void updateConsentStateDataSession(String txnId, String dataSessionId) {
+    public void updateConsentStateDataSession(String txnId, String dataSessionId, boolean postFISuccessful) {
         ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
         if (consentState != null) {
             consentState.setDataSessionId(dataSessionId);
+            consentState.setPostFISuccessful(postFISuccessful);
             consentStore.updateConsentState(consentState);
         }
     }

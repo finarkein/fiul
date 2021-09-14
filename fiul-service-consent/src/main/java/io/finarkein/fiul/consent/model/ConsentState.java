@@ -23,7 +23,8 @@ import java.time.Instant;
 @AllArgsConstructor
 @Table(indexes = {
         @Index(name = "cs_consentId_idx", columnList = "consentId"),
-        @Index(name = "cs_consentStatus_idx", columnList = "consentStatus")
+        @Index(name = "cs_consentStatus_idx", columnList = "consentStatus"),
+        @Index(name = "cs_txnId_idx", columnList = "txnId")
 })
 public class ConsentState {
 
@@ -33,6 +34,7 @@ public class ConsentState {
     private String consentStatus;
     private String txnId;
     private boolean wasSuccessful;
+    private boolean postFISuccessful;
     private String aaId;
     private String notifierId;
     private String dataSessionId;

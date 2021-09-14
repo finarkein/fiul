@@ -7,16 +7,22 @@
 package io.finarkein.fiul.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.finarkein.aa.registry.RegistryService;
+import io.finarkein.aa.registry.RegistryServiceImpl;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.api.aa.notification.NotificationResponse;
+import io.finarkein.api.aa.webclient.helpers.AAInfoRegistry;
+import io.finarkein.api.aa.webclient.jws.Signer;
 import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.notification.NotificationPublisher;
 import io.finarkein.fiul.validator.NotificationValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +34,9 @@ import reactor.core.publisher.Mono;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Properties;
+
+import static io.finarkein.aa.registry.RegistryService.REGISTRY_URL_PROPERTY_NAME;
 
 @RestController
 @RequestMapping("/")
@@ -39,10 +48,15 @@ public class NotificationController {
 
     private final ConsentService consentService;
 
+    private final AAInfoRegistry helperRegistry;
+
+
     @Autowired
-    public NotificationController(NotificationPublisher publisher, ConsentService consentService) {
+    public NotificationController(NotificationPublisher publisher, ConsentService consentService, @Value("${aa.common.central-registry.base-url}") final String REGISTRY_URL_PROPERTY_NAME) {
         this.publisher = publisher;
         this.consentService = consentService;
+        RegistryService registryService = new RegistryServiceImpl(REGISTRY_URL_PROPERTY_NAME);
+        helperRegistry = new AAInfoRegistry(registryService);
     }
 
     @PostMapping("/Consent/Notification")
@@ -51,13 +65,8 @@ public class NotificationController {
         if (consentState == null)
             consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
         if (consentState != null) {
-            if (consentState.getNotifierId() == null || consentState.getConsentId() == null) {
-                consentState.setNotifierId(consentNotification.getNotifier().getId());
-                consentState.setConsentId(consentNotification.getConsentStatusNotification().getConsentId());
-                consentService.updateConsentState(consentState);
-            }
             try {
-                NotificationValidator.validateConsentNotification(consentNotification, consentState);
+                NotificationValidator.validateConsentNotification(consentNotification, consentState, helperRegistry.getEntityInfoByAAName(consentState.getAaId()));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
@@ -80,13 +89,15 @@ public class NotificationController {
     @PostMapping("/FI/Notification")
     public ResponseEntity<Mono<NotificationResponse>> fiNotification(@RequestBody FINotification fiNotification) {
         log.debug("FINotification received:{}", fiNotification);
-
-        try {
-            NotificationValidator.validateFINotification(fiNotification, consentService.getConsentStateByTxnId(fiNotification.getTxnid()));
-        } catch (SystemException e) {
-            if (e.errorCode().httpStatusCode() == 404)
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
-            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+        ConsentState consentState = consentService.getConsentStateByTxnId(fiNotification.getTxnid());
+        if (consentState != null) {
+            try {
+                NotificationValidator.validateFINotification(fiNotification, consentState, helperRegistry.getEntityInfoByAAName(consentState.getAaId()));
+            } catch (SystemException e) {
+                if (e.errorCode().httpStatusCode() == 404)
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+                return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+            }
         }
         try {
             publisher.publishFINotification(fiNotification);

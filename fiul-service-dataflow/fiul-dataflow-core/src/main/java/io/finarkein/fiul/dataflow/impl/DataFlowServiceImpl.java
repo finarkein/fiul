@@ -10,6 +10,7 @@ import io.finarkein.api.aa.consent.ConsentMode;
 import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
+import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentState;
@@ -96,10 +97,13 @@ class DataFlowServiceImpl implements DataFlowService {
                             .build();
                     fiRequestStore.saveFIRequestAndFetchMetadata(fiFetchMetadata, fiRequest);
                     log.debug("SubmitFIRequest: success: response:{}", response);
-                    consentService.updateConsentStateDataSession(response.getTxnid(), response.getSessionId());
+                    consentService.updateConsentStateDataSession(response.getTxnid(), response.getSessionId(), true);
                 })
                 .doOnSuccess(saveRegisterCallback(fiRequest.getCallback()))
-                .doOnError(error -> log.error("SubmitFIRequest: error: {}", error.getMessage(), error));
+                .doOnError(SystemException.class, error -> {
+                    consentService.updateConsentStateDataSession(error.txnId(), null, false);
+                    log.error("SubmitFIRequest: error: {}", error.getMessage(), error);
+                });
     }
 
     private Consumer<FIRequestResponse> saveRegisterCallback(Callback fiCallback) {
