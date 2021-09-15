@@ -14,15 +14,15 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class FiulWebClientConfig {
 
-    @Value("${aa-client.request-cache-service-name}")
+    @Value("${aa-client.request-cache-service-name:in-mem}")
     private String fiRequestCacheServiceName;
 
-    @Value("${aa-client.request-txn-id-setter}")
+    @Value("${aa-client.request-txn-id-setter:generateIfNull}")
     private String requestTimestampSetter;
 
-    @Value("${aa-client.request-timestamp-setter}")
+    @Value("${aa-client.request-timestamp-setter:generateAuto}")
     private String requestTxnIdSetter;
 
-    @Value("${aa-client.crypto-service}")
+    @Value("${aa-client.crypto-service:defaultCryptoService}")
     private String cryptoServiceName;
 }
