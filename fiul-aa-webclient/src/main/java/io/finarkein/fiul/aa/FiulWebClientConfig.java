@@ -17,10 +17,10 @@ public class FiulWebClientConfig {
     @Value("${aa-client.request-cache-service-name:in-mem}")
     private String fiRequestCacheServiceName;
 
-    @Value("${aa-client.request-txn-id-setter:generateIfNull}")
+    @Value("${aa-client.request-timestamp-setter:generateIfNull}")
     private String requestTimestampSetter;
 
-    @Value("${aa-client.request-timestamp-setter:generateAuto}")
+    @Value("${aa-client.request-txn-id-setter:generateIfNull}")
     private String requestTxnIdSetter;
 
     @Value("${aa-client.crypto-service:defaultCryptoService}")
