@@ -10,6 +10,7 @@ import io.finarkein.api.aa.consent.request.ConsentDetail;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.fiul.consent.model.ConsentRequestInput;
 import io.finarkein.fiul.consent.model.ConsentTemplate;
+import io.finarkein.fiul.consent.model.ConsentTemplateDeleteResponse;
 import io.finarkein.fiul.consent.service.ConsentTemplateResponse;
 import io.finarkein.fiul.consent.service.ConsentTemplateService;
 import lombok.extern.log4j.Log4j2;
@@ -52,7 +53,7 @@ public class ConsentTemplateController {
     }
 
     @DeleteMapping("/consent/template/{consentTemplateId}")
-    public Mono<Boolean> deleteConsentTemplate(@PathVariable String consentTemplateId) {
+    public Mono<ConsentTemplateDeleteResponse> deleteConsentTemplate(@PathVariable String consentTemplateId) {
         return consentTemplateService.deleteConsentTemplate(consentTemplateId);
     }
 }

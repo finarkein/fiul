@@ -28,7 +28,7 @@ public interface ConsentService {
 
     Optional<ConsentRequestDTO> getConsentRequestByConsentId(String consentId);
 
-    ConsentDetail consentDetail(String consentId, String aaName);
+    Mono<ConsentDetail> consentDetail(String consentId, String aaName);
 
     void handleConsentNotification(ConsentNotificationLog consentNotificationLog);
 

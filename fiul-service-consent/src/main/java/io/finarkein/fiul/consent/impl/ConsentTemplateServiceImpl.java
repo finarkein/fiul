@@ -16,6 +16,7 @@ import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentRequestInput;
 import io.finarkein.fiul.consent.model.ConsentTemplate;
 import io.finarkein.fiul.consent.model.ConsentTemplateDefinition;
+import io.finarkein.fiul.consent.model.ConsentTemplateDeleteResponse;
 import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.consent.service.ConsentTemplateResponse;
@@ -75,9 +76,9 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     @Override
-    public Mono<Boolean> deleteConsentTemplate(String id) {
+    public Mono<ConsentTemplateDeleteResponse> deleteConsentTemplate(String id) {
         consentTemplateRepository.deleteById(id);
-        return Mono.just(Boolean.TRUE);
+        return Mono.just(new ConsentTemplateDeleteResponse(id, true));
     }
 
     private ConsentTemplate getConsentTemplate(ConsentRequestInput consentRequestInput) {

@@ -10,6 +10,7 @@ import io.finarkein.api.aa.consent.request.ConsentDetail;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.fiul.consent.model.ConsentRequestInput;
 import io.finarkein.fiul.consent.model.ConsentTemplate;
+import io.finarkein.fiul.consent.model.ConsentTemplateDeleteResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -20,7 +21,7 @@ public interface ConsentTemplateService {
 
     Optional<ConsentTemplate> getConsentTemplate(String id);
 
-    Mono<Boolean> deleteConsentTemplate(String id);
+    Mono<ConsentTemplateDeleteResponse> deleteConsentTemplate(String id);
 
     Mono<ConsentResponse> createConsentRequestUsingTemplate(ConsentRequestInput consentRequestInput);
 
