@@ -7,7 +7,6 @@
 package io.finarkein.fiul.aa;
 
 import io.finarkein.api.aa.AAClient;
-import io.finarkein.api.aa.AAClientBuilder;
 import io.finarkein.api.aa.common.FIDataRange;
 import io.finarkein.api.aa.consent.artefact.ConsentArtefact;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
@@ -19,7 +18,6 @@ import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.heartbeat.HeartbeatResponse;
-import io.finarkein.api.aa.jws.JWSSigner;
 import io.finarkein.fiul.*;
 import io.finarkein.fiul.common.RequestUpdater;
 import io.finarkein.fiul.common.UnSupportedCryptoService;
@@ -30,40 +28,43 @@ import io.finarkein.fiul.validation.ConsentValidator;
 import io.finarkein.fiul.validation.ConsentValidatorImpl;
 import io.finarkein.fiul.validation.FIRequestValidator;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import java.util.Properties;
 
 import static io.finarkein.fiul.Functions.fiFetchResponseDecoder;
 
 @Log4j2
+@Service
 class AAClientService implements AAFIUClient {
 
     private final AAClient aaClient;
     private final CacheService cache;
     private final RequestUpdater requestUpdater;
     private final CryptoServiceAdapter crypto;
-    private final JWSSigner util;
     private final ConsentValidator consentValidator = new ConsentValidatorImpl();
     private final FIRequestValidator fiRequestValidator = new FIRequestValidator();
 
-    public AAClientService(FiulWebClientConfig config, JWSSigner util) {
-        this.util = util;
-        aaClient = AAClientBuilder.Registry.builderFor("Default").build(config.getProperties(), util);
+    @Autowired
+    public AAClientService(FiulWebClientConfig config, AAClient aaClient, CryptoServiceConfig cryptoServiceConfig) {
+        this.aaClient = aaClient;
         requestUpdater = new RequestUpdater(config.getRequestTimestampSetter(), config.getRequestTxnIdSetter());
 
-        cache = RequestCacheServiceBuilder.Registry.builderFor(config.getFiRequestCacheServiceName()).build(config.getProperties());
+        cache = RequestCacheServiceBuilder.Registry.builderFor(config.getFiRequestCacheServiceName()).build(new Properties());
 
         log.info("Using RequestCacheService:{}", config.getFiRequestCacheServiceName());
 
-        crypto = buildCryptoService(config);
+        crypto = buildCryptoService(config.getCryptoServiceName(), cryptoServiceConfig);
     }
 
-    private CryptoServiceAdapter buildCryptoService(FiulWebClientConfig config) {
-        CryptoServiceAdapterBuilder builder = CryptoServiceAdapterBuilder.Registry.builderFor(config.getCryptoServiceName());
+    private CryptoServiceAdapter buildCryptoService(String serviceName, CryptoServiceConfig cryptoServiceConfig) {
+        CryptoServiceAdapterBuilder builder = CryptoServiceAdapterBuilder.Registry.builderFor(serviceName);
         if (builder != null) {
             log.info("CryptoService:{}", builder.adapterName());
-            return builder.build(config.getProperties());
+            return builder.build(cryptoServiceConfig.getAllProperties());
         }
         log.info("CryptoService is not configured");
         return UnSupportedCryptoService.INSTANCE;
@@ -202,17 +203,10 @@ class AAClientService implements AAFIUClient {
     }
 
     @Override
-    public String name() {
-        return FiulWebClientBuilder.NAME;
-    }
-
-    @Override
     public Mono<String> generateJWS(String body) {
         try {
             log.debug("Generating jws-signature for:{}", body);
-            String jwsSig = util.sign(body);
-            log.debug("jws-signature:{}", jwsSig);
-            return Mono.just(jwsSig);
+            return aaClient.generateJWS(body);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

@@ -8,6 +8,7 @@ package io.finarkein.fiul.dataflow;
 
 import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.model.FIData;
+import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
 import reactor.core.publisher.Mono;
 
@@ -23,9 +24,9 @@ public interface EasyDataFlowService {
 
     Mono<FIData> getData(String consentId, String sessionId);
 
-    Mono<Boolean> deleteData(String consentId, String dataSessionId);
+    Mono<FIDataDeleteResponse> deleteData(String consentId, String dataSessionId);
 
-    Mono<Boolean> deleteData(String consentId);
+    Mono<FIDataDeleteResponse> deleteData(String consentId);
 
     Mono<Boolean> deleteByDataLifeExpireOnBefore(Timestamp triggerTimestamp);
 }
