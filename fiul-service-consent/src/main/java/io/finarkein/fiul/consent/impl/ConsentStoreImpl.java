@@ -124,11 +124,17 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Override
     public void logConsentNotification(ConsentNotificationLog consentNotificationLog) {
-        var consentState = new ConsentState();
+        ConsentState consentState;
+        Optional<ConsentState> optionalConsentState = consentStateRepository.findByTxnId(consentNotificationLog.getTxnId());
+        if (optionalConsentState.isPresent())
+            consentState = optionalConsentState.get();
+        else
+            consentState = new ConsentState();
         consentState.setConsentHandle(consentNotificationLog.getConsentHandle());
         consentState.setConsentId(consentNotificationLog.getConsentId());
         consentState.setConsentStatus(consentNotificationLog.getConsentState());
         consentState.setTxnId(consentNotificationLog.getTxnId());
+        consentState.setNotifierId(consentNotificationLog.getNotifierId());
 
         consentNotificationLogRepository.save(consentNotificationLog);
         consentStateRepository.save(consentState);

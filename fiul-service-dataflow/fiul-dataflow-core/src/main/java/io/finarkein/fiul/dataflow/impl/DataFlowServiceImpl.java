@@ -10,12 +10,14 @@ import io.finarkein.api.aa.consent.ConsentMode;
 import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
+import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.dataflow.DataFlowService;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
+import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
 import io.finarkein.fiul.dataflow.easy.DataSaveRequest;
@@ -96,10 +98,13 @@ class DataFlowServiceImpl implements DataFlowService {
                             .build();
                     fiRequestStore.saveFIRequestAndFetchMetadata(fiFetchMetadata, fiRequest);
                     log.debug("SubmitFIRequest: success: response:{}", response);
-                    consentService.updateConsentStateDataSession(response.getTxnid(), response.getSessionId());
+                    consentService.updateConsentStateDataSession(response.getTxnid(), response.getSessionId(), true);
                 })
                 .doOnSuccess(saveRegisterCallback(fiRequest.getCallback()))
-                .doOnError(error -> log.error("SubmitFIRequest: error: {}", error.getMessage(), error));
+                .doOnError(SystemException.class, error -> {
+                    consentService.updateConsentStateDataSession(error.txnId(), null, false);
+                    log.error("SubmitFIRequest: error: {}", error.getMessage(), error);
+                });
     }
 
     private Consumer<FIRequestResponse> saveRegisterCallback(Callback fiCallback) {
@@ -159,16 +164,18 @@ class DataFlowServiceImpl implements DataFlowService {
         return fiFetchResponse -> {
             final var fiRequest = fiRequestStore.getFIRequestByAANameAndSessionId(sessionId, aaName);
             final var consentId = fiRequest.map(FIRequestDTO::getConsentId).orElse(null);
-            final var consentDetail = consentService.consentDetail(consentId, aaName);
-            if (consentId == null || ConsentMode.get(consentDetail.getConsentMode()) != STORE)
-                return;
+            final var consentDetailMono = consentService.consentDetail(consentId, aaName);
+            consentDetailMono.subscribe(consentDetail -> {
+                if (consentId == null || ConsentMode.get(consentDetail.getConsentMode()) != STORE)
+                    return;
 
-            aafiDataStore.saveFIData(DataSaveRequest.with(fiFetchResponse)
-                    .consentId(consentId)
-                    .sessionId(sessionId)
-                    .aaName(aaName)
-                    .dataLife(consentDetail.getDataLife())
-                    .dataLifeExpireOn(calculateExpireTime.apply(consentDetail.getDataLife())).build());
+                aafiDataStore.saveFIData(DataSaveRequest.with(fiFetchResponse)
+                        .consentId(consentId)
+                        .sessionId(sessionId)
+                        .aaName(aaName)
+                        .dataLife(consentDetail.getDataLife())
+                        .dataLifeExpireOn(calculateExpireTime.apply(consentDetail.getDataLife())).build());
+            });
         };
     }
 
@@ -193,28 +200,32 @@ class DataFlowServiceImpl implements DataFlowService {
     }
 
     @Override
-    public Mono<Boolean> deleteDataForSession(String dataSessionId) {
+    public Mono<FIDataDeleteResponse> deleteDataForSession(String dataSessionId) {
+        FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, false);
         log.debug("Deleting data for sessionId:{}", dataSessionId);
         final var deletionCounts = aafiDataStore.deleteFIDataBySessionId(dataSessionId);
         if (deletionCounts.isEmpty()) {
             log.debug("Data not present for sessionId:{}", dataSessionId);
-            return Mono.just(Boolean.FALSE);
+            return Mono.just(response);
         }
+        response.setDeleted(true);
         log.debug("Data deleted for sessionId:{}, deletionCounts:{}", dataSessionId, deletionCounts);
-        return Mono.just(Boolean.TRUE);
+        return Mono.just(response);
     }
 
     @Override
-    public Mono<Boolean> deleteDataByConsentId(String consentId) {
+    public Mono<FIDataDeleteResponse> deleteDataByConsentId(String consentId) {
         log.debug("Deleting data for consentId:{}", consentId);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentId, false);
 
         final var deletionCounts = aafiDataStore.deleteFIDataByConsentId(consentId);
         if (deletionCounts.isEmpty()) {
             log.debug("Data not present for consentId:{}", consentId);
-            return Mono.just(Boolean.FALSE);
+            return Mono.just(response);
         }
+        response.setDeleted(true);
         log.debug("Data deleted for consentId:{}, deletionCounts:{}", consentId, deletionCounts);
-        return Mono.just(Boolean.TRUE);
+        return Mono.just(response);
     }
 
     @Override

@@ -37,6 +37,7 @@ public class ConsentNotificationLog {
     private String consentHandle;
     private String consentId;
     private String consentState;
+    private String aaId;
 
     @Column(columnDefinition = "DATETIME(6)")
     protected Timestamp createdOn;

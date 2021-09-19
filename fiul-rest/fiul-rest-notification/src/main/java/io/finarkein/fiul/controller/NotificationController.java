@@ -7,6 +7,7 @@
 package io.finarkein.fiul.controller;
 
 
+import io.finarkein.aa.registry.RegistryService;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
@@ -27,22 +28,24 @@ import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/")
 @Log4j2
 public class NotificationController {
 
-
     private final NotificationPublisher publisher;
 
     private final ConsentService consentService;
 
+    private final RegistryService registryService;
+
     @Autowired
-    public NotificationController(NotificationPublisher publisher, ConsentService consentService) {
+    public NotificationController(NotificationPublisher publisher, ConsentService consentService,
+                                  RegistryService registryService) {
         this.publisher = publisher;
         this.consentService = consentService;
+        this.registryService = registryService;
     }
 
     @PostMapping("/Consent/Notification")
@@ -51,13 +54,8 @@ public class NotificationController {
         if (consentState == null)
             consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
         if (consentState != null) {
-            if (consentState.getNotifierId() == null || consentState.getConsentId() == null) {
-                consentState.setNotifierId(consentNotification.getNotifier().getId());
-                consentState.setConsentId(consentNotification.getConsentStatusNotification().getConsentId());
-                consentService.updateConsentState(consentState);
-            }
             try {
-                NotificationValidator.validateConsentNotification(consentNotification, consentState);
+                NotificationValidator.validateConsentNotification(consentNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
@@ -80,13 +78,15 @@ public class NotificationController {
     @PostMapping("/FI/Notification")
     public ResponseEntity<Mono<NotificationResponse>> fiNotification(@RequestBody FINotification fiNotification) {
         log.debug("FINotification received:{}", fiNotification);
-
-        try {
-            NotificationValidator.validateFINotification(fiNotification, consentService.getConsentStateByTxnId(fiNotification.getTxnid()));
-        } catch (SystemException e) {
-            if (e.errorCode().httpStatusCode() == 404)
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
-            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+        ConsentState consentState = consentService.getConsentStateByTxnId(fiNotification.getTxnid());
+        if (consentState != null) {
+            try {
+                NotificationValidator.validateFINotification(fiNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()));
+            } catch (SystemException e) {
+                if (e.errorCode().httpStatusCode() == 404)
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+                return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+            }
         }
         try {
             publisher.publishFINotification(fiNotification);

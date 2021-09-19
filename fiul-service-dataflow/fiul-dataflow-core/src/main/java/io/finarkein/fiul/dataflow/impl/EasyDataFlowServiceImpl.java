@@ -24,6 +24,7 @@ import io.finarkein.fiul.converter.xml.XMLConverterFunctions;
 import io.finarkein.fiul.dataflow.DataRequest;
 import io.finarkein.fiul.dataflow.EasyDataFlowService;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
+import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
 import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
@@ -187,26 +188,26 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
             easyFIDataStore.deleteKey(consentId, sessionId);
 
-            final var consentDetail = consentService.consentDetail(consentId, fiRequestDTO.getAaName());
+            final var consentDetailMono = consentService.consentDetail(consentId, fiRequestDTO.getAaName());
+            consentDetailMono.subscribe(consentDetail -> {
+                if (ConsentMode.get(consentDetail.getConsentMode()) == STORE) {
+                    easyFIDataStore.saveFIData(DataSaveRequest.with(decryptedFIData)
+                            .consentId(consentId)
+                            .sessionId(sessionId)
+                            .aaName(fiRequestDTO.getAaName())
+                            .dataLife(consentDetail.getDataLife())
+                            .dataLifeExpireOn(calculateExpireTime.apply(consentDetail.getDataLife()))
+                            .build());
+                }
+            });
 
-            if (ConsentMode.get(consentDetail.getConsentMode()) == STORE) {
-                easyFIDataStore.saveFIData(DataSaveRequest.with(decryptedFIData)
-                        .consentId(consentId)
-                        .sessionId(sessionId)
-                        .aaName(fiRequestDTO.getAaName())
-                        .dataLife(consentDetail.getDataLife())
-                        .dataLifeExpireOn(calculateExpireTime.apply(consentDetail.getDataLife()))
-                        .build());
-            }
-            return toFIData(consentId, sessionId, decryptedFIData, consentDetail);
+            return toFIData(consentId, sessionId, decryptedFIData);
         };
     }
 
     private Mono<FIData> toFIData(String consentId, String sessionId,
-                                  io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse decryptedFIData,
-                                  io.finarkein.api.aa.consent.request.ConsentDetail consentDetail) {
+                                  io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse decryptedFIData) {
         final var builder = FIData.builder()
-                .customerAAId(consentDetail.getCustomer().getId())
                 .consentId(consentId)
                 .sessionId(sessionId);
 
@@ -297,8 +298,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         return easyFIDataStore.getFIData(consentId, sessionId)
                 .map(fiFetchResponse -> {
                     final FIRequestDTO fiRequestDTO = validateAndGetFIRequest(consentId, sessionId);
-                    final var consentDetail = consentService.consentDetail(consentId, fiRequestDTO.getAaName());
-                    return toFIData(consentId, sessionId, fiFetchResponse, consentDetail)
+                    return toFIData(consentId, sessionId, fiFetchResponse)
                             .doOnSuccess(response -> log.debug("GetStoredData: success: consentId:{}, sessionId:{}", consentId, sessionId))
                             .doOnError(error -> log.error("GetStoredData: error: consentId:{}, sessionId:{}, error:{}", consentId, sessionId, error.getMessage(), error))
                             ;
@@ -310,14 +310,16 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
     }
 
     @Override
-    public Mono<Boolean> deleteData(String consentId) {
+    public Mono<FIDataDeleteResponse> deleteData(String consentId) {
+        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentId , false);
         final var deletionCounts = easyFIDataStore.deleteFIDataByConsentId(consentId);
         if (deletionCounts.isEmpty()) {
             log.debug("DeleteData: data not present for consentId:{}", consentId);
-            return Mono.just(Boolean.FALSE);
+            return Mono.just(response);
         }
+        response.setDeleted(true);
         log.debug("DeleteData: success: consentId:{}, deletionCounts:{}", consentId, deletionCounts);
-        return Mono.just(Boolean.TRUE);
+        return Mono.just(response);
     }
 
     @Override
@@ -330,13 +332,15 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
     }
 
     @Override
-    public Mono<Boolean> deleteData(String consentId, String sessionId) {
+    public Mono<FIDataDeleteResponse> deleteData(String consentId, String sessionId) {
+        FIDataDeleteResponse response = new FIDataDeleteResponse(sessionId, consentId , false);
         final var deletionCounts = easyFIDataStore.deleteFIDataByConsentIdAndSessionId(consentId, sessionId);
         if (deletionCounts.isEmpty()) {
             log.debug("Data not present for consentId:{}, sessionId:{}", consentId, sessionId);
-            return Mono.just(Boolean.FALSE);
+            return Mono.just(response);
         }
+        response.setDeleted(true);
         log.debug("Data deleted for consentId:{}, sessionId:{}, deletionCounts:{}", consentId, sessionId, deletionCounts);
-        return Mono.just(Boolean.TRUE);
+        return Mono.just(response);
     }
 }

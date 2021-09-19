@@ -44,8 +44,6 @@ import reactor.core.publisher.Mono;
  */
 public interface AAFIUClient {
 
-    String name();
-
     Mono<HeartbeatResponse> heartBeat(String aaName);
 
     Mono<ConsentResponse> createConsent(FIUConsentRequest consentRequest);

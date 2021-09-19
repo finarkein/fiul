@@ -35,7 +35,8 @@ import java.util.function.Supplier;
 
 import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
 import static io.finarkein.api.aa.util.Functions.strToTimeStamp;
-import static io.finarkein.fiul.Functions.*;
+import static io.finarkein.fiul.Functions.UUIDSupplier;
+import static io.finarkein.fiul.Functions.currentTimestampSupplier;
 
 @Log4j2
 @Service
@@ -170,19 +171,21 @@ class ConsentServiceImpl implements ConsentService {
     }
 
     @Override
-    public ConsentDetail consentDetail(String consentId, String aaName) {
+    public Mono<ConsentDetail> consentDetail(String consentId, String aaName) {
         log.debug("GetConsentDetail: start: consentId:{}, aaName:{}", consentId, aaName);
-        try {
-            final var consentArtefact = doGet(aafiuClient.getConsentArtefact(consentId, aaName));
-            final var signedConsent = consentArtefact.getSignedConsent();
-            final var tokens = Functions.decodeJWTToken.apply(signedConsent);
-            if (tokens[1] != null) {
-                return mapper.readValue(tokens[1], ConsentDetail.class);
-            }
-        } catch (Exception e) {
-            log.error("GetConsentDetail: error: consentId:{}, aaName:{}, error:{}", consentId, aaName, e.getMessage(), e);
-        }
-        return null;
+        return aafiuClient.getConsentArtefact(consentId, aaName)
+                .map(ConsentArtefact::getSignedConsent)
+                .flatMap(signedConsent -> {
+                    final var tokens = Functions.decodeJWTToken.apply(signedConsent);
+                    if (tokens[1] != null) {
+                        try {
+                            return Mono.just(mapper.readValue(tokens[1], ConsentDetail.class));
+                        } catch (Exception e) {
+                            return Mono.error(e);
+                        }
+                    }
+                    return Mono.empty();
+                }).doOnSuccess(details -> log.debug("GetConsentDetail: success: consentId:{}, aaName:{}", consentId, aaName));
     }
 
     @Override
@@ -211,10 +214,11 @@ class ConsentServiceImpl implements ConsentService {
     }
 
     @Override
-    public void updateConsentStateDataSession(String txnId, String dataSessionId) {
+    public void updateConsentStateDataSession(String txnId, String dataSessionId, boolean postFISuccessful) {
         ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
         if (consentState != null) {
             consentState.setDataSessionId(dataSessionId);
+            consentState.setPostFISuccessful(postFISuccessful);
             consentStore.updateConsentState(consentState);
         }
     }

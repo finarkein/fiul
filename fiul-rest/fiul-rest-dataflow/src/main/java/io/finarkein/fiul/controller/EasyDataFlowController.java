@@ -10,6 +10,7 @@ import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.model.FIData;
 import io.finarkein.fiul.dataflow.DataRequest;
 import io.finarkein.fiul.dataflow.EasyDataFlowService;
+import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class EasyDataFlowController {
     }
 
     @DeleteMapping({"/FI/data/{consentId}", "/FI/data/{consentId}/{sessionId}"})
-    public Mono<Boolean> deleteData(@PathVariable Map<String, String> map) {
+    public Mono<FIDataDeleteResponse> deleteData(@PathVariable Map<String, String> map) {
         final String sessionId = map.get("sessionId");
         if (sessionId != null)
             return easyDataFlowService.deleteData(map.get("consentId"), sessionId);
