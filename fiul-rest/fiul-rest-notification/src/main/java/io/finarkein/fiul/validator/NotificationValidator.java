@@ -35,8 +35,7 @@ public class NotificationValidator {
         BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(), consentNotification.getTimestamp(), "ConsentNotification");
         if (consentState == null)
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent data not found for given txnId");
-        if (consentState.getConsentStatus() != null)
-            if (consentState.getConsentStatus().equalsIgnoreCase("FAILED"))
+        if (consentState.getConsentStatus() != null && consentState.getConsentStatus().equalsIgnoreCase("FAILED"))
                 throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Status is failed");
         if (!consentState.isWasSuccessful())
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent creation was failed");

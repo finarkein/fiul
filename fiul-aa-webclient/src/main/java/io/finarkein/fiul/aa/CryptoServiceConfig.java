@@ -6,6 +6,7 @@
  */
 package io.finarkein.fiul.aa;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import java.util.Properties;
 
 @Configuration
 @ConfigurationProperties(prefix = "forwardsecrecy")
+@Getter
 public class CryptoServiceConfig {
 
     @Value("${forwardsecrecy.ecc.curve:Curve25519}")
