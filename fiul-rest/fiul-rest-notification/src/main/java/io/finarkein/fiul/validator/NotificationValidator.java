@@ -31,7 +31,11 @@ public class NotificationValidator {
         return UUID_REGEX_PATTERN.matcher(str).matches();
     }
 
-    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState, EntityInfo entityInfo) {
+    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState, EntityInfo entityInfo, String jwsSignature) {
+        if (jwsSignature == null)
+            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Null JWS Signature");
+        if (jwsSignature.split("\\.").length != 3)
+            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Invalid JWS Signature");
         BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(), consentNotification.getTimestamp(), "ConsentNotification");
         if (consentState == null)
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent data not found for given txnId");
@@ -71,26 +75,37 @@ public class NotificationValidator {
         // - consent details of alternate AA timestamp error
     }
 
-    public static void validateFINotification(FINotification fiNotification, ConsentState consentState, EntityInfo entityInfo) {
+    public static void validateFINotification(FINotification fiNotification, ConsentState consentState, EntityInfo entityInfo, String jwsSignature) {
+        if (jwsSignature == null)
+            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Null JWS Signature");
+        if (jwsSignature.split("\\.").length != 3)
+            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Invalid JWS Signature");
         BasicResponseValidator.basicValidation(fiNotification.getTxnid(), fiNotification.getVer(), fiNotification.getTimestamp(), "FINotification");
         if (!fiNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Invalid Notifier type");
         }
-
         if (consentState == null)
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "TxnId is invalid");
-
         if (!consentState.isPostFISuccessful())
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Post FI was not successful");
-
-        if (!isValidUUID(fiNotification.getTxnid()))
-            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Txn Id is invalid");
-
         if (!fiNotification.getNotifier().getId().equals(entityInfo.getId()))
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI notifier Id is invalid");
         if (!fiNotification.getFIStatusNotification().getSessionId().equals(consentState.getDataSessionId()))
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI session Id is invalid");
-
+        if (fiNotification.getFIStatusNotification().getFiStatusResponse().forEach(
+                fiStatusResponse -> {
+                    fiStatusResponse.getAccounts().forEach(
+                            account -> {
+                                if (account.getLinkRefNumber() == null)
+                                    throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "LinkRefNumber is null");
+                                if (account.getFiStatus() == null)
+                                    throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI Status is null");
+                                if (account.getDescription() == null)
+                                    throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Description is null");
+                            }
+                    );
+                }
+        );)
         //DONE -
         // - 15min variation in timestamp field error
         // - Invalid version

@@ -20,10 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
@@ -49,13 +46,16 @@ public class NotificationController {
     }
 
     @PostMapping("/Consent/Notification")
-    public ResponseEntity<Mono<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification) {
+    public ResponseEntity<Mono<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification, @RequestHeader("x-jws-signature") String jwsSignature) {
+        if (!NotificationValidator.isValidUUID(consentNotification.getTxnid())) {
+            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), "Invalid TxnId")));
+        }
         ConsentState consentState = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
         if (consentState == null)
             consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
         if (consentState != null) {
             try {
-                NotificationValidator.validateConsentNotification(consentNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()));
+                NotificationValidator.validateConsentNotification(consentNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()), jwsSignature);
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
@@ -76,12 +76,15 @@ public class NotificationController {
     }
 
     @PostMapping("/FI/Notification")
-    public ResponseEntity<Mono<NotificationResponse>> fiNotification(@RequestBody FINotification fiNotification) {
+    public ResponseEntity<Mono<NotificationResponse>> fiNotification(@RequestBody FINotification fiNotification, @RequestHeader("x-jws-signature") String jwsSignature) {
         log.debug("FINotification received:{}", fiNotification);
+        if (!NotificationValidator.isValidUUID(fiNotification.getTxnid())) {
+            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), "Invalid TxnId")));
+        }
         ConsentState consentState = consentService.getConsentStateByTxnId(fiNotification.getTxnid());
         if (consentState != null) {
             try {
-                NotificationValidator.validateFINotification(fiNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()));
+                NotificationValidator.validateFINotification(fiNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()), jwsSignature);
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
