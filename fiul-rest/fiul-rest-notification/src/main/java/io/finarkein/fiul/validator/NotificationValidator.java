@@ -40,7 +40,7 @@ public class NotificationValidator {
         if (consentState == null)
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent data not found for given txnId");
         if (consentState.getConsentStatus() != null && consentState.getConsentStatus().equalsIgnoreCase("FAILED"))
-                throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Status is failed");
+            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Status is failed");
         if (!consentState.isWasSuccessful())
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent creation was failed");
         if (!consentNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
@@ -92,7 +92,7 @@ public class NotificationValidator {
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI notifier Id is invalid");
         if (!fiNotification.getFIStatusNotification().getSessionId().equals(consentState.getDataSessionId()))
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI session Id is invalid");
-        if (fiNotification.getFIStatusNotification().getFiStatusResponse().forEach(
+        fiNotification.getFIStatusNotification().getFiStatusResponse().forEach(
                 fiStatusResponse -> {
                     fiStatusResponse.getAccounts().forEach(
                             account -> {
@@ -105,7 +105,7 @@ public class NotificationValidator {
                             }
                     );
                 }
-        );)
+        );
         //DONE -
         // - 15min variation in timestamp field error
         // - Invalid version
