@@ -31,12 +31,9 @@ public class NotificationValidator {
         return UUID_REGEX_PATTERN.matcher(str).matches();
     }
 
-    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState, EntityInfo entityInfo, String jwsSignature) {
-        if (jwsSignature == null)
-            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Null JWS Signature");
-        if (jwsSignature.split("\\.").length != 3)
-            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Invalid JWS Signature");
-        BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(), consentNotification.getTimestamp(), "ConsentNotification");
+    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState, EntityInfo entityInfo) {
+        BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(),
+                consentNotification.getTimestamp(), "ConsentNotification");
         if (consentState == null)
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent data not found for given txnId");
         if (consentState.getConsentStatus() != null && consentState.getConsentStatus().equalsIgnoreCase("FAILED"))
@@ -55,32 +52,11 @@ public class NotificationValidator {
 //            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Id is invalid");
         if (!consentNotification.getNotifier().getId().equals(entityInfo.getId()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent notifier Id is invalid");
-
-        //DONE -
-        // - 15min variation in timestamp field error
-        // - Invalid version
-        // - Invalid timestamp
-        // - FIP in notifier type
-        // - Alternate AA id
-        // - Invalid consentId
-        // - Invalid consentHandle
-        // - Verify that on making valid POST /Consent/Notification with PAUSED status, user is not able to make FI request
-        // - Verify that on making valid POST /Consent/Notification with EXPIRED status, user is not able to make FI request
-        // - Verify that on making valid POST /Consent/Notification with REVOKED status, user is not able to make FI requestInvalid version
-        // - Invalid API Key
-        // - Alternate AA API Key
-
-        //TODO:
-        // - Schematic error
-        // - consent details of alternate AA timestamp error
     }
 
-    public static void validateFINotification(FINotification fiNotification, ConsentState consentState, EntityInfo entityInfo, String jwsSignature) {
-        if (jwsSignature == null)
-            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Null JWS Signature");
-        if (jwsSignature.split("\\.").length != 3)
-            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Invalid JWS Signature");
-        BasicResponseValidator.basicValidation(fiNotification.getTxnid(), fiNotification.getVer(), fiNotification.getTimestamp(), "FINotification");
+    public static void validateFINotification(FINotification fiNotification, ConsentState consentState, EntityInfo entityInfo) {
+        BasicResponseValidator.basicValidation(fiNotification.getTxnid(), fiNotification.getVer(), fiNotification.getTimestamp(),
+                "FINotification");
         if (!fiNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Invalid Notifier type");
         }
@@ -106,22 +82,5 @@ public class NotificationValidator {
                     );
                 }
         );
-        //DONE -
-        // - 15min variation in timestamp field error
-        // - Invalid version
-        // - Invalid timestamp
-        // - FIP in notifier type
-        // - Invalid sessionId
-        // - Alternate AA Id
-        // - Invalid txnId
-
-        //TODO:
-        // - Schematic error
-        // - selected details of alternate AA
-        // - Verify that on making valid POST /FI/Notification with FIStatusNotification.sessionStatus as EXPIRED,
-        //   FIU Spec is not able to make FI/fetch
-        // - Invalid API Key
-        // - Alternate AA API Key
-
     }
 }

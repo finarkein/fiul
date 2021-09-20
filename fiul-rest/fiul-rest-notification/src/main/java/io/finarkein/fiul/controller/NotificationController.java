@@ -8,6 +8,7 @@ package io.finarkein.fiul.controller;
 
 
 import io.finarkein.aa.registry.RegistryService;
+import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
@@ -46,7 +47,9 @@ public class NotificationController {
     }
 
     @PostMapping("/Consent/Notification")
-    public ResponseEntity<Mono<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification, @RequestHeader("x-jws-signature") String jwsSignature) {
+    public ResponseEntity<Mono<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification,
+                                                                          @RequestHeader("x-jws-signature") String jwsSignature) {
+        validateJWS(consentNotification.getTxnid(), jwsSignature);
         if (!NotificationValidator.isValidUUID(consentNotification.getTxnid())) {
             return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), "Invalid TxnId")));
         }
@@ -55,11 +58,13 @@ public class NotificationController {
             consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
         if (consentState != null) {
             try {
-                NotificationValidator.validateConsentNotification(consentNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()), jwsSignature);
+                NotificationValidator.validateConsentNotification(consentNotification, consentState,
+                        registryService.getEntityInfoByAAName(consentState.getAaId()));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
-                return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+                return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
+                        Timestamp.from(Instant.now()), e.getMessage())));
             }
         }
 
@@ -72,19 +77,22 @@ public class NotificationController {
             throw new IllegalStateException(e);
         }
 
-        return ResponseEntity.ok().body(Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()))));
+        return ResponseEntity.ok().body(Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(),
+                Timestamp.from(Instant.now()))));
     }
 
     @PostMapping("/FI/Notification")
     public ResponseEntity<Mono<NotificationResponse>> fiNotification(@RequestBody FINotification fiNotification, @RequestHeader("x-jws-signature") String jwsSignature) {
         log.debug("FINotification received:{}", fiNotification);
+        validateJWS(fiNotification.getTxnid(), jwsSignature);
         if (!NotificationValidator.isValidUUID(fiNotification.getTxnid())) {
-            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), "Invalid TxnId")));
+            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(),
+                    Timestamp.from(Instant.now()), "Invalid TxnId")));
         }
         ConsentState consentState = consentService.getConsentStateByTxnId(fiNotification.getTxnid());
         if (consentState != null) {
             try {
-                NotificationValidator.validateFINotification(fiNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()), jwsSignature);
+                NotificationValidator.validateFINotification(fiNotification, consentState, registryService.getEntityInfoByAAName(consentState.getAaId()));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
@@ -100,5 +108,12 @@ public class NotificationController {
         }
 
         return ResponseEntity.ok(Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()))));
+    }
+
+    private static void validateJWS(String txnId, String jwsSignature) {
+        if (jwsSignature == null)
+            throw Errors.InvalidRequest.with(txnId, "Null JWS Signature");
+        if (jwsSignature.split("\\.").length != 3)
+            throw Errors.InvalidRequest.with(txnId, "Invalid JWS Signature");
     }
 }
