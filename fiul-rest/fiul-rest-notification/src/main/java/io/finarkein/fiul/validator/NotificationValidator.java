@@ -11,7 +11,9 @@ import io.finarkein.aa.validators.BasicResponseValidator;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
+import io.finarkein.fiul.config.model.AaApiKeyBody;
 import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -31,9 +33,12 @@ public class NotificationValidator {
         return UUID_REGEX_PATTERN.matcher(str).matches();
     }
 
-    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState, EntityInfo entityInfo) {
+    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState,
+                                                   EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
         BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(),
                 consentNotification.getTimestamp(), "ConsentNotification");
+        if (!consentNotification.getNotifier().getId().equals(aaApiKeyBody.getClientId()))
+            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Api key of alternate AA sent");
         if (consentState == null)
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent data not found for given txnId");
         if (consentState.getConsentStatus() != null && consentState.getConsentStatus().equalsIgnoreCase("FAILED"))
@@ -54,19 +59,22 @@ public class NotificationValidator {
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent notifier Id is invalid");
     }
 
-    public static void validateFINotification(FINotification fiNotification, ConsentState consentState, EntityInfo entityInfo) {
+    public static void validateFINotification(FINotification fiNotification, FIRequestState fiRequestState,
+                                              EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
         BasicResponseValidator.basicValidation(fiNotification.getTxnid(), fiNotification.getVer(), fiNotification.getTimestamp(),
                 "FINotification");
+        if (!fiNotification.getNotifier().getId().equals(aaApiKeyBody.getClientId()))
+            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Api key of alternate AA sent");
         if (!fiNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Invalid Notifier type");
         }
-        if (consentState == null)
+        if (fiRequestState == null)
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "TxnId is invalid");
-        if (!consentState.isPostFISuccessful())
+        if (!fiRequestState.isFiRequestSuccessful())
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Post FI was not successful");
         if (!fiNotification.getNotifier().getId().equals(entityInfo.getId()))
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI notifier Id is invalid");
-        if (!fiNotification.getFIStatusNotification().getSessionId().equals(consentState.getDataSessionId()))
+        if (!fiNotification.getFIStatusNotification().getSessionId().equals(fiRequestState.getSessionId()))
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI session Id is invalid");
         fiNotification.getFIStatusNotification().getFiStatusResponse().forEach(
                 fiStatusResponse -> {
@@ -76,7 +84,7 @@ public class NotificationValidator {
                                     throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "LinkRefNumber is null");
                                 if (account.getFiStatus() == null)
                                     throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI Status is null");
-                                if (account.getDescription() == null)
+                                if (account.getDescription() == null || account.getDescription().trim().length() == 0)
                                     throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Description is null");
                             }
                     );

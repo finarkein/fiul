@@ -33,8 +33,10 @@ public class FIRequestState {
     protected String sessionId;
 
     protected String notifierId;
+    protected boolean fiRequestSuccessful;
     protected String sessionStatus;
     protected String txnId;
+    protected String aaId;
 
     @Column(columnDefinition = "DATETIME(6)")
     protected Timestamp notificationTimestamp;

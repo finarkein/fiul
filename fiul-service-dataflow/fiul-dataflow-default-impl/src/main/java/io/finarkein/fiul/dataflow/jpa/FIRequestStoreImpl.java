@@ -19,6 +19,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 import static io.finarkein.api.aa.util.Functions.strToTimeStamp;
@@ -43,10 +44,11 @@ public class FIRequestStoreImpl implements FIRequestStore {
 
     @Override
     public void saveFIRequestAndFetchMetadata(FIFetchMetadata fiFetchMetadata, FIUFIRequest fiRequest) {
+        final Timestamp timestamp = strToTimeStamp.apply(fiRequest.getTimestamp());
         final var fiRequestDTO = FIRequestDTO.builder()
                 .sessionId(fiFetchMetadata.getSessionId())
                 .consentId(fiFetchMetadata.getConsentId())
-                .timestamp(strToTimeStamp.apply(fiRequest.getTimestamp()))
+                .timestamp(timestamp)
                 .version(fiRequest.getVer())
                 .txnId(fiFetchMetadata.getTxnId())
                 .aaName(fiFetchMetadata.getAaName())
@@ -56,10 +58,37 @@ public class FIRequestStoreImpl implements FIRequestStore {
                 .callback(fiRequest.getCallback())
                 .build();
 
+        final var fiRequestState = FIRequestState.builder()
+                .sessionId(fiFetchMetadata.getSessionId())
+                .notifierId(null)
+                .txnId(fiFetchMetadata.getTxnId())
+                .sessionStatus("ACTIVE")
+                .fiStatusResponse(null)
+                .fiRequestSuccessful(true)
+                .notificationTimestamp(timestamp)
+                .aaId(fiFetchMetadata.getAaName())
+                .build();
+
         transactionTemplate.executeWithoutResult(transactionStatus -> {
             repoFIRequestDTO.save(fiRequestDTO);
             repoFIFetchMetadata.save(fiFetchMetadata);
+            repoFIRequestState.save(fiRequestState);
         });
+    }
+
+    @Override
+    public void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName) {
+        final var fiRequestState = FIRequestState.builder()
+                .sessionId(Functions.uuidSupplier.get())
+                .notifierId(null)
+                .txnId(fiRequest.getTxnid())
+                .sessionStatus(null)
+                .fiStatusResponse(null)
+                .fiRequestSuccessful(false)
+                .aaId(aaName)
+                .notificationTimestamp(strToTimeStamp.apply(fiRequest.getTimestamp()))
+                .build();
+        repoFIRequestState.save(fiRequestState);
     }
 
     @Override
@@ -109,5 +138,10 @@ public class FIRequestStoreImpl implements FIRequestStore {
     @Override
     public Optional<FIRequestState> getFIRequestState(String sessionId) {
         return repoFIRequestState.findById(sessionId);
+    }
+
+    @Override
+    public Optional<FIRequestState> getFIRequestStateByTxnId(String txnId) {
+        return repoFIRequestState.findByTxnId(txnId);
     }
 }
