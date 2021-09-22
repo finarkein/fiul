@@ -7,6 +7,7 @@
 package io.finarkein.fiul.consent.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.finarkein.aa.validators.ConsentHandleResponseValidator;
 import io.finarkein.api.aa.consent.artefact.ConsentArtefact;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
 import io.finarkein.api.aa.consent.handle.ConsentStatus;
@@ -79,16 +80,17 @@ class ConsentServiceImpl implements ConsentService {
                     consentStore.saveConsentRequest(response.getConsentHandle(), consentRequest);
                     consentStore.saveConsentState(ConsentState.builder()
                             .txnId(response.getTxnid())
-                            .wasSuccessful(true)
+                            .isPostConsentSuccessful(true)
                             .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
                             .consentHandle(response.getConsentHandle())
+                            .postConsentResponseTimestamp(strToTimeStamp.apply(response.getTimestamp()))
                             .build());
                 }).doOnError(SystemException.class, e -> {
                             if (e.getParamValue("consentHandle") != null)
                                 consentStore.saveConsentState(ConsentState.builder()
                                         .consentHandle(e.getParamValue("consentHandle"))
                                         .txnId(consentRequest.getTxnid())
-                                        .wasSuccessful(false)
+                                        .isPostConsentSuccessful(false)
                                         .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
                                         .build());
                         }
@@ -105,6 +107,16 @@ class ConsentServiceImpl implements ConsentService {
                         aaNameOptional
                                 .or(consentRequestAANameByConsentHandle(consentHandle))
                                 .map(aaName -> aafiuClient.getConsentStatus(consentHandle, aaName))
+                                /*.flatMap(consentHandleResponse -> {
+                                    try {
+                                        final Optional<ConsentState> consentState = consentStore.getConsentStateByHandle(consentHandle);
+                                        //TODO perform response.timestamp validation based on consentState.postConsentResponseTimestamp
+                                        ConsentHandleResponseValidator.validateConsentHandleResponse(consentHandleResponse.getTxnid(), consentHandleResponse.getVer(), consentHandleResponse.getTimestamp(), consentHandleID, consentHandleResponse.getConsentHandle());
+                                        return Mono.just(consentHandleResponse);
+                                    } catch (Exception var3) {
+                                        return Mono.error(var3);
+                                    }
+                                })*/
                                 .orElseThrow(() -> Errors
                                         .NoDataFound
                                         .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaName"))
@@ -211,16 +223,6 @@ class ConsentServiceImpl implements ConsentService {
     @Override
     public ConsentState getConsentStateByConsentHandle(String consentHandle) {
         return consentStore.getConsentStateByHandle(consentHandle).orElse(null);
-    }
-
-    @Override
-    public void updateConsentStateDataSession(String txnId, String dataSessionId, boolean postFISuccessful) {
-        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
-        if (consentState != null) {
-            consentState.setDataSessionId(dataSessionId);
-            consentState.setPostFISuccessful(postFISuccessful);
-            consentStore.updateConsentState(consentState);
-        }
     }
 
     @Override

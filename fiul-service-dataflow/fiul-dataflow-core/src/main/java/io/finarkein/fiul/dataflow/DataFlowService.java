@@ -9,9 +9,11 @@ package io.finarkein.fiul.dataflow;
 import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
+import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 public interface DataFlowService {
 
@@ -26,4 +28,6 @@ public interface DataFlowService {
     Mono<FIDataDeleteResponse> deleteDataByConsentId(String consentId);
 
     Mono<Boolean> deleteByDataLifeExpireOnBefore(Timestamp triggerTimestamp);
+
+    Optional<FIRequestState> getFIRequestStateByTxnId(String txnId);
 }

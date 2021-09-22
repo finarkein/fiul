@@ -38,8 +38,6 @@ public interface ConsentService {
 
     ConsentState getConsentStateByConsentHandle(String consentHandle);
 
-    void updateConsentStateDataSession(String txnId, String dataSessionId, boolean postFISuccessful);
-
     void updateConsentStateNotifier(String txnId, String notifierId);
 
     void updateConsentState(ConsentState consentState);

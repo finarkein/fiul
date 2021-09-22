@@ -18,8 +18,8 @@ import io.finarkein.api.aa.notification.NotificationResponse;
 import io.finarkein.fiul.config.model.AaApiKeyBody;
 import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
+import io.finarkein.fiul.dataflow.DataFlowService;
 import io.finarkein.fiul.dataflow.dto.FIRequestState;
-import io.finarkein.fiul.dataflow.store.FIRequestStore;
 import io.finarkein.fiul.notification.NotificationPublisher;
 import io.finarkein.fiul.validator.NotificationValidator;
 import lombok.extern.log4j.Log4j2;
@@ -44,7 +44,7 @@ public class NotificationController {
 
     private final ConsentService consentService;
 
-    private final FIRequestStore fiRequestStore;
+    private final DataFlowService dataFlowService;
 
     private final RegistryService registryService;
 
@@ -58,11 +58,11 @@ public class NotificationController {
 
     @Autowired
     public NotificationController(NotificationPublisher publisher, ConsentService consentService,
-                                  RegistryService registryService, FIRequestStore fiRequestStore) {
+                                  RegistryService registryService, DataFlowService dataFlowService) {
         this.publisher = publisher;
         this.consentService = consentService;
         this.registryService = registryService;
-        this.fiRequestStore = fiRequestStore;
+        this.dataFlowService = dataFlowService;
         this.objectMapper = new ObjectMapper();
     }
 
@@ -72,7 +72,9 @@ public class NotificationController {
                                                                           @RequestHeader("aa_api_key") String aaApiKey) {
         log.debug("ConsentNotification received:{}", consentNotification);
         validateJWS(consentNotification.getTxnid(), jwsSignature);
+
         String[] chunks = aaApiKey.split("\\.");
+
         String payload = new String(decoder.decode(chunks[1]));
         AaApiKeyBody aaApiKeyBody = null;
         try {
@@ -85,12 +87,15 @@ public class NotificationController {
             return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), "Invalid TxnId")));
         }
         ConsentState consentState = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
+
         if (consentState == null)
             consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
+
         if (consentState != null) {
             try {
                 NotificationValidator.validateConsentNotification(consentNotification, consentState,
                         registryService.getEntityInfoByAAName(consentState.getAaId()), testScenario, aaApiKeyBody);
+
                 publisher.publishConsentNotification(consentNotification);
                 log.debug("NotificationPublisher.publish(consentNotification) done");
                 return ResponseEntity.ok().body(Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(),
@@ -128,7 +133,7 @@ public class NotificationController {
             return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(),
                     Timestamp.from(Instant.now()), "Invalid TxnId")));
         }
-        Optional<FIRequestState> optionalFIRequestState = fiRequestStore.getFIRequestStateByTxnId(fiNotification.getTxnid());
+        Optional<FIRequestState> optionalFIRequestState = dataFlowService.getFIRequestStateByTxnId(fiNotification.getTxnid());
         if (optionalFIRequestState.isPresent()) {
             try {
                 NotificationValidator.validateFINotification(fiNotification, optionalFIRequestState.get(),

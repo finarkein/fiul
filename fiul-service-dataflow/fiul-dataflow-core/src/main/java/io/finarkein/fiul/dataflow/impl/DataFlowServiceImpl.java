@@ -19,6 +19,7 @@ import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
+import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import io.finarkein.fiul.dataflow.easy.DataSaveRequest;
 import io.finarkein.fiul.dataflow.store.AAFIDataStore;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
@@ -235,6 +236,11 @@ class DataFlowServiceImpl implements DataFlowService {
             return Mono.just(Boolean.FALSE);
         log.debug("delete-data-by-dataLife-expire-on-before deletionCounts:{}", deletionCounts);
         return Mono.just(Boolean.TRUE);
+    }
+
+    @Override
+    public Optional<FIRequestState> getFIRequestStateByTxnId(String txnId) {
+        return fiRequestStore.getFIRequestStateByTxnId(txnId);
     }
 
     @Data
