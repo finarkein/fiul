@@ -7,7 +7,6 @@
 package io.finarkein.fiul.consent.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.finarkein.aa.validators.ConsentHandleResponseValidator;
 import io.finarkein.api.aa.consent.artefact.ConsentArtefact;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
 import io.finarkein.api.aa.consent.handle.ConsentStatus;
@@ -30,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -106,17 +107,21 @@ class ConsentServiceImpl implements ConsentService {
                 .orElseGet(() ->
                         aaNameOptional
                                 .or(consentRequestAANameByConsentHandle(consentHandle))
-                                .map(aaName -> aafiuClient.getConsentStatus(consentHandle, aaName))
-                                /*.flatMap(consentHandleResponse -> {
-                                    try {
-                                        final Optional<ConsentState> consentState = consentStore.getConsentStateByHandle(consentHandle);
-                                        //TODO perform response.timestamp validation based on consentState.postConsentResponseTimestamp
-                                        ConsentHandleResponseValidator.validateConsentHandleResponse(consentHandleResponse.getTxnid(), consentHandleResponse.getVer(), consentHandleResponse.getTimestamp(), consentHandleID, consentHandleResponse.getConsentHandle());
-                                        return Mono.just(consentHandleResponse);
-                                    } catch (Exception var3) {
-                                        return Mono.error(var3);
-                                    }
-                                })*/
+                                .map(aaName ->
+                                        aafiuClient
+                                                .getConsentStatus(consentHandle, aaName)
+                                                .flatMap(consentHandleResponse -> {
+                                                    final Optional<ConsentState> optionalConsentState = consentStore
+                                                            .getConsentStateByHandle(consentHandle);
+                                                    if (optionalConsentState.isPresent()) {
+                                                        if (strToTimeStamp.apply(consentHandleResponse.getTimestamp())
+                                                                .before(optionalConsentState.get().getPostConsentResponseTimestamp()))
+                                                            throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
+                                                                    "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
+                                                    }
+                                                    return Mono.just(consentHandleResponse);
+                                                })
+                                )
                                 .orElseThrow(() -> Errors
                                         .NoDataFound
                                         .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaName"))
@@ -169,7 +174,21 @@ class ConsentServiceImpl implements ConsentService {
         log.debug("GetConsentArtefact: start: consentId:{}, aaName:{}", consentId, aaNameOptional);
         return aaNameOptional
                 .or(consentRequestAANameByConsentId(consentId))
-                .map(aaName -> aafiuClient.getConsentArtefact(consentId, aaName))
+                .map(aaName -> aafiuClient
+                        .getConsentArtefact(consentId, aaName)
+                        .flatMap(consentArtefact -> {
+                            final ConsentState consentState = consentStore.getConsentStateById(consentArtefact.getConsentId());
+                            if (consentState != null) {
+                                if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).before(consentState.getPostConsentResponseTimestamp()))
+                                    throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
+                                            + consentArtefact.getCreateTimestamp());
+                            }
+                            if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).after(Timestamp.from(Instant.now())))
+                                throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
+                                        + consentArtefact.getCreateTimestamp());
+                            return Mono.just(consentArtefact);
+                        })
+                )
                 .orElseThrow(() -> Errors
                         .NoDataFound
                         .with(UUIDSupplier.get(), "ConsentArtefact not found, try with aaName"))
