@@ -33,14 +33,16 @@ public class ConsentState {
     private String consentId;
     private String consentStatus;
     private String txnId;
-    private boolean wasSuccessful;
-    private boolean postFISuccessful;
+    private Boolean isPostConsentSuccessful;
     private String aaId;
     private String notifierId;
-    private String dataSessionId;
+
     @LastModifiedDate
     @Column(columnDefinition = "DATETIME(6)")
     private Timestamp updatedOn;
+
+    @Column(columnDefinition = "DATETIME(6)")
+    private Timestamp postConsentResponseTimestamp;
 
     @PrePersist
     protected void onCreate() {

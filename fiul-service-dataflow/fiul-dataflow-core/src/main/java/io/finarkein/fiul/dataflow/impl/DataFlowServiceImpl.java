@@ -13,13 +13,13 @@ import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.dataflow.DataFlowService;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
+import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import io.finarkein.fiul.dataflow.easy.DataSaveRequest;
 import io.finarkein.fiul.dataflow.store.AAFIDataStore;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
@@ -98,11 +98,12 @@ class DataFlowServiceImpl implements DataFlowService {
                             .build();
                     fiRequestStore.saveFIRequestAndFetchMetadata(fiFetchMetadata, fiRequest);
                     log.debug("SubmitFIRequest: success: response:{}", response);
-                    consentService.updateConsentStateDataSession(response.getTxnid(), response.getSessionId(), true);
+//                    consentService.updateConsentStateDataSession(response.getTxnid(), response.getSessionId(), true);
                 })
                 .doOnSuccess(saveRegisterCallback(fiRequest.getCallback()))
                 .doOnError(SystemException.class, error -> {
-                    consentService.updateConsentStateDataSession(error.txnId(), null, false);
+                    fiRequestStore.updateFIRequestStateOnError(fiRequest, aaName);
+//                    consentService.updateConsentStateDataSession(error.txnId(), null, false);
                     log.error("SubmitFIRequest: error: {}", error.getMessage(), error);
                 });
     }
@@ -235,6 +236,11 @@ class DataFlowServiceImpl implements DataFlowService {
             return Mono.just(Boolean.FALSE);
         log.debug("delete-data-by-dataLife-expire-on-before deletionCounts:{}", deletionCounts);
         return Mono.just(Boolean.TRUE);
+    }
+
+    @Override
+    public Optional<FIRequestState> getFIRequestStateByTxnId(String txnId) {
+        return fiRequestStore.getFIRequestStateByTxnId(txnId);
     }
 
     @Data

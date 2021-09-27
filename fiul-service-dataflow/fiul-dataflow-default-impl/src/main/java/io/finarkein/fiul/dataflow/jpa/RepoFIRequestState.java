@@ -10,6 +10,9 @@ import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RepoFIRequestState extends JpaRepository<FIRequestState, String> {
+    Optional<FIRequestState> findByTxnId(String txnId);
 }

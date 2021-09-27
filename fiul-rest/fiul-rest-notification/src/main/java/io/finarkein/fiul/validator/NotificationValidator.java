@@ -11,7 +11,9 @@ import io.finarkein.aa.validators.BasicResponseValidator;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
+import io.finarkein.fiul.config.model.AaApiKeyBody;
 import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -31,13 +33,17 @@ public class NotificationValidator {
         return UUID_REGEX_PATTERN.matcher(str).matches();
     }
 
-    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState, EntityInfo entityInfo) {
-        BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(), consentNotification.getTimestamp(), "ConsentNotification");
+    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState,
+                                                   EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
+        BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(),
+                consentNotification.getTimestamp(), "ConsentNotification");
+        if (!consentNotification.getNotifier().getId().equals(aaApiKeyBody.getClientId()))
+            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Api key of alternate AA sent");
         if (consentState == null)
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent data not found for given txnId");
         if (consentState.getConsentStatus() != null && consentState.getConsentStatus().equalsIgnoreCase("FAILED"))
-                throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Status is failed");
-        if (!consentState.isWasSuccessful())
+            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Status is failed");
+        if (consentState.getIsPostConsentSuccessful() != null && !consentState.getIsPostConsentSuccessful())
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent creation was failed");
         if (!consentNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Invalid Notifier type");
@@ -51,62 +57,38 @@ public class NotificationValidator {
 //            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Id is invalid");
         if (!consentNotification.getNotifier().getId().equals(entityInfo.getId()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent notifier Id is invalid");
-
-        //DONE -
-        // - 15min variation in timestamp field error
-        // - Invalid version
-        // - Invalid timestamp
-        // - FIP in notifier type
-        // - Alternate AA id
-        // - Invalid consentId
-        // - Invalid consentHandle
-        // - Verify that on making valid POST /Consent/Notification with PAUSED status, user is not able to make FI request
-        // - Verify that on making valid POST /Consent/Notification with EXPIRED status, user is not able to make FI request
-        // - Verify that on making valid POST /Consent/Notification with REVOKED status, user is not able to make FI requestInvalid version
-        // - Invalid API Key
-        // - Alternate AA API Key
-
-        //TODO:
-        // - Schematic error
-        // - consent details of alternate AA timestamp error
     }
 
-    public static void validateFINotification(FINotification fiNotification, ConsentState consentState, EntityInfo entityInfo) {
-        BasicResponseValidator.basicValidation(fiNotification.getTxnid(), fiNotification.getVer(), fiNotification.getTimestamp(), "FINotification");
+    public static void validateFINotification(FINotification fiNotification, FIRequestState fiRequestState,
+                                              EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
+        BasicResponseValidator.basicValidation(fiNotification.getTxnid(), fiNotification.getVer(), fiNotification.getTimestamp(),
+                "FINotification");
+        if (!fiNotification.getNotifier().getId().equals(aaApiKeyBody.getClientId()))
+            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Api key of alternate AA sent");
         if (!fiNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Invalid Notifier type");
         }
-
-        if (consentState == null)
+        if (fiRequestState == null)
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "TxnId is invalid");
-
-        if (!consentState.isPostFISuccessful())
+        if (!fiRequestState.isFiRequestSuccessful())
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Post FI was not successful");
-
-        if (!isValidUUID(fiNotification.getTxnid()))
-            throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Txn Id is invalid");
-
         if (!fiNotification.getNotifier().getId().equals(entityInfo.getId()))
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI notifier Id is invalid");
-        if (!fiNotification.getFIStatusNotification().getSessionId().equals(consentState.getDataSessionId()))
+        if (!fiNotification.getFIStatusNotification().getSessionId().equals(fiRequestState.getSessionId()))
             throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI session Id is invalid");
-
-        //DONE -
-        // - 15min variation in timestamp field error
-        // - Invalid version
-        // - Invalid timestamp
-        // - FIP in notifier type
-        // - Invalid sessionId
-        // - Alternate AA Id
-        // - Invalid txnId
-
-        //TODO:
-        // - Schematic error
-        // - selected details of alternate AA
-        // - Verify that on making valid POST /FI/Notification with FIStatusNotification.sessionStatus as EXPIRED,
-        //   FIU Spec is not able to make FI/fetch
-        // - Invalid API Key
-        // - Alternate AA API Key
-
+        fiNotification.getFIStatusNotification().getFiStatusResponse().forEach(
+                fiStatusResponse -> {
+                    fiStatusResponse.getAccounts().forEach(
+                            account -> {
+                                if (account.getLinkRefNumber() == null)
+                                    throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "LinkRefNumber is null");
+                                if (account.getFiStatus() == null)
+                                    throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "FI Status is null");
+                                if (account.getDescription() == null || account.getDescription().trim().length() == 0)
+                                    throw Errors.InvalidRequest.with(fiNotification.getTxnid(), "Description is null");
+                            }
+                    );
+                }
+        );
     }
 }

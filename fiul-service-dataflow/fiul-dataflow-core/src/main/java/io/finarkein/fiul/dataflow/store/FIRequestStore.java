@@ -18,6 +18,8 @@ public interface FIRequestStore {
 
     void saveFIRequestAndFetchMetadata(FIFetchMetadata fiFetchMetadata, FIUFIRequest fiRequest);
 
+    void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName);
+
     Optional<FIRequestDTO> getFIRequest(String consentId, String sessionId);
 
     Optional<FIRequestDTO> getFIRequestByAANameAndSessionId(String sessionId, String aaName);
@@ -27,4 +29,6 @@ public interface FIRequestStore {
     void logNotificationAndUpdateState(FINotification fiNotification);
 
     Optional<FIRequestState> getFIRequestState(String sessionId);
+
+    Optional<FIRequestState> getFIRequestStateByTxnId(String txnId);
 }
