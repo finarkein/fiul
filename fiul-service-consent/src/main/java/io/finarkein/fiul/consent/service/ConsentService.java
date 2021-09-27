@@ -7,6 +7,7 @@
 package io.finarkein.fiul.consent.service;
 
 import io.finarkein.api.aa.consent.artefact.ConsentArtefact;
+import io.finarkein.api.aa.consent.artefact.SignedConsent;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
 import io.finarkein.api.aa.consent.request.ConsentDetail;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
@@ -28,7 +29,7 @@ public interface ConsentService {
 
     Optional<ConsentRequestDTO> getConsentRequestByConsentId(String consentId);
 
-    Mono<ConsentDetail> consentDetail(String consentId, String aaName);
+    Mono<SignedConsent> getSignedConsentDetail(String consentId, String aaName);
 
     void handleConsentNotification(ConsentNotificationLog consentNotificationLog);
 

@@ -8,6 +8,7 @@ package io.finarkein.fiul.consent.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.consent.artefact.ConsentArtefact;
+import io.finarkein.api.aa.consent.artefact.SignedConsent;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
 import io.finarkein.api.aa.consent.handle.ConsentStatus;
 import io.finarkein.api.aa.consent.request.ConsentDetail;
@@ -202,7 +203,7 @@ class ConsentServiceImpl implements ConsentService {
     }
 
     @Override
-    public Mono<ConsentDetail> consentDetail(String consentId, String aaName) {
+    public Mono<SignedConsent> getSignedConsentDetail(String consentId, String aaName) {
         log.debug("GetConsentDetail: start: consentId:{}, aaName:{}", consentId, aaName);
         return aafiuClient.getConsentArtefact(consentId, aaName)
                 .map(ConsentArtefact::getSignedConsent)
@@ -210,7 +211,7 @@ class ConsentServiceImpl implements ConsentService {
                     final var tokens = Functions.decodeJWTToken.apply(signedConsent);
                     if (tokens[1] != null) {
                         try {
-                            return Mono.just(mapper.readValue(tokens[1], ConsentDetail.class));
+                            return Mono.just(mapper.readValue(tokens[1], SignedConsent.class));
                         } catch (Exception e) {
                             return Mono.error(e);
                         }
