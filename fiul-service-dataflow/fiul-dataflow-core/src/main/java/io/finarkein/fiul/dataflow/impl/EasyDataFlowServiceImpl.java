@@ -188,7 +188,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
             easyFIDataStore.deleteKey(consentId, sessionId);
 
-            final var consentDetailMono = consentService.consentDetail(consentId, fiRequestDTO.getAaName());
+            final var consentDetailMono = consentService.getSignedConsentDetail(consentId, fiRequestDTO.getAaName());
             consentDetailMono.subscribe(consentDetail -> {
                 if (ConsentMode.get(consentDetail.getConsentMode()) == STORE) {
                     easyFIDataStore.saveFIData(DataSaveRequest.with(decryptedFIData)
