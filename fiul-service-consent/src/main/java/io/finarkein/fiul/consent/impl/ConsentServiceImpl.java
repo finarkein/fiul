@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -79,16 +81,17 @@ class ConsentServiceImpl implements ConsentService {
                     consentStore.saveConsentRequest(response.getConsentHandle(), consentRequest);
                     consentStore.saveConsentState(ConsentState.builder()
                             .txnId(response.getTxnid())
-                            .wasSuccessful(true)
+                            .isPostConsentSuccessful(true)
                             .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
                             .consentHandle(response.getConsentHandle())
+                            .postConsentResponseTimestamp(strToTimeStamp.apply(response.getTimestamp()))
                             .build());
                 }).doOnError(SystemException.class, e -> {
                             if (e.getParamValue("consentHandle") != null)
                                 consentStore.saveConsentState(ConsentState.builder()
                                         .consentHandle(e.getParamValue("consentHandle"))
                                         .txnId(consentRequest.getTxnid())
-                                        .wasSuccessful(false)
+                                        .isPostConsentSuccessful(false)
                                         .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
                                         .build());
                         }
@@ -104,7 +107,21 @@ class ConsentServiceImpl implements ConsentService {
                 .orElseGet(() ->
                         aaNameOptional
                                 .or(consentRequestAANameByConsentHandle(consentHandle))
-                                .map(aaName -> aafiuClient.getConsentStatus(consentHandle, aaName))
+                                .map(aaName ->
+                                        aafiuClient
+                                                .getConsentStatus(consentHandle, aaName)
+                                                .flatMap(consentHandleResponse -> {
+                                                    final Optional<ConsentState> optionalConsentState = consentStore
+                                                            .getConsentStateByHandle(consentHandle);
+                                                    if (optionalConsentState.isPresent()) {
+                                                        if (strToTimeStamp.apply(consentHandleResponse.getTimestamp())
+                                                                .before(optionalConsentState.get().getPostConsentResponseTimestamp()))
+                                                            throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
+                                                                    "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
+                                                    }
+                                                    return Mono.just(consentHandleResponse);
+                                                })
+                                )
                                 .orElseThrow(() -> Errors
                                         .NoDataFound
                                         .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaName"))
@@ -157,7 +174,21 @@ class ConsentServiceImpl implements ConsentService {
         log.debug("GetConsentArtefact: start: consentId:{}, aaName:{}", consentId, aaNameOptional);
         return aaNameOptional
                 .or(consentRequestAANameByConsentId(consentId))
-                .map(aaName -> aafiuClient.getConsentArtefact(consentId, aaName))
+                .map(aaName -> aafiuClient
+                        .getConsentArtefact(consentId, aaName)
+                        .flatMap(consentArtefact -> {
+                            final ConsentState consentState = consentStore.getConsentStateById(consentArtefact.getConsentId());
+                            if (consentState != null) {
+                                if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).before(consentState.getPostConsentResponseTimestamp()))
+                                    throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
+                                            + consentArtefact.getCreateTimestamp());
+                            }
+                            if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).after(Timestamp.from(Instant.now())))
+                                throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
+                                        + consentArtefact.getCreateTimestamp());
+                            return Mono.just(consentArtefact);
+                        })
+                )
                 .orElseThrow(() -> Errors
                         .NoDataFound
                         .with(UUIDSupplier.get(), "ConsentArtefact not found, try with aaName"))
@@ -211,16 +242,6 @@ class ConsentServiceImpl implements ConsentService {
     @Override
     public ConsentState getConsentStateByConsentHandle(String consentHandle) {
         return consentStore.getConsentStateByHandle(consentHandle).orElse(null);
-    }
-
-    @Override
-    public void updateConsentStateDataSession(String txnId, String dataSessionId, boolean postFISuccessful) {
-        ConsentState consentState = consentStore.getConsentStateByTxnId(txnId);
-        if (consentState != null) {
-            consentState.setDataSessionId(dataSessionId);
-            consentState.setPostFISuccessful(postFISuccessful);
-            consentStore.updateConsentState(consentState);
-        }
     }
 
     @Override
