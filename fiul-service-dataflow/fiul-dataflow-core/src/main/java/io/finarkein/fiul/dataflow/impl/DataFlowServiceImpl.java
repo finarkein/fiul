@@ -165,7 +165,7 @@ class DataFlowServiceImpl implements DataFlowService {
         return fiFetchResponse -> {
             final var fiRequest = fiRequestStore.getFIRequestByAANameAndSessionId(sessionId, aaName);
             final var consentId = fiRequest.map(FIRequestDTO::getConsentId).orElse(null);
-            final var consentDetailMono = consentService.consentDetail(consentId, aaName);
+            final var consentDetailMono = consentService.getSignedConsentDetail(consentId, aaName);
             consentDetailMono.subscribe(consentDetail -> {
                 if (consentId == null || ConsentMode.get(consentDetail.getConsentMode()) != STORE)
                     return;
