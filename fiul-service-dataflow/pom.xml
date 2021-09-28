@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fiul</artifactId>
+        <groupId>io.finarkein.fiu</groupId>
+        <version>0.4.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fiul-service-dataflow</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>fiul-dataflow-core</module>
+        <module>fiul-dataflow-default-impl</module>
+        <module>fiul-dataflow-notification-subscriber</module>
+        <module>fiul-dataflow-fi-data-crypto-no-op</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-dataflow-fi-data-crypto-no-op</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-dataflow-notification-subscriber</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

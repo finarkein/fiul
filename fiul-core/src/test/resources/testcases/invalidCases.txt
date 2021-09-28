@@ -1,0 +1,49 @@
+{
+    "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2020-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "keyvalue"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}
+*
+{
+    "ver": "1.1.0",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "FIDataRange": {
+        "from": "2018-12-06T11:39:57.153Z",
+        "to": "2020-07-03T14:25:33.440Z"
+    },
+    "Consent": {
+        "id": "c2b8e163-6ca1-4014-9036-6ee1c579677d",
+        "digitalSignature": "NA"
+    },
+    "KeyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "params": "",
+        "DHPublicKey": {
+            "expiry": "2022-05-23T23:29:42.028Z",
+            "Parameters": "",
+            "KeyValue": "keyvalue"
+        },
+        "Nonce": "LTEtMTU4NTc1NS0xLTEtMS0xLTE2MTUzLTEtMS0xLTE="
+    }
+}

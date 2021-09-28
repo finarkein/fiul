@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>io.finarkein.fiu</groupId>
+        <artifactId>fiul-service-notification</artifactId>
+        <version>0.4.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fiul-notification-callbacks-pubsub-core</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-notification-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-notification-callback-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.auth</groupId>
+            <artifactId>finarkein-auth-oauth2</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-pool</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.aa</groupId>
+            <artifactId>aa-webclient-core</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

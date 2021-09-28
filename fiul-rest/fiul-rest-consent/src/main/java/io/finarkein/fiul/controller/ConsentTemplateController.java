@@ -1,0 +1,59 @@
+/**
+ * Copyright (C) 2021 Finarkein Analytics Pvt. Ltd.
+ * All rights reserved This software is the confidential and proprietary information of Finarkein Analytics Pvt. Ltd.
+ * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
+ * agreement you entered into with Finarkein Analytics Pvt. Ltd.
+ */
+package io.finarkein.fiul.controller;
+
+import io.finarkein.api.aa.consent.request.ConsentDetail;
+import io.finarkein.api.aa.consent.request.ConsentResponse;
+import io.finarkein.fiul.consent.model.ConsentRequestInput;
+import io.finarkein.fiul.consent.model.ConsentTemplate;
+import io.finarkein.fiul.consent.model.ConsentTemplateDeleteResponse;
+import io.finarkein.fiul.consent.service.ConsentTemplateResponse;
+import io.finarkein.fiul.consent.service.ConsentTemplateService;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api")
+@Log4j2
+public class ConsentTemplateController {
+
+    private final ConsentTemplateService consentTemplateService;
+
+    @Autowired
+    ConsentTemplateController(ConsentTemplateService consentTemplateService) {
+        this.consentTemplateService = consentTemplateService;
+    }
+
+    @PostMapping("/consent/template")
+    public Mono<ConsentTemplateResponse> saveConsentTemplate(@RequestBody ConsentTemplate consentTemplate) {
+        return consentTemplateService.saveConsentTemplate(consentTemplate);
+    }
+
+    @PostMapping("/consent/request")
+    public Mono<ConsentResponse> postConsentUsingTemplate(@RequestBody ConsentRequestInput consentRequestInput) {
+        return consentTemplateService.createConsentRequestUsingTemplate(consentRequestInput);
+    }
+
+    @GetMapping("/consent/template/{consentTemplateId}")
+    public Optional<ConsentTemplate> getConsentTemplate(@PathVariable String consentTemplateId) {
+        return consentTemplateService.getConsentTemplate(consentTemplateId);
+    }
+
+    @PostMapping("/consent/template/detail")
+    public Mono<ConsentDetail> prepareConsentDetailsFromTemplate(@RequestBody ConsentRequestInput consentRequestInput) {
+        return consentTemplateService.prepareConsentDetailsFromTemplate(consentRequestInput);
+    }
+
+    @DeleteMapping("/consent/template/{consentTemplateId}")
+    public Mono<ConsentTemplateDeleteResponse> deleteConsentTemplate(@PathVariable String consentTemplateId) {
+        return consentTemplateService.deleteConsentTemplate(consentTemplateId);
+    }
+}

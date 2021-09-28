@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <profiles>
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2/</url>
+                </repository>
+                <repository>
+                    <id>repo.finarkein.jfrog</id>
+                    <name>Finarkein JFrog Repository</name>
+                    <url>https://finarkein.jfrog.io/artifactory/maven-aa/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+</settings>
