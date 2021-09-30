@@ -11,7 +11,6 @@ import io.finarkein.api.aa.consent.artefact.ConsentArtefact;
 import io.finarkein.api.aa.consent.artefact.SignedConsent;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
 import io.finarkein.api.aa.consent.handle.ConsentStatus;
-import io.finarkein.api.aa.consent.request.ConsentDetail;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
@@ -30,14 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
-import static io.finarkein.api.aa.util.Functions.strToTimeStamp;
+import static io.finarkein.api.aa.util.Functions.*;
 import static io.finarkein.fiul.Functions.UUIDSupplier;
 import static io.finarkein.fiul.Functions.currentTimestampSupplier;
 
@@ -184,9 +181,10 @@ class ConsentServiceImpl implements ConsentService {
                                     throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
                                             + consentArtefact.getCreateTimestamp());
                             }
-                            if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).after(Timestamp.from(Instant.now())))
+                            if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).after(strToTimeStamp.apply(currentTimestampSupplierMinusDuration.apply(-5, ChronoUnit.SECONDS)))) {
                                 throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
                                         + consentArtefact.getCreateTimestamp());
+                            }
                             return Mono.just(consentArtefact);
                         })
                 )
