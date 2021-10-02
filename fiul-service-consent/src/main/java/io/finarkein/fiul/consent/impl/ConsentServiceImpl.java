@@ -111,11 +111,10 @@ class ConsentServiceImpl implements ConsentService {
                                                 .flatMap(consentHandleResponse -> {
                                                     final Optional<ConsentState> optionalConsentState = consentStore
                                                             .getConsentStateByHandle(consentHandle);
-                                                    if (optionalConsentState.isPresent()) {
-                                                        if (strToTimeStamp.apply(consentHandleResponse.getTimestamp())
-                                                                .before(optionalConsentState.get().getPostConsentResponseTimestamp()))
-                                                            throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
-                                                                    "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
+                                                    if (optionalConsentState.isPresent() && strToTimeStamp.apply(consentHandleResponse.getTimestamp())
+                                                            .before(optionalConsentState.get().getPostConsentResponseTimestamp())) {
+                                                        throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
+                                                                "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
                                                     }
                                                     return Mono.just(consentHandleResponse);
                                                 })
@@ -125,7 +124,8 @@ class ConsentServiceImpl implements ConsentService {
                                         .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaName"))
                 ).doOnSuccess(consentHandleResponse -> {
                     log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
-                    consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(), consentHandleResponse.getConsentStatus().getStatus());
+                    consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(),
+                            consentHandleResponse.getConsentStatus().getStatus());
                 })
                 .doOnError(error -> log.error("GetConsentStatus: error:{}", error.getMessage(), error));
     }
@@ -176,8 +176,8 @@ class ConsentServiceImpl implements ConsentService {
                         .getConsentArtefact(consentId, aaName)
                         .flatMap(consentArtefact -> {
                             final ConsentState consentState = consentStore.getConsentStateById(consentArtefact.getConsentId());
-                            if (consentState != null) {
-                                if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).before(consentState.getPostConsentResponseTimestamp()))
+                            if (consentState != null && strToTimeStamp.apply(consentArtefact.getCreateTimestamp())
+                                    .before(consentState.getPostConsentResponseTimestamp())) {
                                     throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
                                             + consentArtefact.getCreateTimestamp());
                             }
