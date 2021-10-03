@@ -102,7 +102,7 @@ class DataFlowServiceImpl implements DataFlowService {
                 })
                 .doOnSuccess(saveRegisterCallback(fiRequest.getCallback()))
                 .doOnError(SystemException.class, error -> {
-                    fiRequestStore.updateFIRequestStateOnError(fiRequest, aaName);
+                    fiRequestStore.updateFIRequestStateOnError(fiRequest, aaName, error.getParamValue("dataSessionId"));
 //                    consentService.updateConsentStateDataSession(error.txnId(), null, false);
                     log.error("SubmitFIRequest: error: {}", error.getMessage(), error);
                 });

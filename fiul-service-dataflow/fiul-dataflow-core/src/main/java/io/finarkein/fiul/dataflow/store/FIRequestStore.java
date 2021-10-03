@@ -18,7 +18,7 @@ public interface FIRequestStore {
 
     void saveFIRequestAndFetchMetadata(FIFetchMetadata fiFetchMetadata, FIUFIRequest fiRequest);
 
-    void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName);
+    void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName, String dataSessionId);
 
     Optional<FIRequestDTO> getFIRequest(String consentId, String sessionId);
 
