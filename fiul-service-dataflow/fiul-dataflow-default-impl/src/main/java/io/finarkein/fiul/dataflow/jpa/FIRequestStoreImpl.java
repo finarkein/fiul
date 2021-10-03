@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.util.Optional;
 
 import static io.finarkein.api.aa.util.Functions.strToTimeStamp;
+import static io.finarkein.api.aa.util.Functions.uuidSupplier;
 
 @Service
 public class FIRequestStoreImpl implements FIRequestStore {
@@ -77,9 +78,11 @@ public class FIRequestStoreImpl implements FIRequestStore {
     }
 
     @Override
-    public void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName) {
+    public void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName, String dataSessionId) {
+        if (dataSessionId == null)
+            dataSessionId = uuidSupplier.get();
         final var fiRequestState = FIRequestState.builder()
-                .sessionId(Functions.uuidSupplier.get())
+                .sessionId(dataSessionId)
                 .notifierId(null)
                 .txnId(fiRequest.getTxnid())
                 .sessionStatus(null)
