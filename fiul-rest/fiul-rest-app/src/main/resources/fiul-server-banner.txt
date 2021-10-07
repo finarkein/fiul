@@ -1,0 +1,5 @@
+╔══════════════════════════════╗
+═   FIUL-Server by Finarkein   ═
+╚══════════════════════════════╝
+
+v${application.version}

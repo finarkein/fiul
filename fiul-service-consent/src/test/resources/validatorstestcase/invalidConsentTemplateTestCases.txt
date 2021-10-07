@@ -1,0 +1,571 @@
+{
+    "description": "",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "",
+                "value": 20000
+            }
+        ]
+    }
+}
+*
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "z.z",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}

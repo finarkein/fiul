@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%style{%d{dd-MM-yy HH:mm:ss.SSS}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}:}{bright,yellow} %msg%n%throwable"/>
+        </Console>
+
+        <RollingFile name="FIULServiceLogFile"
+                     fileName="./logs/${server.name}.log"
+                     filePattern="./logs/${server.name}-%d{-dd-MMMM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>%d{dd-MM-yy HH:mm:ss.SSS} %-5level [%-t] [%logger{36}]: %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+<!--                <OnStartupTriggeringPolicy />-->
+                <SizeBasedTriggeringPolicy size="50 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="FIULDataFlowAudit"
+                     fileName="./logs/fiul-data-flow-audit.log"
+                     filePattern="./logs/fiul-data-flow-audit-%d{-dd-MMMM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>%d{dd-MM-yy HH:mm:ss.SSS} %-5level [%-t] [%logger{36}]: %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!--                <OnStartupTriggeringPolicy />-->
+                <SizeBasedTriggeringPolicy size="100 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console" level="info"/>
+            <AppenderRef ref="FIULServiceLogFile"/>
+        </Root>
+
+        <Logger name="io.finarkein" level="debug" additivity="false">
+<!--            <AppenderRef ref="Console" level="debug"/>-->
+            <AppenderRef ref="FIULServiceLogFile"/>
+        </Logger>
+
+        <Logger name="io.finarkein.fiul.dataflow.easy.dto.FIDataKeyEntityListener" level="info" additivity="false">
+            <AppenderRef ref="FIULDataFlowAudit"/>
+        </Logger>
+    </Loggers>
+</Configuration>

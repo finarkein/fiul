@@ -1,0 +1,979 @@
+{   "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "ConsentDetail":{
+    }
+}
+*
+{   "ver": "1.1.2",
+    "timestamp": "2021-06-05T14:07:28.289Z",
+    "txnid": "{{txn_id}}",
+    "ConsentDetail":
+        {    "consentStart": "",
+             "consentExpiry": "2021-12-31T11:39:57.153Z",
+                "consentMode": "STORE",
+                "fetchType": "PERIODIC",
+                "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                "fiTypes": [       "DEPOSIT"     ],
+                "DataConsumer": {
+                    "id": "fiu@finarkein"     },
+                    "Customer": {
+                        "id": "xxx@finvu"
+                    },
+                    "Purpose": {
+                        "code": "101",
+                        "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                        "text": "Wealth management service",
+                        "Category": {
+                            "type": "string"
+                        }
+                    },
+                    "FIDataRange": {
+                        "from": "2018-12-06T11:39:57.153Z",
+                        "to": "2020-07-03T14:25:33.440Z"
+                    },
+                    "DataLife": {
+                        "unit": "MONTH",
+                        "value": 1
+                    },
+                    "Frequency": {
+                        "unit": "MONTH",
+                        "value": 100
+                    },
+                    "DataFilter": [
+                        {
+                            "type": "TRANSACTIONAMOUNT",
+                            "operator": ">=",
+                            "value": "20000"
+                        }
+                    ]
+
+        }
+}
+*
+{   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": ""
+                     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {},
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "DataFilter": [
+                         {
+                             "type": "TRANSACTIONAMOUNT",
+                             "operator": ">=",
+                             "value": "20000"
+                         }
+                     ]
+
+         }
+ }
+ *
+ {   "ver": "1.1.2",
+     "timestamp": "2021-06-05T14:07:28.289Z",
+     "txnid": "{{txn_id}}",
+     "ConsentDetail":
+         {    "consentStart": "2021-06-05T14:07:28.289Z",
+              "consentExpiry": "2021-12-31T11:39:57.153Z",
+                 "consentMode": "STORE",
+                 "fetchType": "PERIODIC",
+                 "consentTypes": [       "TRANSACTIONS",       "PROFILE",       "SUMMARY"     ],
+                 "fiTypes": [       "DEPOSIT"     ],
+                 "DataConsumer": {
+                     "id": "fiu@finarkein"     },
+                     "Customer": {
+                         "id": "xxx@finvu"
+                     },
+                     "Purpose": {
+                         "code": "101",
+                         "refUri": "https://api.rebit.org.in/aa/purpose/101.xml",
+                         "text": "Wealth management service",
+                         "Category": {
+                             "type": "string"
+                         }
+                     },
+                     "FIDataRange": {
+                         "from": "2018-12-06T11:39:57.153Z",
+                         "to": "2020-07-03T14:25:33.440Z"
+                     },
+                     "DataLife": {
+                         "unit": "MONTH",
+                         "value": 1
+                     },
+                     "Frequency": {
+                         "unit": "MONTH",
+                         "value": 100
+                     },
+                     "DataFilter": [
+                         {
+
+                         }
+                     ]
+
+         }
+ }

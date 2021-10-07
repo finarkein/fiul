@@ -1,0 +1,35 @@
+{
+    "description": "Consent Template description",
+    "tags": "Consent,Template,tags",
+    "consentVersion": "1.1.2",
+    "consentTemplateDefinition": {
+        "consentStartOffset": "1m",
+        "consentExpiryDuration": "1y",
+        "consentMode": "STORE",
+        "consentTypes": [
+            "PROFILE",
+            "TRANSACTIONS",
+            "SUMMARY"
+        ],
+        "fiTypes": [
+            "DEPOSIT"
+        ],
+        "purposeCode": "101",
+        "fetchType": "ONETIME",
+        "frequency": "1M",
+        "dataLife": "i",
+        "consentTemplateDataRange": {
+            "type": "CONSENT_START_RELATIVE",
+            "year": "-1z",
+            "from": "-1y",
+            "to": "-1M"
+        },
+        "dataFilter": [
+            {
+                "type": "TRANSACTIONAMOUNT",
+                "operator": "<=",
+                "value": 20000
+            }
+        ]
+    }
+}
