@@ -7,6 +7,7 @@
 package io.finarkein.fiul.validator;
 
 import io.finarkein.aa.registry.models.EntityInfo;
+import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.aa.validators.BasicResponseValidator;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
@@ -23,15 +24,6 @@ import java.util.regex.Pattern;
 public class NotificationValidator {
 
     private static final String REQUIRED_NOTIFIER_TYPE = "AA";
-    private static final Pattern UUID_REGEX_PATTERN =
-            Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-
-    public static boolean isValidUUID(String str) {
-        if (str == null || str.isEmpty()) {
-            return false;
-        }
-        return UUID_REGEX_PATTERN.matcher(str).matches();
-    }
 
     public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState,
                                                    EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
@@ -48,8 +40,8 @@ public class NotificationValidator {
         if (!consentNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Invalid Notifier type");
         }
-        if (!isValidUUID(consentNotification.getConsentStatusNotification().getConsentId()))
-            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Id is invalid");
+        ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getConsentStatusNotification().getConsentId(),
+                "ConsentId");
 
         if (!consentNotification.getConsentStatusNotification().getConsentHandle().equals(consentState.getConsentHandle()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "ConsentHandle Id is invalid");
