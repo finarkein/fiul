@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 @Log4j2
 public class EasyDataFlowController {
 
