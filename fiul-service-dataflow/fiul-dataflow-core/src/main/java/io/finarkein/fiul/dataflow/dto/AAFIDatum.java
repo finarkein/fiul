@@ -49,8 +49,8 @@ public class AAFIDatum {
     private String maskedAccNumber;
 
     @Column(columnDefinition = "BYTEA", nullable = false, updatable = false)
-    @Convert(converter = ZippedBlobAttrConverter.OfByteArray.class)
-    private byte[] fiData;
+    @Convert(converter = ZippedBlobAttrConverter.OfString.class)
+    private String fiData;
 
     @Column(columnDefinition = "BYTEA", nullable = false, updatable = false)
     @Convert(converter = ZippedBlobAttrConverter.OfKeyMaterial.class)

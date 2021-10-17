@@ -32,19 +32,6 @@ public abstract class ZippedBlobAttrConverter<T> implements AttributeConverter<T
         return readFromBytes(Functions.gzipDecompression.apply(dbData));
     }
 
-    public static class OfByteArray extends ZippedBlobAttrConverter<byte[]> {
-
-        @Override
-        protected byte[] writeAsBytes(byte[] object) {
-            return object;
-        }
-
-        @Override
-        protected byte[] readFromBytes(byte[] bytes) {
-            return bytes;
-        }
-    }
-
     public static class OfString extends ZippedBlobAttrConverter<String>{
 
         @Override

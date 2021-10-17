@@ -108,7 +108,7 @@ public abstract class Functions {
             .stream()
             .map(datum -> {
                         DecryptedDatum decryptedDatum = new DecryptedDatum(datum);
-                        CipherParameter cipherParameter = prepareCipherParam(key, new String(datum.getEncryptedFI()), remoteKeyMaterial);
+                        CipherParameter cipherParameter = prepareCipherParam(key, datum.getEncryptedFI(), remoteKeyMaterial);
                         CipherResponse decrypt = cryptoService.decrypt(cipherParameter);
                         decryptedDatum.setDecryptedFI(decrypt.getBase64Data());
                         return decryptedDatum;

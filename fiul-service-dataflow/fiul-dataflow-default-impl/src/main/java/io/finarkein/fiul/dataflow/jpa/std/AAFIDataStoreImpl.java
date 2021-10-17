@@ -136,7 +136,7 @@ public class AAFIDataStoreImpl implements AAFIDataStore {
                             .map(datum -> builder
                                     .linkRefNumber(datum.getLinkRefNumber())
                                     .maskedAccNumber(datum.getMaskedAccNumber())
-                                    .fiData(datum.getEncryptedFI().getBytes())
+                                    .fiData(datum.getEncryptedFI())
                                     .build());
                 }).forEach(fiDataList::add);
         return fiDataList;
