@@ -38,14 +38,14 @@ public class FIRequestState {
     protected String txnId;
     protected String aaId;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp notificationTimestamp;
 
     @Column(columnDefinition = "text")
     @Convert(converter = Converter.OfFIStatusResponseList.class)
     protected List<FIStatusResponse> fiStatusResponse;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp updatedOn;
 
     @PrePersist

@@ -36,16 +36,16 @@ public class ConsentRequestLog {
     private String version;
     private String txnId;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     private Timestamp timestamp;
     private String aaId;
     private String customerAAId;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONAttrConverter.OfTypeConsentDetail.class)
     private ConsentDetail consentDetail;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp createdOn;
     private String errorDetails;
     private ErrorOrigin errorOrigin;
