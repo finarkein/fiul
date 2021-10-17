@@ -17,7 +17,6 @@ import io.finarkein.fiul.dataflow.response.decrypt.DecryptedDatum;
 import io.finarkein.fiul.dataflow.response.decrypt.DecryptedFI;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
