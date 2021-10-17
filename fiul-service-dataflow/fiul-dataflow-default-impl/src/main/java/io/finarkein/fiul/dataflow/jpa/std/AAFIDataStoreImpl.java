@@ -136,7 +136,7 @@ public class AAFIDataStoreImpl implements AAFIDataStore {
                             .map(datum -> builder
                                     .linkRefNumber(datum.getLinkRefNumber())
                                     .maskedAccNumber(datum.getMaskedAccNumber())
-                                    .fiData(datum.getEncryptedFI())
+                                    .fiData(datum.getEncryptedFI().getBytes())
                                     .build());
                 }).forEach(fiDataList::add);
         return fiDataList;
@@ -172,7 +172,7 @@ public class AAFIDataStoreImpl implements AAFIDataStore {
                                 return Datum.builder()
                                         .linkRefNumber(aaFIDatum.getLinkRefNumber())
                                         .maskedAccNumber(aaFIDatum.getMaskedAccNumber())
-                                        .encryptedFI(aaFIDatum.getFiData())
+                                        .encryptedFI(new String(aaFIDatum.getFiData()))
                                         .build();
                             }).collect(Collectors.toList()));
                     return fi;

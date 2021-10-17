@@ -48,20 +48,18 @@ public class AAFIDatum {
     @Column(length = 36)
     private String maskedAccNumber;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB", nullable = false, updatable = false)
-    @Convert(converter = ZippedBlobAttrConverter.OfString.class)
-    private String fiData;
+    @Column(columnDefinition = "BYTEA", nullable = false, updatable = false)
+    @Convert(converter = ZippedBlobAttrConverter.OfByteArray.class)
+    private byte[] fiData;
 
-    @Lob
-    @Column(columnDefinition = "BLOB", nullable = false, updatable = false)
+    @Column(columnDefinition = "BYTEA", nullable = false, updatable = false)
     @Convert(converter = ZippedBlobAttrConverter.OfKeyMaterial.class)
     private KeyMaterial keyMaterial;
 
-    @Column(columnDefinition = "DATETIME(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
     private Timestamp dataLifeExpireOn;
 
-    @Column(columnDefinition = "DATETIME(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
     private Timestamp createdOn;
 
     @PrePersist

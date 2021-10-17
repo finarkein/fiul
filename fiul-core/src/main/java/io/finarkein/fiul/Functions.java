@@ -17,6 +17,7 @@ import io.finarkein.fiul.dataflow.response.decrypt.DecryptedDatum;
 import io.finarkein.fiul.dataflow.response.decrypt.DecryptedFI;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -108,7 +109,7 @@ public abstract class Functions {
             .stream()
             .map(datum -> {
                         DecryptedDatum decryptedDatum = new DecryptedDatum(datum);
-                        CipherParameter cipherParameter = prepareCipherParam(key, datum.getEncryptedFI(), remoteKeyMaterial);
+                        CipherParameter cipherParameter = prepareCipherParam(key, new String(datum.getEncryptedFI()), remoteKeyMaterial);
                         CipherResponse decrypt = cryptoService.decrypt(cipherParameter);
                         decryptedDatum.setDecryptedFI(decrypt.getBase64Data());
                         return decryptedDatum;

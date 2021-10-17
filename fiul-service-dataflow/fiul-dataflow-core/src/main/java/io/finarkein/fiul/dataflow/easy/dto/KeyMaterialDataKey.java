@@ -28,7 +28,7 @@ public class KeyMaterialDataKey {
     @Id
     String sessionId;
 
-    @Column(columnDefinition = "LONGTEXT", nullable = false, updatable = false)
+    @Column(columnDefinition = "TEXT", nullable = false, updatable = false)
     String encryptedKey;
 
     @Data
