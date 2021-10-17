@@ -172,7 +172,7 @@ public class AAFIDataStoreImpl implements AAFIDataStore {
                                 return Datum.builder()
                                         .linkRefNumber(aaFIDatum.getLinkRefNumber())
                                         .maskedAccNumber(aaFIDatum.getMaskedAccNumber())
-                                        .encryptedFI(new String(aaFIDatum.getFiData()))
+                                        .encryptedFI(aaFIDatum.getFiData())
                                         .build();
                             }).collect(Collectors.toList()));
                     return fi;
