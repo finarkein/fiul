@@ -30,7 +30,7 @@ public class FICallback {
     protected String consentId;
     protected String callbackUrl;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp createdOn;
 
     @PrePersist

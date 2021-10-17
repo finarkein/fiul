@@ -37,17 +37,17 @@ public class FIRequestDTO {
 
     protected String version;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp timestamp;
 
     protected String txnId;
 
     protected String aaName;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiDataRangeFrom;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiDataRangeTo;
 
     @Column(columnDefinition="text")
@@ -58,7 +58,7 @@ public class FIRequestDTO {
     @Convert(converter = JSONAttrConverter.OfCallback.class)
     protected Callback callback;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp createdOn;
 
     @PrePersist

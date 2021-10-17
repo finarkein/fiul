@@ -38,10 +38,10 @@ public final class FIDataRecordDataKey {
     @Column(nullable = false, updatable = false)
     private byte[] encryptedDataKey;
 
-    @Column(columnDefinition = "DATETIME(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
     private Timestamp dataLifeExpireOn;
 
-    @Column(columnDefinition = "DATETIME(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
     private Timestamp createdOn;
 
     @PrePersist

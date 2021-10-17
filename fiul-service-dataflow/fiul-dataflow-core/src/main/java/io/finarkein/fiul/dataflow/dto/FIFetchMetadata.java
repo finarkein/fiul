@@ -41,13 +41,13 @@ public class FIFetchMetadata {
     @Column(length = 20)
     protected String aaName;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiDataRangeFrom;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiDataRangeTo;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiRequestSubmittedOn;
 
     @Column(length = 36)
@@ -55,13 +55,13 @@ public class FIFetchMetadata {
     @Column(length = 36)
     protected String linkRefNumbers;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiFetchSubmittedOn;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiFetchCompletedOn;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp updatedOn;
 
     @PrePersist

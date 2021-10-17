@@ -47,10 +47,10 @@ public class FIDataHeader {
     @Column(nullable = false, updatable = false)
     private Integer dataLifeValue;
 
-    @Column(columnDefinition = "DATETIME(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
     private Timestamp dataLifeExpireOn;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     private Timestamp createdOn;
 
     @PrePersist
