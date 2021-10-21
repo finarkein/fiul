@@ -23,10 +23,12 @@ import java.time.Instant;
 @Builder(builderClassName = "Builder")
 @Table( name = "FI_FETCH_METADATA",
         indexes = {
-                @Index(name = "FIFetchMD_Idx1", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo, fipId, linkRefNumbers, fiFetchSubmittedOn"),
+                @Index(name = "FIFetchMD_Idx1", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo, fipId, " +
+                        "linkRefNumbers, fiFetchSubmittedOn"),
                 @Index(name = "FIFetchMD_Idx2", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo"),
                 @Index(name = "FIFetchMD_Idx3", columnList = "sessionId, aaName"),
-                @Index(name = "FIFetchMD_Idx4", columnList = "sessionId")
+                @Index(name = "FIFetchMD_Idx4", columnList = "sessionId"),
+                @Index(name = "FIFetchMD_Idx5", columnList = "fiFetchCompletedOn, consentId, fiDataRangeFrom, fiDataRangeTo, easyDataFlow"),
         })
 public class FIFetchMetadata {
 
@@ -41,6 +43,9 @@ public class FIFetchMetadata {
     @Column(length = 20)
     protected String aaName;
 
+    @Column(columnDefinition = "boolean default false")
+    protected boolean easyDataFlow;
+
     @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiDataRangeFrom;
 
@@ -52,6 +57,7 @@ public class FIFetchMetadata {
 
     @Column(length = 36)
     protected String fipId;
+
     @Column(length = 36)
     protected String linkRefNumbers;
 

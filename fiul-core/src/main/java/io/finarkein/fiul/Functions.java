@@ -30,15 +30,11 @@ import java.util.stream.Collectors;
 
 public abstract class Functions {
     public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    private static final SimpleDateFormat timestampFormat;
     private static final SimpleDateFormat dateFormat;
 
-    private static final String DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ss";
     public static final Supplier<String> UUIDSupplier = () -> java.util.UUID.randomUUID().toString();
 
     static {
-        timestampFormat = new SimpleDateFormat(DATE_FORMAT_STRING, Locale.US);
-        timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     }
 
@@ -49,16 +45,6 @@ public abstract class Functions {
     }
 
     public static final Supplier<String> currentTimestampSupplier = () -> createFormat().format(Date.from(Instant.now()));
-
-    public static final Function<String, Timestamp> timestampToSqlDate = timestamp -> {
-        if (timestamp == null)
-            return null;
-        try {
-            return new Timestamp(timestampFormat.parse(timestamp).getTime());
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    };
 
     public static final Function<String, Timestamp> toTimestamp = timestamp -> {
         final Date inputTimestamp;

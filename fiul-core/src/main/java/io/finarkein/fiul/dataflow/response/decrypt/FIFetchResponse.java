@@ -9,6 +9,7 @@ package io.finarkein.fiul.dataflow.response.decrypt;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.finarkein.fiul.dataflow.model.FIDataI;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FIFetchResponse {
+public class FIFetchResponse implements FIDataI {
     @JsonProperty("ver")
     private String ver;
     @JsonProperty("timestamp")

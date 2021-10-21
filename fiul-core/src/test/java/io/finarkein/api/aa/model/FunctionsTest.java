@@ -9,9 +9,7 @@ package io.finarkein.api.aa.model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.crypto.KeyMaterial;
 import io.finarkein.api.aa.crypto.SerializedKeyPair;
-import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.service.crypto.CryptoService;
-import io.finarkein.api.aa.validators.ConsentValidatorTest;
 import io.finarkein.fiul.CryptoServiceAdapter;
 import io.finarkein.fiul.CryptoServiceAdapterBuilder;
 import io.finarkein.fiul.Functions;
@@ -22,7 +20,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import static io.finarkein.fiul.Functions.fiFetchResponseDecoder;
+import static io.finarkein.api.aa.util.Functions.timestampToSqlDate;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FunctionsTest {
@@ -36,13 +34,13 @@ class FunctionsTest {
     @Test
     void timestampToSqlDateTest() {
         String timestampString = null;
-        Timestamp timestamp = Functions.timestampToSqlDate.apply(timestampString);
+        Timestamp timestamp = timestampToSqlDate.apply(timestampString);
         Assert.isNull(timestamp, "Timestamp generated is not null");
         String timestampStringIllegal = "illegalTimestamp";
-        assertThrows(IllegalArgumentException.class, () -> Functions.timestampToSqlDate.apply(timestampStringIllegal));
+        assertThrows(IllegalArgumentException.class, () -> timestampToSqlDate.apply(timestampStringIllegal));
 
         timestampString = "2021-06-05T14:07:28.289Z";
-        Assert.notNull(Functions.timestampToSqlDate.apply(timestampString), "Timestamp not generated");
+        Assert.notNull(timestampToSqlDate.apply(timestampString), "Timestamp not generated");
     }
 
     @Test
