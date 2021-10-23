@@ -96,14 +96,14 @@ public abstract class Functions {
                         DecryptedDatum decryptedDatum = new DecryptedDatum(datum);
                         CipherParameter cipherParameter = prepareCipherParam(key, datum.getEncryptedFI(), remoteKeyMaterial);
                         CipherResponse decrypt = cryptoService.decrypt(cipherParameter);
-                        decryptedDatum.setDecryptedFI(decrypt.getBase64Data());
+                        decryptedDatum.setAccountData(decrypt.getBase64Data());
                         return decryptedDatum;
                     }
             ).collect(Collectors.toList());
 
     public static FIDecoder fiDecoder = (fiToDecode, cryptoService, key) -> {
         DecryptedFI fiData = new DecryptedFI(fiToDecode);
-        fiData.setDecryptedDatum(datumDecoder.decode(fiToDecode.getData(), cryptoService, fiToDecode.getKeyMaterial(), key));
+        fiData.setAccounts(datumDecoder.decode(fiToDecode.getData(), cryptoService, fiToDecode.getKeyMaterial(), key));
         return fiData;
     };
 
@@ -114,7 +114,7 @@ public abstract class Functions {
                 .map(fiToDecode -> fiDecoder.decode(fiToDecode, cryptoService, key))
                 .collect(Collectors.toList());
         io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse response = new io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse(responseDecode);
-        response.setDecryptedFI(fiDataList);
+        response.setFipData(fiDataList);
         return response;
     };
 

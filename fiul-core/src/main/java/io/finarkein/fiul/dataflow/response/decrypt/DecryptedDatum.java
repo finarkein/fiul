@@ -19,7 +19,7 @@ import lombok.ToString;
 @JsonPropertyOrder({
         "linkRefNumber",
         "maskedAccNumber",
-        "decryptedFI"
+        "accountData"
 })
 @ToString
 @Data
@@ -30,8 +30,8 @@ public class DecryptedDatum {
     protected String linkRefNumber;
     @JsonProperty("maskedAccNumber")
     protected String maskedAccNumber;
-    @JsonProperty("decryptedFI")
-    protected String decryptedFI;
+    @JsonProperty("accountData")
+    protected String accountData;
 
     public DecryptedDatum(Datum datum) {
         linkRefNumber = datum.getLinkRefNumber();

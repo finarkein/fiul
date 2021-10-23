@@ -4,7 +4,7 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.dataflow;
+package io.finarkein.fiul.dataflow.response.decrypt;
 
 import io.finarkein.api.aa.exception.Errors;
 

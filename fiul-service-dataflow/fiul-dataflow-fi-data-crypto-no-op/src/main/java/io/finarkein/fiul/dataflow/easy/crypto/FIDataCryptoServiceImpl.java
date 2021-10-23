@@ -25,16 +25,16 @@ class FIDataCryptoServiceImpl implements FIDataCryptoService {
     public CipheredFIData encrypt(FIFetchResponse fiFetchResponse) {
         final var builder = CipheredFIData.builder();
 
-        fiFetchResponse.getDecryptedFI()
+        fiFetchResponse.getFipData()
                 .forEach(decryptedFI ->
                         decryptedFI
-                                .getDecryptedDatum()
+                                .getAccounts()
                                 .stream()
                                 .map(decryptedDatum -> CipheredDataRecord.builder()
-                                        .fipId(decryptedFI.getFipID())
+                                        .fipId(decryptedFI.getFipId())
                                         .linkRefNumber(decryptedDatum.getLinkRefNumber())
                                         .maskedAccNumber(decryptedDatum.getMaskedAccNumber())
-                                        .fiData(decryptedDatum.getDecryptedFI().getBytes(StandardCharsets.UTF_8))
+                                        .fiData(decryptedDatum.getAccountData().getBytes(StandardCharsets.UTF_8))
                                         .encryptedDataKey("dummy".getBytes()).build())
                                 .forEach(builder::addRecord)
                 );

@@ -20,8 +20,8 @@ import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.converter.xml.XMLConverterFunctions;
 import io.finarkein.fiul.dataflow.DataRequest;
 import io.finarkein.fiul.dataflow.EasyDataFlowService;
+import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
-import io.finarkein.fiul.dataflow.FIDataOutputFormat;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
@@ -29,11 +29,8 @@ import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
 import io.finarkein.fiul.dataflow.easy.DataSaveRequest;
 import io.finarkein.fiul.dataflow.easy.SessionStatus;
 import io.finarkein.fiul.dataflow.easy.dto.KeyMaterialDataKey;
-import io.finarkein.fiul.dataflow.model.AccountData;
-import io.finarkein.fiul.dataflow.model.FIData;
-import io.finarkein.fiul.dataflow.model.FIDataI;
-import io.finarkein.fiul.dataflow.model.FIPData;
-import io.finarkein.fiul.dataflow.response.decrypt.ObjectifiedFIFetchResponse;
+import io.finarkein.fiul.dataflow.response.decrypt.FIDataI;
+import io.finarkein.fiul.dataflow.response.decrypt.FIData;
 import io.finarkein.fiul.dataflow.store.EasyFIDataStore;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
 import io.finarkein.fiul.dataflow.store.FIRequestStore;
@@ -50,7 +47,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static io.finarkein.api.aa.consent.ConsentMode.STORE;
 import static io.finarkein.api.aa.util.Functions.*;
@@ -206,40 +202,16 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                 }
             });
 
-            return toFIData(consentId, sessionId, decryptedFIData, fiDataOutputFormat);
+            return toFIData(decryptedFIData, fiDataOutputFormat);
         };
     }
 
-    protected Mono<FIDataI> toFIData(String consentId, String sessionId,
-                                     io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse decryptedFIData,
+    protected Mono<FIDataI> toFIData(io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse decryptedFIData,
                                      FIDataOutputFormat fiDataOutputFormat) {
         if (FIDataOutputFormat.xml == fiDataOutputFormat)
             return Mono.just(decryptedFIData);
-
-        final var builder = FIData.builder()
-                .consentId(consentId)
-                .sessionId(sessionId);
-
-        ObjectifiedFIFetchResponse response = XMLConverterFunctions.fiFetchResponseToObject.apply(decryptedFIData);
-        final var fipDataList = response.getObjectifiedFI()
-                .stream()
-                .map(objectifiedFI -> FIPData.builder()
-                        .fipId(objectifiedFI.getFipID())
-                        .accountsData(objectifiedFI.getObjectifiedDatumList()
-                                .stream()
-                                .map(obj -> AccountData.builder()
-                                        .linkRefNumber(obj.getLinkRefNumber())
-                                        .maskedAccNumber(obj.getMaskedAccNumber())
-                                        .summary(obj.getFi().getSummary())
-                                        .profile(obj.getFi().getProfile())
-                                        .transactions(obj.getFi().getTransactions())
-                                        .type(obj.getFi().getType())
-                                        .version("" + obj.getFi().getVersion())
-                                        .build()
-                                ).collect(Collectors.toList())
-                        ).build()
-                ).collect(Collectors.toList());
-        return Mono.just(builder.fipData(fipDataList).build());
+        FIData response = XMLConverterFunctions.fiFetchResponseToObject.apply(decryptedFIData);
+        return Mono.just(response);
     }
 
     protected Consumer<FIDataI> updateFetchMetadata(String sessionId, Timestamp fetchDataStartTime) {
@@ -307,7 +279,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         return easyFIDataStore.getFIData(consentId, sessionId)
                 .map(fiFetchResponse -> {
                     final FIRequestDTO fiRequestDTO = validateAndGetFIRequest(consentId, sessionId);
-                    return toFIData(consentId, sessionId, fiFetchResponse, fiDataOutputFormat)
+                    return toFIData(fiFetchResponse, fiDataOutputFormat)
                             .doOnSuccess(response -> log.debug("GetStoredData: success: consentId:{}, sessionId:{}", consentId, sessionId))
                             .doOnError(error -> log.error("GetStoredData: error: consentId:{}, sessionId:{}, error:{}", consentId, sessionId, error.getMessage(), error))
                             ;

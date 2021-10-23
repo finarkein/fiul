@@ -4,7 +4,8 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.dataflow.model;
+package io.finarkein.fiul.dataflow.response.decrypt;
 
 public interface FIDataI {
+    FIDataOutputFormat getOutputFormat();
 }
