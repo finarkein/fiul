@@ -7,6 +7,7 @@
 package io.finarkein.fiul.dataflow.jpa;
 
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -58,4 +60,18 @@ public interface RepoFIFetchMetadata extends JpaRepository<FIFetchMetadata, Stri
                      @Param("updatedOnValue") Timestamp updatedOnValue,
                      @Param("fipIdValue") String fipIdValue,
                      @Param("linkRefNumberValue") String linkRefNumberValue);
+
+    @Query("select t from FIFetchMetadata t where " +
+            "t.fiFetchCompletedOn IS NOT NULL and " +
+            "t.consentId = :consentIdValue and " +
+            "t.fiDataRangeFrom <= :fiDataRangeFromValue and " +
+            "t.fiDataRangeTo >= :fiDataRangeToValue and " +
+            "t.easyDataFlow = :easyDataFlowValue " +
+            "order by t.fiFetchCompletedOn desc")
+    List<FIFetchMetadata> getMetadataForGivenWindow(@Param("consentIdValue") String consentIdValue,
+                                                    @Param("fiDataRangeFromValue") Timestamp fiDataRangeFromValue,
+                                                    @Param("fiDataRangeToValue") Timestamp fiDataRangeToValue,
+                                                    @Param("easyDataFlowValue") boolean easyDataFlowValue,
+                                                    Pageable pageable);
+
 }

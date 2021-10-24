@@ -30,15 +30,11 @@ import java.util.stream.Collectors;
 
 public abstract class Functions {
     public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    private static final SimpleDateFormat timestampFormat;
     private static final SimpleDateFormat dateFormat;
 
-    private static final String DATE_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ss";
     public static final Supplier<String> UUIDSupplier = () -> java.util.UUID.randomUUID().toString();
 
     static {
-        timestampFormat = new SimpleDateFormat(DATE_FORMAT_STRING, Locale.US);
-        timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
     }
 
@@ -49,16 +45,6 @@ public abstract class Functions {
     }
 
     public static final Supplier<String> currentTimestampSupplier = () -> createFormat().format(Date.from(Instant.now()));
-
-    public static final Function<String, Timestamp> timestampToSqlDate = timestamp -> {
-        if (timestamp == null)
-            return null;
-        try {
-            return new Timestamp(timestampFormat.parse(timestamp).getTime());
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    };
 
     public static final Function<String, Timestamp> toTimestamp = timestamp -> {
         final Date inputTimestamp;
@@ -110,14 +96,14 @@ public abstract class Functions {
                         DecryptedDatum decryptedDatum = new DecryptedDatum(datum);
                         CipherParameter cipherParameter = prepareCipherParam(key, datum.getEncryptedFI(), remoteKeyMaterial);
                         CipherResponse decrypt = cryptoService.decrypt(cipherParameter);
-                        decryptedDatum.setDecryptedFI(decrypt.getBase64Data());
+                        decryptedDatum.setAccountData(decrypt.getBase64Data());
                         return decryptedDatum;
                     }
             ).collect(Collectors.toList());
 
     public static FIDecoder fiDecoder = (fiToDecode, cryptoService, key) -> {
         DecryptedFI fiData = new DecryptedFI(fiToDecode);
-        fiData.setDecryptedDatum(datumDecoder.decode(fiToDecode.getData(), cryptoService, fiToDecode.getKeyMaterial(), key));
+        fiData.setAccounts(datumDecoder.decode(fiToDecode.getData(), cryptoService, fiToDecode.getKeyMaterial(), key));
         return fiData;
     };
 
@@ -128,7 +114,7 @@ public abstract class Functions {
                 .map(fiToDecode -> fiDecoder.decode(fiToDecode, cryptoService, key))
                 .collect(Collectors.toList());
         io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse response = new io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse(responseDecode);
-        response.setDecryptedFI(fiDataList);
+        response.setFipData(fiDataList);
         return response;
     };
 

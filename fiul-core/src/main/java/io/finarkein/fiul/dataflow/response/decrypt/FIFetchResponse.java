@@ -21,25 +21,31 @@ import java.util.List;
         "ver",
         "timestamp",
         "txnid",
-        "decryptedFI"
+        "outputFormat",
+        "fipData"
 })
 @ToString
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FIFetchResponse {
+public class FIFetchResponse implements FIDataI {
     @JsonProperty("ver")
     private String ver;
     @JsonProperty("timestamp")
     private String timestamp;
     @JsonProperty("txnid")
     private String txnid;
-    @JsonProperty("decryptedFI")
-    private List<DecryptedFI> decryptedFI;
+    @JsonProperty("fipData")
+    private List<DecryptedFI> fipData;
 
     public FIFetchResponse(io.finarkein.api.aa.dataflow.response.FIFetchResponse FIFetchResponse) {
         ver = FIFetchResponse.getVer();
         timestamp = FIFetchResponse.getTimestamp();
         txnid = FIFetchResponse.getTxnid();
+    }
+
+    @JsonProperty("outputFormat")
+    public FIDataOutputFormat getOutputFormat() {
+        return FIDataOutputFormat.xml;
     }
 }

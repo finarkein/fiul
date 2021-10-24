@@ -6,30 +6,35 @@
  */
 package io.finarkein.fiul.dataflow.response.decrypt;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.finarkein.aa.fi.FIAccount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "fipID",
-        "objectifiedDatumList"
+        "linkRefNumber",
+        "maskedAccNumber",
+        "accountData"
 })
 @ToString
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ObjectifiedFI {
-    @JsonProperty("fipID")
-    private String fipID;
-    @JsonProperty("objectifiedDatumList")
-    private List<ObjectifiedDatum> objectifiedDatumList;
+public class AccountData {
+    @JsonProperty("linkRefNumber")
+    protected String linkRefNumber;
+    @JsonProperty("maskedAccNumber")
+    protected String maskedAccNumber;
+    @JsonProperty("accountData")
+    protected FIAccount accountData;
 
-    public ObjectifiedFI(DecryptedFI decryptedFIData) {
-        fipID = decryptedFIData.getFipID();
+    public AccountData(DecryptedDatum decryptedDatum){
+        linkRefNumber = decryptedDatum.linkRefNumber;
+        maskedAccNumber = decryptedDatum.maskedAccNumber;
     }
 }
