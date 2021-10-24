@@ -10,10 +10,12 @@ import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,6 +43,16 @@ public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
     @Override
     public Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId) {
         return repoFIFetchMetadata.findById(sessionId);
+    }
+
+    @Override
+    public Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentId, Timestamp fromValue,
+                                                              Timestamp toValue, boolean easyDataFlow) {
+        final List<FIFetchMetadata> metadataForGivenWindow = repoFIFetchMetadata.getMetadataForGivenWindow(consentId,
+                fromValue, toValue, easyDataFlow, PageRequest.of(0,1));
+        if(metadataForGivenWindow == null || metadataForGivenWindow.isEmpty())
+            return Optional.empty();
+        return Optional.of(metadataForGivenWindow.get(0));
     }
 
     @Override

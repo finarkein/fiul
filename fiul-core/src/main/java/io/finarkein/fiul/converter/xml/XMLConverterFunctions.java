@@ -25,24 +25,24 @@ public final class XMLConverterFunctions {
         return XmlToBeanConverters.getConverter(accountTag.getType(), accountTag.getVersion()).converter().apply(fiXML);
     };
 
-    static final Function<DecryptedDatum, ObjectifiedDatum> datumToObjectifiedDatum = decryptedDatum -> {
-        var objectifiedDatum = new ObjectifiedDatum(decryptedDatum);
-        objectifiedDatum.setFi(xmlToFIBeanComputer.apply(decryptedDatum.getDecryptedFI()));
+    static final Function<DecryptedDatum, AccountData> datumToObjectifiedDatum = decryptedDatum -> {
+        var objectifiedDatum = new AccountData(decryptedDatum);
+        objectifiedDatum.setAccountData(xmlToFIBeanComputer.apply(decryptedDatum.getAccountData()));
         return objectifiedDatum;
     };
 
-    public static final Function<FIFetchResponse, ObjectifiedFIFetchResponse> fiFetchResponseToObject = fiFetchResponse -> {
-        final List<ObjectifiedFI> objectifiedFIDataList = fiFetchResponse.getDecryptedFI().stream().map(decryptedFIData -> {
-            final List<ObjectifiedDatum> objectifiedDatumList = decryptedFIData.getDecryptedDatum()
+    public static final Function<FIFetchResponse, FIData> fiFetchResponseToObject = fiFetchResponse -> {
+        final List<FIPData> FIPDataDataList = fiFetchResponse.getFipData().stream().map(decryptedFIData -> {
+            final List<AccountData> AccountDataList = decryptedFIData.getAccounts()
                     .stream()
                     .map(datumToObjectifiedDatum)
                     .collect(Collectors.toList());
-            var objectifiedFIData = new ObjectifiedFI(decryptedFIData);
-            objectifiedFIData.setObjectifiedDatumList(objectifiedDatumList);
+            var objectifiedFIData = new FIPData(decryptedFIData);
+            objectifiedFIData.setAccountData(AccountDataList);
             return objectifiedFIData;
         }).collect(Collectors.toList());
-        var objectifiedFIFetchResponse = new ObjectifiedFIFetchResponse(fiFetchResponse);
-        objectifiedFIFetchResponse.setObjectifiedFI(objectifiedFIDataList);
+        var objectifiedFIFetchResponse = new FIData(fiFetchResponse);
+        objectifiedFIFetchResponse.setFipData(FIPDataDataList);
         return objectifiedFIFetchResponse;
     };
 }

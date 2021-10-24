@@ -19,6 +19,8 @@ public interface FIFetchMetadataStore {
 
     Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId);
 
+    Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentId, Timestamp fromValue, Timestamp toValue, boolean easyDataFlow);
+
     Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId, String aaName);
 
     Optional<FIFetchMetadata> getCompletedFIFetchMetadata(String sessionId, String fipId, String linkRefNumbers,

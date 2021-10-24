@@ -467,12 +467,12 @@ public final class TestValues {
         fiFetchResponse.setTimestamp(timestamp);
         DecryptedFI decryptedFI = new DecryptedFI();
         DecryptedDatum decryptedDatum = new DecryptedDatum();
-        decryptedFI.setFipID("FIP-1");
-        decryptedDatum.setDecryptedFI("DecryptedFI");
+        decryptedFI.setFipId("FIP-1");
+        decryptedDatum.setAccountData("DecryptedFI");
         decryptedDatum.setMaskedAccNumber("MaskedAccNumber");
         decryptedDatum.setLinkRefNumber(LinkRefNUmber);
-        decryptedFI.setDecryptedDatum(Collections.singletonList(decryptedDatum));
-        fiFetchResponse.setDecryptedFI(Collections.singletonList(decryptedFI));
+        decryptedFI.setAccounts(Collections.singletonList(decryptedDatum));
+        fiFetchResponse.setFipData(Collections.singletonList(decryptedFI));
         return fiFetchResponse;
     }
 
