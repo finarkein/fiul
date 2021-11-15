@@ -12,6 +12,7 @@ import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.notification.ConsentNotificationSubscriber;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
@@ -36,7 +37,7 @@ public class ConsentStatusNotificationSubscriber implements ConsentNotificationS
     protected final ConsentService consentService;
 
     @Autowired
-    public ConsentStatusNotificationSubscriber(JmsTemplate jms, ConsentService consentService) {
+    public ConsentStatusNotificationSubscriber(@Qualifier("notification") JmsTemplate jms, ConsentService consentService) {
         this.jms = jms;
         this.consentService = consentService;
     }
