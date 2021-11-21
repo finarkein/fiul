@@ -26,10 +26,13 @@ import io.finarkein.fiul.consent.validators.ConsentRequestInputValidator;
 import io.finarkein.fiul.consent.validators.ConsentTemplateValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static io.finarkein.fiul.Functions.currentTimestampSupplier;
@@ -119,6 +122,11 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
         var consentTemplate = getConsentTemplate(consentRequestInput);
         return Mono.just(prepareConsentDetailFromTemplate(consentTemplate.getConsentTemplateDefinition(), consentRequestInput.getDataConsumerId(), consentRequestInput.getCustomerId()));
+    }
+
+    @Override
+    public Page<ConsentTemplate> getConsentTemplatesByQuery(String tag, String consentVersion, Pageable pageRequest) {
+        return consentTemplateRepository.getByQuery(tag, consentVersion, pageRequest);
     }
 
     private ConsentDetail prepareConsentDetailFromTemplate(ConsentTemplateDefinition consentTemplateDefinition, String dataConsumerId, String customerId) {
