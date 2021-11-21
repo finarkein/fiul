@@ -7,6 +7,8 @@
 package io.finarkein.fiul.consent.repo;
 
 import io.finarkein.fiul.consent.model.ConsentTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +24,11 @@ public interface ConsentTemplateRepository extends JpaRepository<ConsentTemplate
     @Transactional
     @Query("DELETE FROM ConsentTemplate WHERE id = :idValue")
     void deleteById(@Param("idValue") String idValue);
+
+    @Query("select ct from ConsentTemplate ct where " +
+            "(:tagValue is null or ct.tags like %:tagValue%) " +
+            "and (:consentVersionValue is null or ct.consentVersion like %:consentVersionValue%)")
+    Page<ConsentTemplate> getByQuery(@Param("tagValue") String tagValue,
+                                     @Param("consentVersionValue") String consentVersion,
+                                     final Pageable pageable);
 }
