@@ -15,6 +15,9 @@ import io.finarkein.fiul.consent.service.ConsentTemplateResponse;
 import io.finarkein.fiul.consent.service.ConsentTemplateService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -45,6 +48,22 @@ public class ConsentTemplateController {
     @GetMapping("/consent/template/{consentTemplateId}")
     public Optional<ConsentTemplate> getConsentTemplate(@PathVariable String consentTemplateId) {
         return consentTemplateService.getConsentTemplate(consentTemplateId);
+    }
+
+    @GetMapping("/consent/template/q")
+    public Page<ConsentTemplate> getConsentTemplateByQuery(@RequestParam(value = "tag", required = false) String tag,
+                                                           @RequestParam(value = "consentVersion", required = false) String consentVersion,
+                                                           @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                           @RequestParam(value = "pageNumber", required = false) Integer pageNumber
+    ) {
+        return consentTemplateService.getConsentTemplatesByQuery(tag,
+                consentVersion,
+                PageRequest.of(
+                        (pageNumber == null) ? 0 : pageNumber,
+                        (pageSize == null) ? 20 : pageSize,
+                        Sort.by(Sort.Order.desc("createdOn"))
+                )
+        );
     }
 
     @PostMapping("/consent/template/detail")
