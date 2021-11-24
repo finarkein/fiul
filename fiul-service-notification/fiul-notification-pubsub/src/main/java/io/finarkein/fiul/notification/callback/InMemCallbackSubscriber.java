@@ -33,7 +33,7 @@ class InMemCallbackSubscriber extends AbstractCallbackSubscriber
         implements FINotificationSubscriber, ConsentNotificationSubscriber {
 
     @Autowired
-    public InMemCallbackSubscriber(JmsTemplate jms,
+    public InMemCallbackSubscriber(@Qualifier("notification") JmsTemplate jms,
                                    @Qualifier(WEBHOOK_QUALIFIER_SUPPLIER_METHOD)
                                            WebClient webClient,
                                    CallbackRegistry registry) {
