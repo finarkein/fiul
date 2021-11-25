@@ -18,8 +18,6 @@ import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.regex.Pattern;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NotificationValidator {
 
