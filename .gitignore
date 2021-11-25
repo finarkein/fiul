@@ -6,6 +6,10 @@ target/
 !**/src/test/**/target/
 *logs/
 .mvn
+*.data
+*.redo
+*.log
+lock
 
 ### STS ###
 .apt_generated

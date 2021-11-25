@@ -29,15 +29,15 @@ public class ConsentTemplate {
     private String tags;
     private String consentVersion;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = ConsentJsonAttrConverter.OfTypeConsentTemplateDefinition.class)
     private ConsentTemplateDefinition consentTemplateDefinition;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     private Timestamp createdOn;
 
     @LastModifiedDate
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     private Timestamp updatedOn;
 
     @PrePersist

@@ -9,10 +9,7 @@ package io.finarkein.fiul.dataflow.response.decrypt;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
@@ -21,25 +18,35 @@ import java.util.List;
         "ver",
         "timestamp",
         "txnid",
-        "objectifiedFI"
+        "outputFormat",
+        "fipData"
 })
 @ToString
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ObjectifiedFIFetchResponse {
+@Builder(builderClassName = "Builder")
+public class FIData implements FIDataI {
     @JsonProperty("ver")
     private String ver;
+
     @JsonProperty("timestamp")
     private String timestamp;
+
     @JsonProperty("txnid")
     private String txnid;
-    @JsonProperty("objectifiedFI")
-    private List<ObjectifiedFI> objectifiedFI;
 
-    public ObjectifiedFIFetchResponse(FIFetchResponse fiFetchResponse) {
+    @JsonProperty("fipData")
+    private List<FIPData> fipData;
+
+    public FIData(FIFetchResponse fiFetchResponse) {
         ver = fiFetchResponse.getVer();
         timestamp = fiFetchResponse.getTimestamp();
         txnid = fiFetchResponse.getTxnid();
+    }
+
+    @JsonProperty("outputFormat")
+    public FIDataOutputFormat getOutputFormat() {
+        return FIDataOutputFormat.json;
     }
 }

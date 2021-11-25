@@ -185,7 +185,7 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
         response.setVer(fiDataHeader.getVersion());
         response.setTxnid(fiDataHeader.getTxnId());
         response.setTimestamp(timestampToStr.apply(Timestamp.from(Instant.now())));
-        response.setDecryptedFI(decryptedFIList);
+        response.setFipData(decryptedFIList);
         return Optional.of(response);
     }
 
@@ -263,13 +263,13 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
                 .stream()
                 .map(entry -> {
                     final var decryptedFI = new DecryptedFI();
-                    decryptedFI.setFipID(entry.getKey());
-                    decryptedFI.setDecryptedDatum(entry.getValue().stream()
+                    decryptedFI.setFipId(entry.getKey());
+                    decryptedFI.setAccounts(entry.getValue().stream()
                             .map(decipheredDataRecord -> {
                                 final var datum = new DecryptedDatum();
                                 datum.setLinkRefNumber(decipheredDataRecord.getLinkRefNumber());
                                 datum.setMaskedAccNumber(decipheredDataRecord.getMaskedAccNumber());
-                                datum.setDecryptedFI(decipheredDataRecord.getData());
+                                datum.setAccountData(decipheredDataRecord.getData());
                                 return datum;
                             }).collect(Collectors.toList()));
                     return decryptedFI;

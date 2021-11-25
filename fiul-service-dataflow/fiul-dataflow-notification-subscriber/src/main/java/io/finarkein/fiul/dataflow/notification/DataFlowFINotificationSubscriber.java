@@ -14,7 +14,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -34,7 +33,7 @@ public class DataFlowFINotificationSubscriber implements FINotificationSubscribe
     protected final DataFlowNotificationHandler dataFlowNotificationHandler;
 
     @Autowired
-    public DataFlowFINotificationSubscriber(JmsTemplate jms, DataFlowNotificationHandler dataFlowNotificationHandler) {
+    public DataFlowFINotificationSubscriber(DataFlowNotificationHandler dataFlowNotificationHandler) {
         this.dataFlowNotificationHandler = dataFlowNotificationHandler;
     }
 

@@ -23,10 +23,12 @@ import java.time.Instant;
 @Builder(builderClassName = "Builder")
 @Table( name = "FI_FETCH_METADATA",
         indexes = {
-                @Index(name = "FIFetchMD_Idx1", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo, fipId, linkRefNumbers, fiFetchSubmittedOn"),
+                @Index(name = "FIFetchMD_Idx1", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo, fipId, " +
+                        "linkRefNumbers, fiFetchSubmittedOn"),
                 @Index(name = "FIFetchMD_Idx2", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo"),
                 @Index(name = "FIFetchMD_Idx3", columnList = "sessionId, aaName"),
-                @Index(name = "FIFetchMD_Idx4", columnList = "sessionId")
+                @Index(name = "FIFetchMD_Idx4", columnList = "sessionId"),
+                @Index(name = "FIFetchMD_Idx5", columnList = "fiFetchCompletedOn, consentId, fiDataRangeFrom, fiDataRangeTo, easyDataFlow"),
         })
 public class FIFetchMetadata {
 
@@ -41,27 +43,31 @@ public class FIFetchMetadata {
     @Column(length = 20)
     protected String aaName;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "boolean default false")
+    protected boolean easyDataFlow;
+
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiDataRangeFrom;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiDataRangeTo;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiRequestSubmittedOn;
 
     @Column(length = 36)
     protected String fipId;
+
     @Column(length = 36)
     protected String linkRefNumbers;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiFetchSubmittedOn;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp fiFetchCompletedOn;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp updatedOn;
 
     @PrePersist
