@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 import static io.finarkein.api.aa.exception.Errors.InvalidRequest;
-import static io.finarkein.fiul.Functions.timestampToSqlDate;
+import static io.finarkein.api.aa.util.Functions.timestampToSqlDate;
 
 public class CommonDataFlowValidator {
 

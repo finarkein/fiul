@@ -45,16 +45,16 @@ import static io.finarkein.api.aa.util.Functions.*;
 
 @Log4j2
 @Service
-class DataFlowServiceImpl implements DataFlowService {
-    private final AAFIUClient fiuClient;
-    private final FIRequestStore fiRequestStore;
-    private final AAFIDataStore aafiDataStore;
-    private final FIFetchMetadataStore fiFetchMetadataStore;
-    private final ConsentService consentService;
-    private final CallbackRegistry callbackRegistry;
+public class DataFlowServiceImpl implements DataFlowService {
+    protected final AAFIUClient fiuClient;
+    protected final FIRequestStore fiRequestStore;
+    protected final AAFIDataStore aafiDataStore;
+    protected final FIFetchMetadataStore fiFetchMetadataStore;
+    protected final ConsentService consentService;
+    protected final CallbackRegistry callbackRegistry;
 
     @Autowired
-    DataFlowServiceImpl(AAFIUClient fiuClient, FIRequestStore fiRequestStore,
+    protected DataFlowServiceImpl(AAFIUClient fiuClient, FIRequestStore fiRequestStore,
                         FIFetchMetadataStore fiFetchMetadataStore,
                         ConsentService consentService,
                         AAFIDataStore aafiDataStore,
@@ -81,7 +81,7 @@ class DataFlowServiceImpl implements DataFlowService {
                 ;
     }
 
-    private Mono<FIRequestResponse> doCreateFIRequest(FIUFIRequest fiRequest, String aaName) {
+    protected Mono<FIRequestResponse> doCreateFIRequest(FIUFIRequest fiRequest, String aaName) {
         log.debug("SubmitFIRequest: start: request:{}", fiRequest);
         final var fiRequestStartTime = Timestamp.from(Instant.now());
 
@@ -108,7 +108,7 @@ class DataFlowServiceImpl implements DataFlowService {
                 });
     }
 
-    private Consumer<FIRequestResponse> saveRegisterCallback(Callback fiCallback) {
+    protected Consumer<FIRequestResponse> saveRegisterCallback(Callback fiCallback) {
         return response -> {
             if (Objects.isNull(fiCallback) || Objects.isNull(fiCallback.getUrl()))
                 return;
@@ -144,7 +144,7 @@ class DataFlowServiceImpl implements DataFlowService {
                         .with(uuidSupplier.get(), "Cannot find aaName to FI fetch, please try with aaName")));
     }
 
-    private Consumer<FIFetchResponse> updateFetchMetadata(String sessionId, String fipId, String[] linkRefNumbers, Timestamp fiFetchStartTime) {
+    protected Consumer<FIFetchResponse> updateFetchMetadata(String sessionId, String fipId, String[] linkRefNumbers, Timestamp fiFetchStartTime) {
         return fiFetchResponse -> {
             var metadataBuilder = FIFetchMetadata.builder()
                     .sessionId(sessionId)
@@ -161,7 +161,7 @@ class DataFlowServiceImpl implements DataFlowService {
         };
     }
 
-    private Consumer<FIFetchResponse> saveDataIfStoreConsentMode(String sessionId, String aaName) {
+    protected Consumer<FIFetchResponse> saveDataIfStoreConsentMode(String sessionId, String aaName) {
         return fiFetchResponse -> {
             final var fiRequest = fiRequestStore.getFIRequestByAANameAndSessionId(sessionId, aaName);
             final var consentId = fiRequest.map(FIRequestDTO::getConsentId).orElse(null);
@@ -245,7 +245,7 @@ class DataFlowServiceImpl implements DataFlowService {
 
     @Data
     @Accessors(fluent = true)
-    static class FIFetchInput {
+    protected static class FIFetchInput {
 
         private final String dataSessionId;
         private String aaName;

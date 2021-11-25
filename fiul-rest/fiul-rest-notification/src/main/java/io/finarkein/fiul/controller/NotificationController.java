@@ -10,6 +10,7 @@ package io.finarkein.fiul.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.aa.registry.RegistryService;
+import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.notification.ConsentNotification;
@@ -83,9 +84,8 @@ public class NotificationController {
             return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
         }
 
-        if (!NotificationValidator.isValidUUID(consentNotification.getTxnid())) {
-            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), "Invalid TxnId")));
-        }
+        ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getTxnid(), "TxnId");
+
         ConsentState consentState = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
 
         if (consentState == null)
@@ -129,10 +129,8 @@ public class NotificationController {
             return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(),
                     Timestamp.from(Instant.now()), e.getMessage())));
         }
-        if (!NotificationValidator.isValidUUID(fiNotification.getTxnid())) {
-            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(),
-                    Timestamp.from(Instant.now()), "Invalid TxnId")));
-        }
+        ArgsValidator.isValidUUID(fiNotification.getTxnid(), fiNotification.getTxnid(), "TxnId");
+
         Optional<FIRequestState> optionalFIRequestState = dataFlowService.getFIRequestStateByTxnId(fiNotification.getTxnid());
         if (optionalFIRequestState.isPresent()) {
             try {

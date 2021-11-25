@@ -38,10 +38,10 @@ public class ConsentState {
     private String notifierId;
 
     @LastModifiedDate
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     private Timestamp updatedOn;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     private Timestamp postConsentResponseTimestamp;
 
     @PrePersist

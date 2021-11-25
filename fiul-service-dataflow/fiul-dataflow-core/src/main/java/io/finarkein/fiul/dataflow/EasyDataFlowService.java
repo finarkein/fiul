@@ -7,9 +7,10 @@
 package io.finarkein.fiul.dataflow;
 
 import io.finarkein.api.aa.dataflow.FIRequestResponse;
-import io.finarkein.api.aa.model.FIData;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
+import io.finarkein.fiul.dataflow.response.decrypt.FIDataI;
+import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
@@ -20,9 +21,9 @@ public interface EasyDataFlowService {
 
     Mono<DataRequestStatus> dataRequestStatus(String consentId, String sessionId);
 
-    Mono<FIData> fetchData(String consentId, String sessionId);
+    Mono<FIDataI> fetchData(String consentId, String sessionId, FIDataOutputFormat fiDataOutputFormat);
 
-    Mono<FIData> getData(String consentId, String sessionId);
+    Mono<FIDataI> getData(String consentId, String sessionId, FIDataOutputFormat fiDataOutputFormat);
 
     Mono<FIDataDeleteResponse> deleteData(String consentId, String dataSessionId);
 

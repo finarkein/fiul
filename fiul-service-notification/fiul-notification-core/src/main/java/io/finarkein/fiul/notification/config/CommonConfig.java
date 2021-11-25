@@ -6,6 +6,7 @@
  */
 package io.finarkein.fiul.notification.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
@@ -20,7 +21,7 @@ public abstract class CommonConfig {
     public static final String FIUL_EVENT_FACTORY = "fiul-events-factory";
 
     @Bean(FIUL_EVENT_FACTORY)
-    public JmsListenerContainerFactory<?> fiuEventFactory(ConnectionFactory connectionFactory,
+    public JmsListenerContainerFactory<?> fiuEventFactory(@Qualifier("notificationConnection") ConnectionFactory connectionFactory,
                                                           DefaultJmsListenerContainerFactoryConfigurer configurer) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         configurer.configure(factory, connectionFactory);

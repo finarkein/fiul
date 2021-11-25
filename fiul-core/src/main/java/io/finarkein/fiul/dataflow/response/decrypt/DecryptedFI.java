@@ -19,20 +19,20 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "fipID",
-        "decryptedDatum"
+        "fipId",
+        "accounts"
 })
 @ToString
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class DecryptedFI {
-    @JsonProperty("fipID")
-    private String fipID;
-    @JsonProperty("decryptedDatum")
-    private List<DecryptedDatum> decryptedDatum;
+    @JsonProperty("fipId")
+    private String fipId;
+    @JsonProperty("accounts")
+    private List<DecryptedDatum> accounts;
 
     public DecryptedFI(FI input) {
-        fipID = input.getFipID();
+        fipId = input.getFipID();
     }
 }

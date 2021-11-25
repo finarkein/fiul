@@ -29,7 +29,7 @@ public class ConsentNotificationLog {
     private String version;
     private String txnId;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     private Timestamp notificationTimestamp;
 
     private String notifierType;
@@ -39,7 +39,7 @@ public class ConsentNotificationLog {
     private String consentState;
     private String aaId;
 
-    @Column(columnDefinition = "DATETIME(6)")
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp createdOn;
 
     @PrePersist
