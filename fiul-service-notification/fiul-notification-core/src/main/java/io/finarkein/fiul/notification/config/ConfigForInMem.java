@@ -30,7 +30,7 @@ public class ConfigForInMem extends CommonConfig{
 
     @Bean
     @Qualifier("notification")
-    public JmsTemplate managedJmsTemplate(@Qualifier("notificationConnection") ConnectionFactory connectionFactoryNotification) {
+    public JmsTemplate inMemJmsTemplate(@Qualifier("notificationConnection") ConnectionFactory connectionFactoryNotification) {
         JmsTemplate jmsTemplate = new JmsTemplate(connectionFactoryNotification);
         jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
         return jmsTemplate;
