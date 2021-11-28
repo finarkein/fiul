@@ -6,7 +6,6 @@
  */
 package io.finarkein.fiul.dataflow;
 
-import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
 import io.finarkein.fiul.dataflow.response.decrypt.FIDataI;
@@ -14,7 +13,6 @@ import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 
 public interface EasyDataFlowService {
 

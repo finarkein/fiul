@@ -31,7 +31,6 @@ import io.finarkein.api.aa.heartbeat.HeartbeatResponse;
 import io.finarkein.api.aa.notification.*;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
-import io.finarkein.fiul.consent.model.ErrorOrigin;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.FetchDataRequest;
 import io.finarkein.fiul.dataflow.response.decrypt.DecryptedDatum;

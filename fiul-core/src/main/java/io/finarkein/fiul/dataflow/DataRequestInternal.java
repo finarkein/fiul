@@ -9,8 +9,6 @@ package io.finarkein.fiul.dataflow;
 import io.finarkein.api.aa.util.Functions;
 import lombok.*;
 
-import java.util.UUID;
-
 @ToString
 @Data
 @EqualsAndHashCode(callSuper = true)
