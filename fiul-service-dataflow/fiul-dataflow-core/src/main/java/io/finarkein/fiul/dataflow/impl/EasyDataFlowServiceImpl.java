@@ -18,10 +18,7 @@ import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.converter.xml.XMLConverterFunctions;
-import io.finarkein.fiul.dataflow.DataRequest;
-import io.finarkein.fiul.dataflow.DataRequestResponse;
-import io.finarkein.fiul.dataflow.EasyDataFlowService;
-import io.finarkein.fiul.dataflow.FIUFIRequest;
+import io.finarkein.fiul.dataflow.*;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
@@ -81,7 +78,8 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
     }
 
     @Override
-    public Mono<DataRequestResponse> createDataRequest(DataRequest dataRequest) {
+    public Mono<DataRequestResponse> createDataRequest(DataRequest dataRequestInput) {
+        DataRequestInternal dataRequest = new DataRequestInternal(dataRequestInput);
         log.debug("CreateDataRequest: start: request:{}", dataRequest);
         return Mono.just(validateDataRequest(dataRequest))
                 .then(doCreateDataRequest(dataRequest))
@@ -89,7 +87,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                 .doOnError(error -> log.error("CreateDataRequest: error: request:{}", error.getMessage(), error));
     }
 
-    protected Mono<DataRequestResponse> doCreateDataRequest(DataRequest dataRequest) {
+    protected Mono<DataRequestResponse> doCreateDataRequest(DataRequestInternal dataRequest) {
         final var startTime = Timestamp.from(Instant.now());
         final var serializedKeyPair = doGet(fiuClient.generateKeyMaterial());
 
@@ -105,7 +103,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
                     return FIUFIRequest.builder()
                             .ver(FIRequest.VERSION)
-                            .txnid(dataRequest.getTxnid())
+                            .txnid(dataRequest.getTxnId())
                             .timestamp(timestampToStr.apply(startTime))
                             .consent(new Consent(dataRequest.getConsentId(), null))
                             .callback(dataRequest.getCallback())
@@ -134,25 +132,19 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                 );
     }
 
-    protected boolean validateDataRequestPre(DataRequest dataRequest) {
-        ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getCustomerAAId(), "customerAAId");
-        return true;
-    }
-
-    protected boolean validateDataRequest(DataRequest dataRequest) {
-        ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getTxnid(), "txnId");
-        ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getConsentHandleId(), "consentHandleId");
-//        ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getCustomerAAId(), "customerAAId");
-        ArgsValidator.checkTimestamp(dataRequest.getTxnid(), dataRequest.getDataRageFrom(), "dataRageFrom");
-        ArgsValidator.checkTimestamp(dataRequest.getTxnid(), dataRequest.getDataRageTo(), "dataRageTo");
-        ArgsValidator.validateDateRange(dataRequest.getTxnid(), dataRequest.getDataRageFrom(), dataRequest.getDataRageTo());
+    protected boolean validateDataRequest(DataRequestInternal dataRequest) {
+        String txnId = dataRequest.getTxnId();
+        ArgsValidator.checkNotEmpty(txnId, dataRequest.getConsentHandleId(), "consentHandleId");
+        ArgsValidator.checkTimestamp(txnId, dataRequest.getDataRageFrom(), "dataRageFrom");
+        ArgsValidator.checkTimestamp(txnId, dataRequest.getDataRageTo(), "dataRageTo");
+        ArgsValidator.validateDateRange(txnId, dataRequest.getDataRageFrom(), dataRequest.getDataRageTo());
 
         if (dataRequest.getCallback() != null)
-            ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getCallback().getUrl(), "Callback.Url");
+            ArgsValidator.checkNotEmpty(txnId, dataRequest.getCallback().getUrl(), "Callback.Url");
         return true;
     }
 
-    protected Consumer<DataRequestResponse> saveFIRequestAndFetchMetadata(String aaName, DataRequest dataRequest,
+    protected Consumer<DataRequestResponse> saveFIRequestAndFetchMetadata(String aaName, DataRequestInternal dataRequest,
                                                                           Timestamp startTime, FIUFIRequest fiufiRequest) {
         return response -> {
             final var fiFetchMetadata = FIFetchMetadata.builder()
@@ -162,7 +154,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                     .sessionId(response.getSessionId())
                     .fiDataRangeFrom(strToTimeStamp.apply(dataRequest.getDataRageFrom()))
                     .fiDataRangeTo(strToTimeStamp.apply(dataRequest.getDataRageTo()))
-                    .txnId(dataRequest.getTxnid())
+                    .txnId(dataRequest.getTxnId())
                     .fiRequestSubmittedOn(startTime)
                     .easyDataFlow(true)
                     .build();
