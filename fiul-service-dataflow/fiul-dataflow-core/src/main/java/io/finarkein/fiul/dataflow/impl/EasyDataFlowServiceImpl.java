@@ -91,8 +91,23 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         final var startTime = Timestamp.from(Instant.now());
         final var serializedKeyPair = doGet(fiuClient.generateKeyMaterial());
 
-        Mono<ConsentState> consentStateMono = consentService.getConsentState(dataRequest.getConsentHandleId(),
-                Optional.ofNullable(dataRequest.getCustomerAAId()));
+        Mono<ConsentState> consentStateMono = consentService
+                .getConsentState(dataRequest.getConsentHandleId(), Optional.ofNullable(dataRequest.getCustomerAAId()))
+                .flatMap(consentState -> {
+                    if (consentState.getConsentId() == null) {
+                        return consentService
+                                .getConsentStatus(consentState.getConsentHandle(), Optional.of(consentState.getAaId()))
+                                .flatMap(consentHandleResponse -> {
+                                            if (!Objects.equals(consentHandleResponse.getConsentStatus().getStatus(), "READY"))
+                                                return Mono.error(Errors.InvalidRequest.with(dataRequest.getTxnId(),
+                                                        "ConsentStatus is not READY"));
+                                            consentState.setConsentId(consentHandleResponse.getConsentStatus().getId());
+                                            return Mono.just(consentState);
+                                        }
+                                );
+                    }
+                    return Mono.just(consentState);
+                });
 
         return consentStateMono
                 .map(consentState -> {
