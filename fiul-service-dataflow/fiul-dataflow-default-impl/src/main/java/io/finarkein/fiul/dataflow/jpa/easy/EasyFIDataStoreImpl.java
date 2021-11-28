@@ -22,6 +22,7 @@ import io.finarkein.fiul.dataflow.response.decrypt.DecryptedDatum;
 import io.finarkein.fiul.dataflow.response.decrypt.DecryptedFI;
 import io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse;
 import io.finarkein.fiul.dataflow.store.EasyFIDataStore;
+import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -209,6 +210,7 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
     public Map<String, Integer> deleteFIDataByConsentHandleId(String consentHandleId) {
         Map<String, Integer> deletionCounts = new HashMap<>(8);
         transactionTemplate.executeWithoutResult(transactionStatus -> {
+
             var rowsDeleted = repoDataHeader.deleteByConsentHandleId(consentHandleId);
             if (rowsDeleted > 0)
                 deletionCounts.put("DataHeader", rowsDeleted);

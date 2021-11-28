@@ -125,14 +125,17 @@ public class FIRequestStoreImpl implements FIRequestStore {
                 .sessionStatus(fiNotification.getFIStatusNotification().getSessionStatus())
                 .notificationTimestamp(Functions.strToTimeStamp.apply(fiNotification.getTimestamp()))
                 .build();
-        final var fiRequestState = FIRequestState.builder()
-                .sessionId(notificationLogEntry.getSessionId())
-                .notifierId(notificationLogEntry.getNotifierId())
-                .txnId(notificationLogEntry.getTxnId())
-                .sessionStatus(notificationLogEntry.getSessionStatus())
-                .fiStatusResponse(notificationLogEntry.getFiStatusNotification())
-                .notificationTimestamp(notificationLogEntry.getNotificationTimestamp())
-                .build();
+
+        final FIRequestState fiRequestState = repoFIRequestState
+                .findById(fiNotification.getFIStatusNotification().getSessionId())
+                .orElse(new FIRequestState());
+
+        fiRequestState.setSessionId(notificationLogEntry.getSessionId());
+        fiRequestState.setNotifierId(notificationLogEntry.getNotifierId());
+        fiRequestState.setTxnId(notificationLogEntry.getTxnId());
+        fiRequestState.setSessionStatus(notificationLogEntry.getSessionStatus());
+        fiRequestState.setFiStatusResponse(notificationLogEntry.getFiStatusNotification());
+        fiRequestState.setNotificationTimestamp(notificationLogEntry.getNotificationTimestamp());
 
         transactionTemplate.executeWithoutResult(transactionStatus -> {
             repoFINotificationLog.save(notificationLogEntry);

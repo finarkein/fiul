@@ -13,13 +13,19 @@ import java.util.Optional;
 
 public interface FIFetchMetadataStore {
 
+    int deleteByConsentId(String consentId);
+
+    int deleteByConsentHandleId(String consentHandleId);
+
+    void deleteBySessionId(String sessionId);
+
     FIFetchMetadata saveFIFetchMetadata(FIFetchMetadata metadata);
 
     int updateSuccessFetchMetadata(FIFetchMetadata fetchMetadata);
 
     Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId);
 
-    Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentId, Timestamp fromValue, Timestamp toValue, boolean easyDataFlow);
+    Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue, Timestamp toValue, boolean easyDataFlow);
 
     Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId, String aaName);
 

@@ -203,6 +203,9 @@ public class DataFlowServiceImpl implements DataFlowService {
     public Mono<FIDataDeleteResponse> deleteDataForSession(String dataSessionId) {
         FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, false);
         log.debug("Deleting data for sessionId:{}", dataSessionId);
+
+        fiFetchMetadataStore.deleteBySessionId(dataSessionId);
+
         final var deletionCounts = aafiDataStore.deleteFIDataBySessionId(dataSessionId);
         if (deletionCounts.isEmpty()) {
             log.debug("Data not present for sessionId:{}", dataSessionId);
@@ -217,6 +220,8 @@ public class DataFlowServiceImpl implements DataFlowService {
     public Mono<FIDataDeleteResponse> deleteDataByConsentId(String consentId) {
         log.debug("Deleting data for consentId:{}", consentId);
         FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentId, false);
+
+        fiFetchMetadataStore.deleteByConsentId(consentId);
 
         final var deletionCounts = aafiDataStore.deleteFIDataByConsentId(consentId);
         if (deletionCounts.isEmpty()) {

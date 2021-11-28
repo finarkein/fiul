@@ -6,13 +6,13 @@
  */
 package io.finarkein.fiul.controller;
 
-import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.fiul.dataflow.DataRequest;
+import io.finarkein.fiul.dataflow.DataRequestResponse;
 import io.finarkein.fiul.dataflow.EasyDataFlowService;
-import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
 import io.finarkein.fiul.dataflow.response.decrypt.FIDataI;
+import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +34,7 @@ public class EasyDataFlowController {
     }
 
     @PostMapping("/FI/data/request")
-    public Mono<FIRequestResponse> postDataRequest(@RequestBody DataRequest dataRequest) {
+    public Mono<DataRequestResponse> postDataRequest(@RequestBody DataRequest dataRequest) {
         return easyDataFlowService.createDataRequest(dataRequest);
     }
 

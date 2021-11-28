@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public interface EasyDataFlowService {
 
-    Mono<FIRequestResponse> createDataRequest(DataRequest dataRequest);
+    Mono<DataRequestResponse> createDataRequest(DataRequest dataRequest);
 
     Mono<DataRequestStatus> dataRequestStatus(String consentHandleId, String sessionId);
 

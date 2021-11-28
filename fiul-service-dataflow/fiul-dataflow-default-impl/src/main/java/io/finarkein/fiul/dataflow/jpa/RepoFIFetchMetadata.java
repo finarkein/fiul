@@ -63,15 +63,21 @@ public interface RepoFIFetchMetadata extends JpaRepository<FIFetchMetadata, Stri
 
     @Query("select t from FIFetchMetadata t where " +
             "t.fiFetchCompletedOn IS NOT NULL and " +
-            "t.consentId = :consentIdValue and " +
+            "t.consentHandleId = :consentHandleIdValue and " +
             "t.fiDataRangeFrom <= :fiDataRangeFromValue and " +
             "t.fiDataRangeTo >= :fiDataRangeToValue and " +
             "t.easyDataFlow = :easyDataFlowValue " +
             "order by t.fiFetchCompletedOn desc")
-    List<FIFetchMetadata> getMetadataForGivenWindow(@Param("consentIdValue") String consentIdValue,
+    List<FIFetchMetadata> getMetadataForGivenWindow(@Param("consentHandleIdValue") String consentHandleIdValue,
                                                     @Param("fiDataRangeFromValue") Timestamp fiDataRangeFromValue,
                                                     @Param("fiDataRangeToValue") Timestamp fiDataRangeToValue,
                                                     @Param("easyDataFlowValue") boolean easyDataFlowValue,
                                                     Pageable pageable);
+    @Modifying(flushAutomatically = true)
+    @Transactional
+    int deleteByConsentHandleId(String consentHandleId);
 
+    @Modifying(flushAutomatically = true)
+    @Transactional
+    int deleteByConsentId(String consentId);
 }
