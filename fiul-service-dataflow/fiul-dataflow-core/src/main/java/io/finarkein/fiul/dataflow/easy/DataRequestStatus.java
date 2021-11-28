@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder({
         "consentId",
         "sessionId",
-        "txnId",
         "sessionStatus"
 })
 @Data
@@ -25,8 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(builderClassName = "Builder")
 public class DataRequestStatus {
-    private String consentId;
+    private String consentHandleId;
     private String sessionId;
-    private String txnId;
     private SessionStatus sessionStatus;
 }

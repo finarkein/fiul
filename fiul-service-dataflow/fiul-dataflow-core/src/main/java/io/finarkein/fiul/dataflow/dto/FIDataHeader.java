@@ -31,7 +31,7 @@ import java.time.Instant;
 )
 public class FIDataHeader {
     @Id
-    private String consentId;
+    private String consentHandleId;
     @Id
     private String sessionId;
 
@@ -63,7 +63,7 @@ public class FIDataHeader {
     @AllArgsConstructor
     public static class Key implements Serializable {
         @Id
-        private String consentId;
+        private String consentHandleId;
         @Id
         private String sessionId;
     }

@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 @Getter
 public class DataSaveRequest<T> {
     private final String aaName;
-    private final String consentId;
+    private final String consentHandleId;
     private final String sessionId;
     private final DataLife dataLife;
     private final Timestamp dataLifeExpireOn;

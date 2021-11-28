@@ -95,8 +95,8 @@ public class FIRequestStoreImpl implements FIRequestStore {
     }
 
     @Override
-    public Optional<FIRequestDTO> getFIRequest(String consentId, String sessionId) {
-        return repoFIRequestDTO.findById(new FIRequestDTO.Key(consentId, sessionId));
+    public Optional<FIRequestDTO> getFIRequest(String consentHandleId, String sessionId) {
+        return repoFIRequestDTO.findById(new FIRequestDTO.Key(consentHandleId, sessionId));
     }
 
     @Override

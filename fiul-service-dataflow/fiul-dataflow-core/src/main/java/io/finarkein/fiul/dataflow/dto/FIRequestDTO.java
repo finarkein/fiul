@@ -32,8 +32,11 @@ import java.time.Instant;
 public class FIRequestDTO {
     @Id
     protected String consentId;
+
     @Id
     protected String sessionId;
+
+    protected String consentHandleId;
 
     protected String version;
 

@@ -29,7 +29,7 @@ import java.time.Instant;
 @EntityListeners(FIDataKeyEntityListener.class)
 public final class FIDataRecordDataKey {
     @Id
-    private String consentId;
+    private String consentHandleId;
     @Id
     private String sessionId;
     @Id
@@ -55,7 +55,7 @@ public final class FIDataRecordDataKey {
     @Builder
     public static class Key implements Serializable {
         @Id
-        private String consentId;
+        private String consentHandleId;
         @Id
         private String sessionId;
         @Id

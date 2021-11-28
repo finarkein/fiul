@@ -16,11 +16,11 @@ import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.fiul.AAFIUClient;
+import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.converter.xml.XMLConverterFunctions;
 import io.finarkein.fiul.dataflow.DataRequest;
 import io.finarkein.fiul.dataflow.EasyDataFlowService;
-import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
@@ -29,8 +29,9 @@ import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
 import io.finarkein.fiul.dataflow.easy.DataSaveRequest;
 import io.finarkein.fiul.dataflow.easy.SessionStatus;
 import io.finarkein.fiul.dataflow.easy.dto.KeyMaterialDataKey;
-import io.finarkein.fiul.dataflow.response.decrypt.FIDataI;
 import io.finarkein.fiul.dataflow.response.decrypt.FIData;
+import io.finarkein.fiul.dataflow.response.decrypt.FIDataI;
+import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import io.finarkein.fiul.dataflow.store.EasyFIDataStore;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
 import io.finarkein.fiul.dataflow.store.FIRequestStore;
@@ -40,11 +41,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -52,8 +55,6 @@ import static io.finarkein.api.aa.consent.ConsentMode.STORE;
 import static io.finarkein.api.aa.util.Functions.*;
 import static io.finarkein.fiul.Functions.UUIDSupplier;
 import static io.finarkein.fiul.Functions.doGet;
-import static io.finarkein.fiul.dataflow.easy.SessionStatus.PENDING;
-import static io.finarkein.fiul.dataflow.easy.SessionStatus.READY;
 
 @Log4j2
 @Service
@@ -91,38 +92,64 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
     protected Mono<FIRequestResponse> doCreateDataRequest(DataRequest dataRequest) {
         final var startTime = Timestamp.from(Instant.now());
-        final var serializedKeyPair = doGet(fiuClient.generateKeyMaterial());
-        final var fiuFIRequest = FIUFIRequest.builder()
-                .ver(FIRequest.VERSION)
-                .txnid(dataRequest.getTxnid())
-                .timestamp(timestampToStr.apply(startTime))
-                .consent(new Consent(dataRequest.getConsentId(), null))
-                .callback(dataRequest.getCallback())
-                .fIDataRange(new FIDataRange(dataRequest.getDataRageFrom(), dataRequest.getDataRageTo()))
-                .keyMaterial(serializedKeyPair.getKeyMaterial())
-                .build();
-
         final var aaName = aaNameExtractor.apply(dataRequest.getCustomerAAId());
-        return Mono.just(fiuFIRequest)
-                .flatMap(request -> fiuClient.createFIRequest(request, aaName))
-                .doOnSuccess(saveKeyMaterialDataKey(serializedKeyPair))
-                .doOnSuccess(saveFIRequestAndFetchMetadata(aaName, dataRequest, startTime, fiuFIRequest))
-                .doOnSuccess(response -> {
-                    final var fiCallback = dataRequest.getCallback();
-                    if (Objects.isNull(fiCallback) || Objects.isNull(fiCallback.getUrl()))
-                        return;
-                    var callback = new FICallback();
-                    callback.setSessionId(response.getSessionId());
-                    callback.setConsentId(response.getConsentId());
-                    callback.setCallbackUrl(fiCallback.getUrl());
-                    callbackRegistry.registerFICallback(callback);
-                });
+        Mono<String> consentIdMono = prepareConsentIdMono(dataRequest, dataRequest.getCustomerAAId());
+        final var serializedKeyPair = doGet(fiuClient.generateKeyMaterial());
+
+        return consentIdMono
+                .map(consentId -> {
+                    //set consentId on dataRequest
+                    dataRequest.setConsentId(consentId);
+                    return FIUFIRequest.builder()
+                            .ver(FIRequest.VERSION)
+                            .txnid(dataRequest.getTxnid())
+                            .timestamp(timestampToStr.apply(startTime))
+                            .consent(new Consent(dataRequest.getConsentId(), null))
+                            .callback(dataRequest.getCallback())
+                            .fIDataRange(new FIDataRange(dataRequest.getDataRageFrom(), dataRequest.getDataRageTo()))
+                            .keyMaterial(serializedKeyPair.getKeyMaterial())
+                            .build();
+                })
+                .flatMap(fiufiRequest ->
+                        fiuClient.createFIRequest(fiufiRequest, aaName)
+                                .doOnSuccess(saveKeyMaterialDataKey(serializedKeyPair, dataRequest))
+                                .doOnSuccess(saveFIRequestAndFetchMetadata(aaName, dataRequest, startTime, fiufiRequest))
+                                .doOnSuccess(response -> {
+                                    final var fiCallback = dataRequest.getCallback();
+                                    if (Objects.isNull(fiCallback) || Objects.isNull(fiCallback.getUrl()))
+                                        return;
+                                    var callback = new FICallback();
+                                    callback.setSessionId(response.getSessionId());
+                                    callback.setConsentId(response.getConsentId());
+                                    callback.setCallbackUrl(fiCallback.getUrl());
+                                    callbackRegistry.registerFICallback(callback);
+                                })
+                )
+                ;
+    }
+
+    protected Mono<String> prepareConsentIdMono(DataRequest dataRequest, String customerAAId) {
+        if (dataRequest.getConsentId() == null) {
+            return consentService
+                    .getConsentState(dataRequest.getConsentHandleId(), Optional.of(customerAAId))
+                    .map(ConsentState::getConsentId);
+        }
+        return Mono.just(dataRequest.getConsentId());
+    }
+
+    public static Context withFiuFiRequest(FIUFIRequest fiuFiRequest) {
+        return Context.of("FIUFIRequest", Mono.just(fiuFiRequest));
+    }
+
+    protected boolean validateDataRequestPre(DataRequest dataRequest) {
+        ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getCustomerAAId(), "customerAAId");
+        return true;
     }
 
     protected boolean validateDataRequest(DataRequest dataRequest) {
         ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getTxnid(), "txnId");
-        ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getCustomerAAId(), "customerAAId");
         ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getConsentHandleId(), "consentHandleId");
+        ArgsValidator.checkNotEmpty(dataRequest.getTxnid(), dataRequest.getCustomerAAId(), "customerAAId");
         ArgsValidator.checkTimestamp(dataRequest.getTxnid(), dataRequest.getDataRageFrom(), "dataRageFrom");
         ArgsValidator.checkTimestamp(dataRequest.getTxnid(), dataRequest.getDataRageTo(), "dataRageTo");
         ArgsValidator.validateDateRange(dataRequest.getTxnid(), dataRequest.getDataRageFrom(), dataRequest.getDataRageTo());
@@ -136,7 +163,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         return response -> {
             final var fiFetchMetadata = FIFetchMetadata.builder()
                     .aaName(aaName)
-                    .consentId(response.getConsentId())
+                    .consentHandleId(dataRequest.getConsentHandleId())
                     .sessionId(response.getSessionId())
                     .fiDataRangeFrom(strToTimeStamp.apply(dataRequest.getDataRageFrom()))
                     .fiDataRangeTo(strToTimeStamp.apply(dataRequest.getDataRageTo()))
@@ -148,52 +175,54 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         };
     }
 
-    protected Consumer<FIRequestResponse> saveKeyMaterialDataKey(SerializedKeyPair serializedKeyPair) {
+    protected Consumer<FIRequestResponse> saveKeyMaterialDataKey(SerializedKeyPair serializedKeyPair,
+                                                                 DataRequest dataRequest) {
         //TODO encrypt privateKey while storing
         return response -> easyFIDataStore.saveKey(KeyMaterialDataKey.builder()
+                .consentHandleId(dataRequest.getConsentHandleId())
                 .consentId(response.getConsentId())
                 .sessionId(response.getSessionId())
                 .encryptedKey(serializedKeyPair.getPrivateKey()).build());
     }
 
     @Override
-    public Mono<FIDataI> fetchData(String consentId, String sessionId, FIDataOutputFormat fiDataOutputFormat) {
-        log.debug("FetchData: start: consentId:{}, sessionId:{}", consentId, sessionId);
+    public Mono<FIDataI> fetchData(String consentHandleId, String sessionId, FIDataOutputFormat fiDataOutputFormat) {
+        log.debug("FetchData: start: consentHandleId:{}, sessionId:{}", consentHandleId, sessionId);
         final var fetchDataStartTime = Timestamp.from(Instant.now());
-        final var fiRequestDTO = validateAndGetFIRequest(consentId, sessionId);
-        requireDataKeyPresent(consentId, sessionId);
+        final var fiRequestDTO = validateAndGetFIRequest(consentHandleId, sessionId);
+        requireDataKeyPresent(consentHandleId, sessionId);
 
         return fiuClient
                 .fiFetch(sessionId, fiRequestDTO.getAaName())
-                .flatMap(saveDataIfStoreConsentMode(fiRequestDTO, consentId, sessionId, fiDataOutputFormat))
+                .flatMap(saveDataIfStoreConsentMode(fiRequestDTO, consentHandleId, sessionId, fiDataOutputFormat))
                 .doOnSuccess(updateFetchMetadata(sessionId, fetchDataStartTime))
-                .doOnSuccess(response -> log.debug("FetchData: success: consentId:{}, sessionId:{}", consentId, sessionId))
-                .doOnError(error -> log.error("FetchData: error: consentId:{}, sessionId:{}, error:{}", consentId, sessionId, error.getMessage(), error))
+                .doOnSuccess(response -> log.debug("FetchData: success: consentHandleId:{}, sessionId:{}", consentHandleId, sessionId))
+                .doOnError(error -> log.error("FetchData: error: consentId:{}, consentHandleId:{}, error:{}", consentHandleId, sessionId, error.getMessage(), error))
                 ;
     }
 
     protected Function<FIFetchResponse, Mono<FIDataI>> saveDataIfStoreConsentMode(FIRequestDTO fiRequestDTO,
-                                                                                  String consentId, String sessionId,
+                                                                                  String consentHandleId, String sessionId,
                                                                                   FIDataOutputFormat fiDataOutputFormat) {
         return fiFetchResponse -> {
 
-            final var privateKey = easyFIDataStore.getKey(consentId, sessionId);
+            final var privateKey = easyFIDataStore.getKey(consentHandleId, sessionId);
             if (privateKey.isEmpty())
                 throw Errors.InternalError.with(fiFetchResponse.getTxnid(),
-                        "Unable to decode FIFetchResponse, data-key not found for consentId:" + consentId + ", sessionId:" + sessionId);
+                        "Unable to decode FIFetchResponse, data-key not found for consentHandleId:" + consentHandleId + ", sessionId:" + sessionId);
 
             var decryptedFIData = doGet(
                     fiuClient.decryptFIFetchResponse(fiFetchResponse,
                             new SerializedKeyPair(privateKey.get().getEncryptedKey(), fiRequestDTO.getKeyMaterial()))
             );
 
-            easyFIDataStore.deleteKey(consentId, sessionId);
+            easyFIDataStore.deleteKey(consentHandleId, sessionId);
 
-            final var consentDetailMono = consentService.getSignedConsentDetail(consentId, fiRequestDTO.getAaName());
+            final var consentDetailMono = consentService.getSignedConsentDetail(consentHandleId, fiRequestDTO.getAaName());
             consentDetailMono.subscribe(consentDetail -> {
                 if (ConsentMode.get(consentDetail.getConsentMode()) == STORE) {
                     easyFIDataStore.saveFIData(DataSaveRequest.with(decryptedFIData)
-                            .consentId(consentId)
+                            .consentHandleId(consentHandleId)
                             .sessionId(sessionId)
                             .aaName(fiRequestDTO.getAaName())
                             .dataLife(consentDetail.getDataLife())
@@ -226,51 +255,43 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         };
     }
 
-    protected FIRequestDTO validateAndGetFIRequest(String consentId, String sessionId) {
+    protected FIRequestDTO validateAndGetFIRequest(String consentHandleId, String sessionId) {
         final String txnId = UUIDSupplier.get();
-        ArgsValidator.checkNotEmpty(txnId, consentId, "ConsentId");
+        ArgsValidator.checkNotEmpty(txnId, consentHandleId, "consentHandleId");
         ArgsValidator.checkNotEmpty(txnId, sessionId, "SessionId");
 
-        final var fiRequestOptional = fiRequestStore.getFIRequest(consentId, sessionId);
+        final var fiRequestOptional = fiRequestStore.getFIRequest(consentHandleId, sessionId);
         if (fiRequestOptional.isEmpty())
-            throw Errors.InvalidRequest.with(txnId, "FIRequest metadata not found for given consentId:" + consentId + ", sessionId:" + sessionId + " not found");
+            throw Errors.InvalidRequest.with(txnId, "FIRequest metadata not found for given consentHandleId:"
+                    + consentHandleId + ", sessionId:" + sessionId + " not found");
 
         return fiRequestOptional.get();
     }
 
-    protected void requireDataKeyPresent(String consentId, String sessionId) {
-        final var dataKey = easyFIDataStore.getKey(consentId, sessionId);
+    protected void requireDataKeyPresent(String consentHandleId, String sessionId) {
+        final var dataKey = easyFIDataStore.getKey(consentHandleId, sessionId);
         if (dataKey.isEmpty())
-            throw Errors.InvalidRequest.with(UUIDSupplier.get(), "Invalid sessionId, KeyPair not found for consentId:" + consentId + ", sessionId:" + sessionId);
+            throw Errors.InvalidRequest.with(UUIDSupplier.get(),
+                    "Invalid sessionId, KeyPair not found for consentHandleId:" + consentHandleId
+                            + ", sessionId:" + sessionId);
     }
 
     @Override
-    public Mono<DataRequestStatus> dataRequestStatus(String consentId, String sessionId) {
-        log.debug("Getting data request status, consentId:{}, sessionId:{}", consentId, sessionId);
+    public Mono<DataRequestStatus> dataRequestStatus(String consentHandleId, String sessionId) {
+        log.debug("Getting data request status, consentHandleId:{}, sessionId:{}", consentHandleId, sessionId);
         final var optionalState = fiRequestStore.getFIRequestState(sessionId);
         if (optionalState.isPresent()) {
             var fiRequestState = optionalState.get();
-            SessionStatus status = fiRequestState.getSessionStatus().equalsIgnoreCase(READY.name()) ?
-                    READY : PENDING;
+            SessionStatus status = SessionStatus.get(fiRequestState.getSessionStatus());
 
             return Mono.just(DataRequestStatus.builder()
                     .sessionStatus(status)
                     .sessionId(sessionId)
-                    .consentId(consentId)
-                    .txnId(fiRequestState.getTxnId())
+                    .consentHandleId(consentHandleId)
                     .build());
         }
 
-        /* TODO this is temporary implementation remove this once we start getting fi-notifications on local machine */
-        try {
-            //It FIP needs some time to prepare FI after FIFetch request is raised successfully,
-            //hence adding sleep
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(e);
-        }
-        return Mono.just(DataRequestStatus.builder().consentId(consentId).sessionId(sessionId).sessionStatus(READY).build());
+        return Mono.error(Errors.NoDataFound.with(UUIDSupplier.get(), "FIRequest not found"));
     }
 
     @Override

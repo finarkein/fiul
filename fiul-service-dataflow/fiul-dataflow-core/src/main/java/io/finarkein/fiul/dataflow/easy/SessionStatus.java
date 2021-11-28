@@ -6,7 +6,26 @@
  */
 package io.finarkein.fiul.dataflow.easy;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public enum SessionStatus {
-    PENDING,
+    ACTIVE,
+    COMPLETED,
+    EXPIRED,
+    FAILED,
     READY;
+
+    static final Map<String, SessionStatus> statuses = Arrays.stream(values())
+            .collect(Collectors.toMap(Enum::name, Function.identity()));
+
+    public static SessionStatus get(String value){
+        final SessionStatus sessionStatus = statuses.get(value);
+        if(sessionStatus == null)
+            return statuses.get(value.toUpperCase());
+
+        return sessionStatus;
+    }
 }

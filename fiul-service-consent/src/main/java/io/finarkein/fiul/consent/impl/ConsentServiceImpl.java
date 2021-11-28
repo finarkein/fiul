@@ -81,6 +81,7 @@ class ConsentServiceImpl implements ConsentService {
                             .txnId(response.getTxnid())
                             .isPostConsentSuccessful(true)
                             .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                            .customerAAId(consentRequest.getConsentDetail().getCustomer().getId())
                             .consentHandle(response.getConsentHandle())
                             .postConsentResponseTimestamp(strToTimeStamp.apply(response.getTimestamp()))
                             .build());
@@ -280,6 +281,6 @@ class ConsentServiceImpl implements ConsentService {
                                         throwable.getMessage(), throwable))
                 )
                 .orElseThrow(() -> Errors.InvalidRequest.with(UUIDSupplier.get(),
-                        "Unable to get status for given consentHandle:" + consentHandle));
+                        "Unable to get status for given consentHandle:" + consentHandle+ ", try with aaName"));
     }
 }

@@ -75,19 +75,19 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
     }
 
     @Override
-    public Optional<KeyMaterialDataKey> getKey(String consentId, String sessionId) {
-        return repoKeyStorage.findById(new KeyMaterialDataKey.Key(consentId, sessionId));
+    public Optional<KeyMaterialDataKey> getKey(String consentHandleId, String sessionId) {
+        return repoKeyStorage.findById(new KeyMaterialDataKey.Key(consentHandleId, sessionId));
     }
 
     @Override
-    public void deleteKey(String consentId, String sessionId) {
-        repoKeyStorage.deleteById(new KeyMaterialDataKey.Key(consentId, sessionId));
+    public void deleteKey(String consentHandleId, String sessionId) {
+        repoKeyStorage.deleteById(new KeyMaterialDataKey.Key(consentHandleId, sessionId));
     }
 
     @Override
     public void saveFIData(DataSaveRequest<FIFetchResponse> dataSaveRequest) {
         final var aaName = dataSaveRequest.getAaName();
-        final var consentId = dataSaveRequest.getConsentId();
+        final var consentHandleId = dataSaveRequest.getConsentHandleId();
         final var sessionId = dataSaveRequest.getSessionId();
         final var fiFetchResponse = dataSaveRequest.getFiFetchResponse();
         final var dataLife = dataSaveRequest.getDataLife();
@@ -96,7 +96,7 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
         final var dataHeader = FIDataHeader.builder()
                 .version(fiFetchResponse.getVer())
                 .txnId(fiFetchResponse.getTxnid())
-                .consentId(consentId)
+                .consentHandleId(consentHandleId)
                 .sessionId(sessionId)
                 .aaName(aaName)
                 .dataLifeUnit(dataLife.getUnit())
@@ -110,10 +110,10 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
             cipheredFIData = cryptoService.encrypt(fiFetchResponse);
             if (log.isDebugEnabled()) {
                 long end = System.currentTimeMillis();
-                log.debug("Time to encrypt FI-Data [{},{},{}] :{} ms", aaName, consentId, sessionId, (end - start));
+                log.debug("Time to encrypt FI-Data [{},{},{}] :{} ms", aaName, consentHandleId, sessionId, (end - start));
             }
         } catch (Exception e) {
-            log.error("Error while encrypting FI-data, consentId:{}, sessionId:{}, error:{}", consentId, sessionId, e.getMessage());
+            log.error("Error while encrypting FI-data, consentHandleId:{}, sessionId:{}, error:{}", consentHandleId, sessionId, e.getMessage());
             throw e;
         }
 
@@ -124,7 +124,7 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
                 .forEach(encryptedDataRecord -> {
                     final var compressedData = gzipCompression.apply(encryptedDataRecord.getFiData());
                     dataRecords.add(FIDataRecord.builder()
-                            .consentId(consentId)
+                            .consentHandleId(consentHandleId)
                             .sessionId(sessionId)
                             .aaName(aaName)
                             .fipId(encryptedDataRecord.getFipId())
@@ -134,7 +134,7 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
                             .dataLifeExpireOn(dataLifeExpirationOn)
                             .build());
                     dataKeys.add(FIDataRecordDataKey.builder()
-                            .consentId(consentId)
+                            .consentHandleId(consentHandleId)
                             .sessionId(sessionId)
                             .fipId(encryptedDataRecord.getFipId())
                             .encryptedDataKey(encryptedDataRecord.getEncryptedDataKey())
@@ -150,7 +150,7 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
 
         if (log.isDebugEnabled()) {
             long end = System.currentTimeMillis();
-            log.debug("Time to store data [{},{},{}] :{} ms", aaName, consentId, sessionId, (end - start));
+            log.debug("Time to store data [{},{},{}] :{} ms", aaName, consentHandleId, sessionId, (end - start));
         }
     }
 
@@ -278,7 +278,7 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
 
     private List<FIDataRecord> retrieveDataRecords(FIDataHeader dataHeader) {
         final Example<FIDataRecord> example = Example.of(FIDataRecord.builder()
-                .consentId(dataHeader.getConsentId())
+                .consentHandleId(dataHeader.getConsentHandleId())
                 .sessionId(dataHeader.getSessionId())
                 .aaName(dataHeader.getAaName())
                 .build());
@@ -288,13 +288,13 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
 
     BiFunction<FIDataHeader, List<FIDataRecord>, CipheredFIData> cipheredFIDataConverter = (fiDataHeader, fiDataRecords) -> {
         final var cipheredFIDataBuilder = CipheredFIData.builder();
-        final var keyBuilder = FIDataRecordDataKey.Key.builder().consentId(fiDataHeader.getConsentId()).sessionId(fiDataHeader.getSessionId());
+        final var keyBuilder = FIDataRecordDataKey.Key.builder().consentHandleId(fiDataHeader.getConsentHandleId()).sessionId(fiDataHeader.getSessionId());
 
         fiDataRecords.forEach(fiDataRecord -> {
             final var dataKeyOptional = repoFIDataRecordDataKey.findById(keyBuilder.fipId(fiDataRecord.getFipId()).build());
             if (dataKeyOptional.isEmpty())
                 throw Errors.InternalError.with(uuidSupplier.get(),
-                        "DataKey not found for consentId:'" + fiDataHeader.getConsentId() + "', sessionId:'" + fiDataHeader.getConsentId() + "', fipId:'" + fiDataRecord.getFipId() + "'");
+                        "DataKey not found for consentHandleId:'" + fiDataHeader.getConsentHandleId() + "', sessionId:'" + fiDataHeader.getConsentHandleId() + "', fipId:'" + fiDataRecord.getFipId() + "'");
             cipheredFIDataBuilder.addRecord(fiDataRecord.getFipId(),
                     fiDataRecord.getLinkRefNumber(),
                     fiDataRecord.getMaskedAccNumber(),

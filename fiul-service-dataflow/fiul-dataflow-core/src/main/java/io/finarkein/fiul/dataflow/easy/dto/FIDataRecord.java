@@ -29,7 +29,7 @@ import java.time.Instant;
 public final class FIDataRecord {
     @Id
     @Column(length = 36)
-    private String consentId;
+    private String consentHandleId;
     @Id
     @Column(length = 36)
     private String sessionId;
@@ -66,7 +66,7 @@ public final class FIDataRecord {
     public static class Key implements Serializable {
         @Id
         @Column(length = 36)
-        private String consentId;
+        private String consentHandleId;
         @Id
         @Column(length = 36)
         private String sessionId;

@@ -14,12 +14,13 @@ import io.finarkein.fiul.dataflow.response.decrypt.FIDataOutputFormat;
 import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 public interface EasyDataFlowService {
 
     Mono<FIRequestResponse> createDataRequest(DataRequest dataRequest);
 
-    Mono<DataRequestStatus> dataRequestStatus(String consentId, String sessionId);
+    Mono<DataRequestStatus> dataRequestStatus(String consentHandleId, String sessionId);
 
     Mono<FIDataI> fetchData(String consentId, String sessionId, FIDataOutputFormat fiDataOutputFormat);
 
