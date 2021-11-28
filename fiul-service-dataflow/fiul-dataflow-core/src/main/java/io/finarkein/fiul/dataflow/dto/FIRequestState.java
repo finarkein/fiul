@@ -25,13 +25,17 @@ import java.util.List;
 @Table( name = "FI_REQUEST_STATE",
         indexes = {
                 @Index(name = "FIReqState_Idx1", columnList = "sessionId, sessionStatus"),
+                @Index(name = "FIReqState_Idx1", columnList = "sessionId, consentHandleId"),
                 @Index(name = "FIReqState_Idx2", columnList = "sessionStatus")
         })
 public class FIRequestState {
 
     @Id
+    @Column(length = 36)
     protected String sessionId;
 
+    @Column(length = 36)
+    protected String consentHandleId;
     protected String notifierId;
     protected boolean fiRequestSuccessful;
     protected String sessionStatus;

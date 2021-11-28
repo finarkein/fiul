@@ -8,7 +8,10 @@ package io.finarkein.fiul;
 
 import io.finarkein.api.aa.consent.*;
 import io.finarkein.fiul.consent.model.*;
-import io.finarkein.fiul.consent.repo.*;
+import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
+import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
+import io.finarkein.fiul.consent.repo.ConsentStateRepository;
+import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import io.finarkein.fiul.notification.callback.RepoConsentCallback;
 import io.finarkein.fiul.notification.callback.RepoFICallback;
 import io.finarkein.fiul.notification.callback.model.ConsentCallback;
@@ -44,9 +47,6 @@ class RepositoryTest {
 
     @Autowired
     private ConsentRequestDTORepository consentRequestDTORepository;
-
-    @Autowired
-    private ConsentRequestLogRepository consentRequestLogRepository;
 
     @Autowired
     private ConsentStateRepository consentStateRepository;
@@ -230,32 +230,6 @@ class RepositoryTest {
         consentRequestDTORepository.delete(consentRequestDTODelete);
         Optional<ConsentRequestDTO> optionalConsentState = consentRequestDTORepository.findById("consentHandle");
         Assertions.assertTrue(optionalConsentState.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Test adding ConsentRequestLog in database and fetching it.")
-    void saveConsentRequestLogTest() {
-        ConsentRequestLog consentRequestLog = ConsentRequestLog.builder()
-                .txnId("TxnId")
-                .build();
-        ConsentRequestLog save = consentRequestLogRepository.save(consentRequestLog);
-
-        Assertions.assertSame(1, consentRequestLogRepository.findAll().size());
-    }
-
-    @Test
-    @DisplayName("Test deleting ConsentRequestLog in database.")
-    void deleteConsentRequestLogTest() {
-        ConsentRequestLog consentRequestLog = ConsentRequestLog.builder()
-                .txnId("TxnId")
-                .build();
-        ConsentRequestLog save = consentRequestLogRepository.save(consentRequestLog);
-
-        Assertions.assertSame(1, consentRequestLogRepository.findAll().size());
-
-        consentRequestLogRepository.delete(save);
-
-        Assertions.assertSame(0, consentRequestLogRepository.findAll().size());
     }
 
     @Test

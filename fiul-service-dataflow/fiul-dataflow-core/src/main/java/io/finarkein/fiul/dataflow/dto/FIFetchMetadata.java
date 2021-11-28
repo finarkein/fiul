@@ -28,7 +28,9 @@ import java.time.Instant;
                 @Index(name = "FIFetchMD_Idx2", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo"),
                 @Index(name = "FIFetchMD_Idx3", columnList = "sessionId, aaName"),
                 @Index(name = "FIFetchMD_Idx4", columnList = "sessionId"),
-                @Index(name = "FIFetchMD_Idx5", columnList = "fiFetchCompletedOn, consentId, fiDataRangeFrom, fiDataRangeTo, easyDataFlow"),
+                @Index(name = "FIFetchMD_Idx6", columnList = "consentId"),
+                @Index(name = "FIFetchMD_Idx7", columnList = "consentHandleId"),
+                @Index(name = "FIFetchMD_Idx8", columnList = "fiFetchCompletedOn, consentHandleId, fiDataRangeFrom, fiDataRangeTo, easyDataFlow"),
         })
 public class FIFetchMetadata {
 
@@ -38,8 +40,13 @@ public class FIFetchMetadata {
 
     @Column(length = 36)
     protected String consentId;
+
+    @Column(length = 36)
+    protected String consentHandleId;
+
     @Column(length = 36)
     protected String txnId;
+
     @Column(length = 20)
     protected String aaName;
 
@@ -86,7 +93,7 @@ public class FIFetchMetadata {
     public static class Key implements Serializable {
         @Id
         @Column(length = 36)
-        String consentId;
+        String consentHandleId;
         @Id
         @Column(length = 36)
         String sessionId;

@@ -4,21 +4,24 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.dataflow.easy;
+package io.finarkein.fiul.dataflow;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.finarkein.api.aa.util.Functions;
+import lombok.*;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(builderClassName = "Builder")
-public class DataRequestStatus {
-    private String consentHandleId;
-    private String sessionId;
-    private SessionStatus sessionStatus;
+public class DataRequestInternal extends DataRequest {
+
+    protected String txnId;
+    protected String consentId;
+
+    public DataRequestInternal(DataRequest dataRequest) {
+        super(dataRequest);
+        txnId = Functions.uuidSupplier.get();
+    }
 }
