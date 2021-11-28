@@ -6,7 +6,6 @@
  */
 package io.finarkein.fiul.consent.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.common.FIDataRange;
 import io.finarkein.api.aa.consent.*;
@@ -16,13 +15,13 @@ import io.finarkein.api.aa.consent.request.DataConsumer;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.ConsentStatusNotification;
 import io.finarkein.api.aa.notification.Notifier;
-import io.finarkein.fiul.common.RequestUpdater;
-import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentRequestLog;
 import io.finarkein.fiul.consent.model.ConsentState;
-import io.finarkein.fiul.consent.repo.*;
+import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
+import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
+import io.finarkein.fiul.consent.repo.ConsentStateRepository;
+import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,7 +30,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
 import static io.finarkein.api.aa.util.Functions.strToTimeStamp;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -50,9 +48,6 @@ class ConsentStoreImplTest {
 
     @Mock
     private ConsentNotificationLogRepository consentNotificationLogRepository;
-
-    @Mock
-    private ConsentRequestLogRepository consentRequestLogRepository;
 
     @Mock
     private ConsentTemplateRepository consentTemplateRepository;
@@ -122,32 +117,6 @@ class ConsentStoreImplTest {
         consentRequest.setConsentDetail(consentDetail);
 
         assertDoesNotThrow(() -> consentStoreImpl.saveConsentRequest("consentHandle", consentRequest));
-    }
-
-    @Test
-    @DisplayName("Log ConsentRequest Test")
-    void logConsentRequestTest() throws JsonProcessingException {
-        Customer customer = new Customer();
-        customer.setId("abcd@finvu");
-        ConsentDetail consentDetail = new ConsentDetail();
-        consentDetail.setCustomer(customer);
-        FIUConsentRequest consentRequest = new FIUConsentRequest();
-        consentRequest.setVer("1.1.2");
-        consentRequest.setTimestamp(RequestUpdater.TimestampUpdaters.currentTimestamp());
-        consentRequest.setTxnid("TxnId");
-        consentRequest.setConsentDetail(consentDetail);
-
-        ConsentRequestLog consentRequestLog = ConsentRequestLog.builder()
-                .version(consentRequest.getVer())
-                .txnId(consentRequest.getTxnid())
-                .timestamp(strToTimeStamp.apply(consentRequest.getTimestamp()))
-                .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
-                .customerAAId(consentRequest.getConsentDetail().getCustomer().getId())
-                .consentDetail(consentRequest.getConsentDetail())
-                .build();
-        when(consentRequestLogRepository.save(consentRequestLog)).thenReturn(consentRequestLog);
-
-        Assertions.assertDoesNotThrow(() -> consentStoreImpl.logConsentRequest(consentRequest));
     }
 
     private ConsentNotificationLog createConsentNotificationLog() {

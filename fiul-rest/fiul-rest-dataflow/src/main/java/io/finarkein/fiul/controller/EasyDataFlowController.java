@@ -44,21 +44,21 @@ public class EasyDataFlowController {
     }
 
     @GetMapping({
-            "/FI/data/fetch/{consentId}/{sessionId}/{outputFormat}",
-            "/FI/data/fetch/{consentId}/{sessionId}"
+            "/FI/data/fetch/{consentHandleId}/{sessionId}/{outputFormat}",
+            "/FI/data/fetch/{consentHandleId}/{sessionId}"
     })
-    public Mono<FIDataI> dataFetch(@PathVariable String consentId, @PathVariable final String sessionId,
+    public Mono<FIDataI> dataFetch(@PathVariable String consentHandleId, @PathVariable final String sessionId,
                                    @PathVariable final Optional<String> outputFormat) {
-        return easyDataFlowService.fetchData(consentId, sessionId, decideOutputFormat(outputFormat));
+        return easyDataFlowService.fetchData(consentHandleId, sessionId, decideOutputFormat(outputFormat));
     }
 
     @GetMapping({
-            "/FI/data/{consentId}/{sessionId}/{outputFormat}",
-            "/FI/data/{consentId}/{sessionId}"
+            "/FI/data/{consentHandleId}/{sessionId}/{outputFormat}",
+            "/FI/data/{consentHandleId}/{sessionId}"
     })
-    public Mono<FIDataI> getData(@PathVariable String consentId, @PathVariable final String sessionId,
+    public Mono<FIDataI> getData(@PathVariable String consentHandleId, @PathVariable final String sessionId,
                                  @PathVariable final Optional<String> outputFormat) {
-        return easyDataFlowService.getData(consentId, sessionId, decideOutputFormat(outputFormat));
+        return easyDataFlowService.getData(consentHandleId, sessionId, decideOutputFormat(outputFormat));
     }
 
     private FIDataOutputFormat decideOutputFormat(Optional<String> outputFormat) {
@@ -68,13 +68,13 @@ public class EasyDataFlowController {
     }
 
     @DeleteMapping({
-            "/FI/data/{consentId}",
-            "/FI/data/{consentId}/{sessionId}"
+            "/FI/data/{consentHandleId}",
+            "/FI/data/{consentHandleId}/{sessionId}"
     })
     public Mono<FIDataDeleteResponse> deleteData(@PathVariable Map<String, String> map) {
         final String sessionId = map.get("sessionId");
         if (sessionId != null)
-            return easyDataFlowService.deleteData(map.get("consentId"), sessionId);
-        return easyDataFlowService.deleteData(map.get("consentId"));
+            return easyDataFlowService.deleteData(map.get("consentHandleId"), sessionId);
+        return easyDataFlowService.deleteData(map.get("consentHandleId"));
     }
 }

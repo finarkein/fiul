@@ -24,16 +24,24 @@ import java.time.Instant;
 @IdClass(FIDataRecordDataKey.Key.class)
 @Table(name = "FI_DATA_RECORD_KEY",
         indexes = {
-                @Index(name = "FIDataRecordDK_Idx1", columnList = "dataLifeExpireOn")
+                @Index(name = "FIDataRecordDK_Idx1", columnList = "dataLifeExpireOn"),
+                @Index(name = "FIDataRecordDK_Idx2", columnList = "consentHandleId")
         })
 @EntityListeners(FIDataKeyEntityListener.class)
 public final class FIDataRecordDataKey {
     @Id
-    private String consentHandleId;
+    @Column(length = 36)
+    private String consentId;
+
     @Id
+    @Column(length = 36)
     private String sessionId;
+
     @Id
     private String fipId;
+
+    @Column(length = 36)
+    private String consentHandleId;
 
     @Column(nullable = false, updatable = false)
     private byte[] encryptedDataKey;
@@ -55,7 +63,7 @@ public final class FIDataRecordDataKey {
     @Builder
     public static class Key implements Serializable {
         @Id
-        private String consentHandleId;
+        private String consentId;
         @Id
         private String sessionId;
         @Id

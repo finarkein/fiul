@@ -41,9 +41,6 @@ class ConsentStoreImpl implements ConsentStore {
     private ConsentNotificationLogRepository consentNotificationLogRepository;
 
     @Autowired
-    private ConsentRequestLogRepository consentRequestLogRepository;
-
-    @Autowired
     private ConsentTemplateRepository consentTemplateRepository;
 
     @Autowired
@@ -51,28 +48,6 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Override
-    public ConsentRequestLog logConsentRequest(FIUConsentRequest consentRequest) {
-        try {
-            var consentRequestLog = ConsentRequestLog.builder()
-                    .version(consentRequest.getVer())
-                    .txnId(consentRequest.getTxnid())
-                    .timestamp(strToTimeStamp.apply(consentRequest.getTimestamp()))
-                    .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
-                    .customerAAId(consentRequest.getConsentDetail().getCustomer().getId())
-                    .consentDetail(consentRequest.getConsentDetail())
-                    .build();
-            return consentRequestLogRepository.save(consentRequestLog);
-        } catch (Exception e) {
-            throw Errors.InternalError.with(consentRequest.getTxnid(), e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void updateConsentRequestLog(ConsentRequestLog consentRequestLog) {
-        consentRequestLogRepository.save(consentRequestLog);
-    }
 
     @Override
     public void saveConsentRequest(String consentHandle, ConsentRequest consentRequest) {

@@ -69,8 +69,7 @@ public class DataFlowServiceImpl implements DataFlowService {
 
     @Override
     public Mono<FIRequestResponse> createFIRequest(FIUFIRequest fiRequest, String aaName) {
-        Optional<String> aaNameOptional = aaName != null ? Optional.of(aaName) : Optional.empty();
-        return aaNameOptional
+        return Optional.ofNullable(aaName)
                 .or(() -> consentService
                         .getConsentRequestByConsentId(fiRequest.getConsent().getId())
                         .map(ConsentRequestDTO::getAaName))

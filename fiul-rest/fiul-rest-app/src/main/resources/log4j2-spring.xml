@@ -39,7 +39,7 @@
         </Root>
 
         <Logger name="io.finarkein" level="debug" additivity="false">
-<!--            <AppenderRef ref="Console" level="debug"/>-->
+            <AppenderRef ref="Console" level="info"/>
             <AppenderRef ref="FIULServiceLogFile"/>
         </Logger>
 

@@ -27,15 +27,19 @@ import java.time.Instant;
 @IdClass(FIRequestDTO.Key.class)
 @Table(name = "FI_REQUEST",
         indexes = {
-                @Index(name = "FIReq_Idx1", columnList = "sessionId, aaName")
+                @Index(name = "FIReq_Idx1", columnList = "sessionId, aaName"),
+                @Index(name = "FIReq_Idx2", columnList = "sessionId, consentHandleId")
         })
 public class FIRequestDTO {
     @Id
+    @Column(length = 36)
     protected String consentId;
 
     @Id
+    @Column(length = 36)
     protected String sessionId;
 
+    @Column(length = 36)
     protected String consentHandleId;
 
     protected String version;

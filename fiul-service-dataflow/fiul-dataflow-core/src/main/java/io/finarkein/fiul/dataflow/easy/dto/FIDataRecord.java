@@ -24,12 +24,14 @@ import java.time.Instant;
 @IdClass(FIDataRecord.Key.class)
 @Table(name = "FI_DATA_RECORD",
         indexes = {
-                @Index(name = "FIDataRecord_Idx1", columnList = "dataLifeExpireOn")
+                @Index(name = "FIDataRecord_Idx1", columnList = "dataLifeExpireOn"),
+                @Index(name = "FIDataRecord_Idx2", columnList = "consentHandleId, sessionId"),
+                @Index(name = "FIDataRecord_Idx3", columnList = "consentHandleId")
         })
 public final class FIDataRecord {
     @Id
     @Column(length = 36)
-    private String consentHandleId;
+    private String consentId;
     @Id
     @Column(length = 36)
     private String sessionId;
@@ -45,6 +47,9 @@ public final class FIDataRecord {
     @Id
     @Column(length = 36)
     private String maskedAccNumber;
+
+    @Column(length = 36, nullable = false, updatable = false)
+    private String consentHandleId;
 
     @Column(columnDefinition="BYTEA", nullable = false, updatable = false)
     private byte[] fiData;
@@ -66,7 +71,7 @@ public final class FIDataRecord {
     public static class Key implements Serializable {
         @Id
         @Column(length = 36)
-        private String consentHandleId;
+        private String consentId;
         @Id
         @Column(length = 36)
         private String sessionId;

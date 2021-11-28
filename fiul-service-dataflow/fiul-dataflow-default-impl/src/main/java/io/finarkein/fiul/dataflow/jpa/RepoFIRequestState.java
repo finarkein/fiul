@@ -15,4 +15,6 @@ import java.util.Optional;
 @Repository
 public interface RepoFIRequestState extends JpaRepository<FIRequestState, String> {
     Optional<FIRequestState> findByTxnId(String txnId);
+
+    Optional<FIRequestState> findBySessionIdAndConsentHandleId(String sessionId, String consentHandleId);
 }

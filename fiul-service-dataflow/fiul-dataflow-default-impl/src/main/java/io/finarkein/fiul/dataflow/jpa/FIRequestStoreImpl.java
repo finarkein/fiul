@@ -49,6 +49,7 @@ public class FIRequestStoreImpl implements FIRequestStore {
         final var fiRequestDTO = FIRequestDTO.builder()
                 .sessionId(fiFetchMetadata.getSessionId())
                 .consentId(fiFetchMetadata.getConsentId())
+                .consentHandleId(fiFetchMetadata.getConsentHandleId())
                 .timestamp(timestamp)
                 .version(fiRequest.getVer())
                 .txnId(fiFetchMetadata.getTxnId())
@@ -61,6 +62,7 @@ public class FIRequestStoreImpl implements FIRequestStore {
 
         final var fiRequestState = FIRequestState.builder()
                 .sessionId(fiFetchMetadata.getSessionId())
+                .consentHandleId(fiFetchMetadata.getConsentHandleId())
                 .notifierId(null)
                 .txnId(fiFetchMetadata.getTxnId())
                 .sessionStatus("ACTIVE")
@@ -96,7 +98,7 @@ public class FIRequestStoreImpl implements FIRequestStore {
 
     @Override
     public Optional<FIRequestDTO> getFIRequest(String consentHandleId, String sessionId) {
-        return repoFIRequestDTO.findById(new FIRequestDTO.Key(consentHandleId, sessionId));
+        return repoFIRequestDTO.findBySessionIdAndConsentHandleId(sessionId, consentHandleId);
     }
 
     @Override
@@ -139,8 +141,8 @@ public class FIRequestStoreImpl implements FIRequestStore {
     }
 
     @Override
-    public Optional<FIRequestState> getFIRequestState(String sessionId) {
-        return repoFIRequestState.findById(sessionId);
+    public Optional<FIRequestState> getFIRequestState(String consentHandleId, String sessionId) {
+        return repoFIRequestState.findBySessionIdAndConsentHandleId(sessionId, consentHandleId);
     }
 
     @Override

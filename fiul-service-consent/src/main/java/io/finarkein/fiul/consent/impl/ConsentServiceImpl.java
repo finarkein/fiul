@@ -270,17 +270,18 @@ class ConsentServiceImpl implements ConsentService {
                                     state.setConsentHandle(consentStatusResponse.getConsentHandle());
                                     state.setConsentId(consentStatusResponse.getConsentStatus().getId());
                                     state.setConsentStatus(consentStatusResponse.getConsentStatus().getStatus());
-                                    state.setUpdatedOn(strToTimeStamp.apply(consentStatusResponse.getTimestamp()));
                                     state.setTxnId(consentStatusResponse.getTxnid());
-                                    /* TODO we can decide to persist this state in store as it was not received
-                                     * through consentNotification
-                                     */
+                                    state.setAaId(aaName);
+                                    customerAAId.ifPresent(state::setCustomerAAId);
+
+                                    //saving consentState
+                                    consentStore.saveConsentState(state);
                                     return Mono.just(state);
                                 })
                                 .onErrorMap(throwable -> Errors.InvalidRequest.with(UUIDSupplier.get(),
                                         throwable.getMessage(), throwable))
                 )
                 .orElseThrow(() -> Errors.InvalidRequest.with(UUIDSupplier.get(),
-                        "Unable to get status for given consentHandle:" + consentHandle+ ", try with aaName"));
+                        "Unable to get status for given consentHandle:" + consentHandle+ ", try with customerAAId"));
     }
 }

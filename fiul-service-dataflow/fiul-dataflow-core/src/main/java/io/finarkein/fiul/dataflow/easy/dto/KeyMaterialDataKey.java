@@ -24,10 +24,12 @@ import java.io.Serializable;
 public class KeyMaterialDataKey {
 
     @Id
-    String consentHandleId;
+    String consentId;
+
     @Id
     String sessionId;
-    String consentId;
+
+    String consentHandleId;
 
     @Column(columnDefinition = "TEXT", nullable = false, updatable = false)
     String encryptedKey;
@@ -37,10 +39,9 @@ public class KeyMaterialDataKey {
     @AllArgsConstructor
     public static class Key implements Serializable {
         @Id
-        String consentHandleId;
+        String consentId;
 
         @Id
         String sessionId;
     }
-
 }

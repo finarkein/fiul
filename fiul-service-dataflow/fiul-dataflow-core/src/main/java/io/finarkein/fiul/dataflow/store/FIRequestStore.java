@@ -20,7 +20,7 @@ public interface FIRequestStore {
 
     void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName, String dataSessionId);
 
-    Optional<FIRequestDTO> getFIRequest(String consentId, String sessionId);
+    Optional<FIRequestDTO> getFIRequest(String consentHandleId, String sessionId);
 
     Optional<FIRequestDTO> getFIRequestByAANameAndSessionId(String sessionId, String aaName);
 
@@ -28,7 +28,7 @@ public interface FIRequestStore {
 
     void logNotificationAndUpdateState(FINotification fiNotification);
 
-    Optional<FIRequestState> getFIRequestState(String sessionId);
+    Optional<FIRequestState> getFIRequestState(String consentHandleId, String sessionId);
 
     Optional<FIRequestState> getFIRequestStateByTxnId(String txnId);
 }
