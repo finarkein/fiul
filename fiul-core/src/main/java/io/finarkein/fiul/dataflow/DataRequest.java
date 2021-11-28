@@ -9,18 +9,15 @@ package io.finarkein.fiul.dataflow;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import io.finarkein.api.aa.common.TxnIdConsumer;
 import io.finarkein.fiul.ext.Callback;
 import lombok.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "txnId",
         "customerAAId",
         "dataRageFrom",
         "dataRageTo",
         "consentHandleId",
-        "consentId",
         "callback"
 })
 @ToString
@@ -28,10 +25,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(builderClassName = "Builder")
-public class DataRequest implements TxnIdConsumer{
-
-    @JsonProperty("txnId")
-    protected String txnid;
+public class DataRequest {
 
     @JsonProperty("customerAAId")
     protected String customerAAId;
@@ -45,28 +39,26 @@ public class DataRequest implements TxnIdConsumer{
     @JsonProperty("consentHandleId")
     protected String consentHandleId;
 
-    @JsonProperty("consentId")
-    protected String consentId;
-
     @JsonProperty("callback")
     protected Callback callback;
 
+    protected DataRequest(DataRequest dataRequest){
+        consentHandleId = dataRequest.getConsentHandleId();
+        customerAAId = dataRequest.getCustomerAAId();
+        dataRageFrom = dataRequest.dataRageFrom;
+        dataRageTo = dataRequest.dataRageTo;
+        consentHandleId = dataRequest.getConsentHandleId();
+        callback = dataRequest.callback;
+    }
+
     public static class Builder {
-        private String txnId;
         private String customerAAId;
         private String dataRageFrom;
         private String dataRageTo;
         private String consentHandleId;
-        private String consentId;
         private Callback callback;
 
         Builder() {
-        }
-
-        @JsonProperty("txnId")
-        public DataRequest.Builder txnId(@NonNull final String txnId) {
-            this.txnId = txnId;
-            return this;
         }
 
         @JsonProperty("customerAAId")
@@ -93,12 +85,6 @@ public class DataRequest implements TxnIdConsumer{
             return this;
         }
 
-        @JsonProperty("consentId")
-        public DataRequest.Builder consentId(@NonNull final String consentId) {
-            this.consentId = consentId;
-            return this;
-        }
-
         @JsonProperty("callback")
         public DataRequest.Builder callback(final Callback callback) {
             this.callback = callback;
@@ -112,7 +98,7 @@ public class DataRequest implements TxnIdConsumer{
         }
 
         public DataRequest build() {
-            return new DataRequest(this.txnId, this.customerAAId, this.dataRageFrom, this.dataRageTo, this.consentHandleId, this.consentId, this.callback);
+            return new DataRequest(this.customerAAId, this.dataRageFrom, this.dataRageTo, this.consentHandleId, this.callback);
         }
 
         public String toString() {

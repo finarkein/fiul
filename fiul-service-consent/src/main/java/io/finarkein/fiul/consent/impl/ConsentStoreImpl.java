@@ -10,14 +10,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.consent.ConsentMode;
 import io.finarkein.api.aa.consent.FetchType;
 import io.finarkein.api.aa.consent.request.ConsentRequest;
-import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.ConsentStatusNotification;
 import io.finarkein.api.aa.notification.Notifier;
 import io.finarkein.api.aa.util.Functions;
-import io.finarkein.fiul.consent.FIUConsentRequest;
-import io.finarkein.fiul.consent.model.*;
-import io.finarkein.fiul.consent.repo.*;
+import io.finarkein.fiul.consent.model.ConsentNotificationLog;
+import io.finarkein.fiul.consent.model.ConsentRequestDTO;
+import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
+import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
+import io.finarkein.fiul.consent.repo.ConsentStateRepository;
+import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.consent.service.PurposeFetcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +44,6 @@ class ConsentStoreImpl implements ConsentStore {
     private ConsentNotificationLogRepository consentNotificationLogRepository;
 
     @Autowired
-    private ConsentRequestLogRepository consentRequestLogRepository;
-
-    @Autowired
     private ConsentTemplateRepository consentTemplateRepository;
 
     @Autowired
@@ -51,28 +51,6 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Override
-    public ConsentRequestLog logConsentRequest(FIUConsentRequest consentRequest) {
-        try {
-            var consentRequestLog = ConsentRequestLog.builder()
-                    .version(consentRequest.getVer())
-                    .txnId(consentRequest.getTxnid())
-                    .timestamp(strToTimeStamp.apply(consentRequest.getTimestamp()))
-                    .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
-                    .customerAAId(consentRequest.getConsentDetail().getCustomer().getId())
-                    .consentDetail(consentRequest.getConsentDetail())
-                    .build();
-            return consentRequestLogRepository.save(consentRequestLog);
-        } catch (Exception e) {
-            throw Errors.InternalError.with(consentRequest.getTxnid(), e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void updateConsentRequestLog(ConsentRequestLog consentRequestLog) {
-        consentRequestLogRepository.save(consentRequestLog);
-    }
 
     @Override
     public void saveConsentRequest(String consentHandle, ConsentRequest consentRequest) {
