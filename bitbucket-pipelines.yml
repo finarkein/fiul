@@ -15,7 +15,7 @@ definitions:
         name: Maven Verify
         script:
           - source local.env # requires: *setup-auth before this step to work
-          - mvn verify -Djacoco.haltOnFailure=false -Dmaven.javadoc.skip=true -B -U -s .ci/settings.xml
+          - mvn verify -DskipTests -Djacoco.haltOnFailure=false -Dmaven.javadoc.skip=true -B -U -s .ci/settings.xml
         after-script:
           # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
           - pipe: atlassian/checkstyle-report:0.2.0
@@ -144,6 +144,13 @@ pipelines:
       - step: *maven-pkg-image-artifacts
       - step: *build-docker # check if docker image builds properly
       - step: *maven-deploy-feature
+    bugfix/*:
+      - step: *lint-dockerfile
+      - step: *setup-auth
+      - step: *maven-verify
+      - step: *maven-pkg-image-artifacts
+      - step: *build-docker # check if docker image builds properly
+      - step: *maven-deploy-feature 
   branches:
     main:
       - step: *lint-dockerfile
