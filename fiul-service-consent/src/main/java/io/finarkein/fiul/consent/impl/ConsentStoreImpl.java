@@ -23,6 +23,7 @@ import io.finarkein.fiul.consent.repo.ConsentStateRepository;
 import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.consent.service.PurposeFetcher;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
 import static io.finarkein.api.aa.util.Functions.strToTimeStamp;
 
 @Service
+@Log4j2
 class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
@@ -102,12 +104,8 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Override
     public void logConsentNotification(ConsentNotificationLog consentNotificationLog) {
-        ConsentState consentState;
-        Optional<ConsentState> optionalConsentState = consentStateRepository.findByTxnId(consentNotificationLog.getTxnId());
-        if (optionalConsentState.isPresent())
-            consentState = optionalConsentState.get();
-        else
-            consentState = new ConsentState();
+        Optional<ConsentState> optionalConsentState = consentStateRepository.findById(consentNotificationLog.getConsentHandle());
+        ConsentState consentState = optionalConsentState.orElseGet(ConsentState::new);
         consentState.setConsentHandle(consentNotificationLog.getConsentHandle());
         consentState.setConsentId(consentNotificationLog.getConsentId());
         consentState.setConsentStatus(consentNotificationLog.getConsentState());
@@ -115,7 +113,8 @@ class ConsentStoreImpl implements ConsentStore {
         consentState.setNotifierId(consentNotificationLog.getNotifierId());
 
         consentNotificationLogRepository.save(consentNotificationLog);
-        consentStateRepository.save(consentState);
+        final ConsentState savedConsentState = consentStateRepository.save(consentState);
+        log.debug("Saved consentState after consentNotification:{}",savedConsentState);
         updateConsentRequest(consentNotificationLog.getConsentHandle(), consentNotificationLog.getConsentId());
     }
 

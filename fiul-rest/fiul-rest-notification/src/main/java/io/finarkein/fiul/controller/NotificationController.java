@@ -86,10 +86,9 @@ public class NotificationController {
 
         ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getTxnid(), "TxnId");
 
-        ConsentState consentState = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
-
+        ConsentState consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
         if (consentState == null)
-            consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
+            consentState = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
 
         if (consentState != null) {
             try {
