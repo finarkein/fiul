@@ -16,7 +16,6 @@ public class ConsentRequestInput {
 
     private String txnId;
     private String consentTemplateId;
-    private String dataConsumerId;
     private String customerId;
     private Callback callback;
 }

@@ -26,6 +26,7 @@ import io.finarkein.fiul.consent.validators.ConsentRequestInputValidator;
 import io.finarkein.fiul.consent.validators.ConsentTemplateValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,13 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
     @Autowired
     private ConsentService consentService;
+
+    private final String dataConsumerId;
+
+    @Autowired
+    public ConsentTemplateServiceImpl(@Value("${fiul.data_consumer_id}") String dataConsumerId) {
+        this.dataConsumerId = dataConsumerId;
+    }
 
     @Override
     public Mono<ConsentTemplateResponse> saveConsentTemplate(ConsentTemplate consentTemplate) {
@@ -104,7 +112,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
         var consentTemplate = getConsentTemplate(consentRequestInput);
         final var consentTemplateDefinition = consentTemplate.getConsentTemplateDefinition();
-        var consentDetail = prepareConsentDetailFromTemplate(consentTemplateDefinition, consentRequestInput.getDataConsumerId(), consentRequestInput.getCustomerId());
+        var consentDetail = prepareConsentDetailFromTemplate(consentTemplateDefinition, consentRequestInput.getCustomerId());
 
         return consentService.createConsent(FIUConsentRequest.builder()
                 .ver(consentTemplate.getConsentVersion())
@@ -120,7 +128,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         consentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
 
         var consentTemplate = getConsentTemplate(consentRequestInput);
-        return Mono.just(prepareConsentDetailFromTemplate(consentTemplate.getConsentTemplateDefinition(), consentRequestInput.getDataConsumerId(), consentRequestInput.getCustomerId()));
+        return Mono.just(prepareConsentDetailFromTemplate(consentTemplate.getConsentTemplateDefinition(), consentRequestInput.getCustomerId()));
     }
 
     @Override
@@ -128,7 +136,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return consentTemplateRepository.getByQuery(tag, consentVersion, pageRequest);
     }
 
-    private ConsentDetail prepareConsentDetailFromTemplate(ConsentTemplateDefinition consentTemplateDefinition, String dataConsumerId, String customerId) {
+    private ConsentDetail prepareConsentDetailFromTemplate(ConsentTemplateDefinition consentTemplateDefinition, String customerId) {
         ConsentDetail consentDetail = new ConsentDetail();
 
         String consentStart = Functions.currentTimestampSupplier.get();
