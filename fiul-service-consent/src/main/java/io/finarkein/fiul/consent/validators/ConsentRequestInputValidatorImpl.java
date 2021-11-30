@@ -16,7 +16,6 @@ class ConsentRequestInputValidatorImpl implements ConsentRequestInputValidator {
     private void nullValidations(ConsentRequestInput consentRequestInput) {
         ArgsValidator.checkNotEmpty(consentRequestInput.getTxnId(), consentRequestInput.getConsentTemplateId(), "Template Id");
         ArgsValidator.checkNotEmpty(consentRequestInput.getTxnId(), consentRequestInput.getCustomerId(), "Customer Id");
-        ArgsValidator.checkNotEmpty(consentRequestInput.getTxnId(), consentRequestInput.getDataConsumerId(), "DataConsumer Id");
     }
 
     private void valueValidations(ConsentRequestInput consentRequestInput) {

@@ -1,27 +1,17 @@
 {
     "txnId": "",
     "consentTemplateId": "1",
-    "dataConsumerId" :"dataCustomerId",
-    "customerId": "test@aa"
-}
-*
-{
-    "txnId": "d1863ba6-ebff-4af3-b95e-292418a17263",
-    "consentTemplateId": "1",
-    "dataConsumerId" :"",
     "customerId": "test@aa"
 }
 *
 {
     "txnId": "d1863ba6-ebff-4af3-b95e-292418a17263",
     "consentTemplateId": "",
-    "dataConsumerId" :"dataCustomerId",
     "customerId": "test@aa"
 }
 *
 {
     "txnId": "d1863ba6-ebff-4af3-b95e-292418a17263",
     "consentTemplateId": "1",
-    "dataConsumerId" :"dataCustomerId",
     "customerId": ""
 }
