@@ -60,7 +60,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     private final String dataConsumerId;
 
     @Autowired
-    public ConsentTemplateServiceImpl(@Value("${fiul.data_consumer_id}") String dataConsumerId) {
+    public ConsentTemplateServiceImpl(@Value("${fiul.entity_id}") String dataConsumerId) {
         this.dataConsumerId = dataConsumerId;
     }
 
