@@ -126,6 +126,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>io.finarkein.aa</groupId>
+                <artifactId>aa-webclient-core</artifactId>
+                <version>${version.aa-commons}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.finarkein.fiu</groupId>
                 <artifactId>fiul-core</artifactId>
                 <version>${project.version}</version>
@@ -142,7 +147,17 @@
             </dependency>
             <dependency>
                 <groupId>io.finarkein.fiu</groupId>
-                <artifactId>fiul-notification-pubsub</artifactId>
+                <artifactId>fiul-notification-callbacks-in-mem-sub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-in-mem-pub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-in-mem-config</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

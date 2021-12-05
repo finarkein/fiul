@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static io.finarkein.fiul.TestValues.*;
-import static io.finarkein.fiul.notification.config.CommonConfig.FIUL_EVENT_FACTORY;
 
 /**
  * Configuration for test which mocks the beans required in the flow
@@ -51,7 +50,7 @@ public class TestConfig {
     private JWSSigner jwsSignatureUtil;
     @MockBean
     private ConnectionFactory connectionFactory;
-    @MockBean(name = FIUL_EVENT_FACTORY)
+    @MockBean(name = "fiul-events-factory")
     private JmsListenerContainerFactory<?> listenerContainerFactory;
     @MockBean
     private CallbackRegistry callbackRegistry;

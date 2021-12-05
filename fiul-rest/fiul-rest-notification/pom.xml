@@ -14,7 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>io.finarkein.fiu</groupId>
-            <artifactId>fiul-notification-pubsub</artifactId>
+            <artifactId>fiul-notification-in-mem-pub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-notification-callbacks-in-mem-sub</artifactId>
         </dependency>
         <dependency>
             <groupId>io.finarkein.fiu</groupId>
