@@ -4,7 +4,7 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.notification.callback.config;
+package io.finarkein.fiul.notification.config;
 
 import io.finarkein.fiul.notification.ServiceConstants;
 import org.apache.activemq.ActiveMQConnectionFactory;

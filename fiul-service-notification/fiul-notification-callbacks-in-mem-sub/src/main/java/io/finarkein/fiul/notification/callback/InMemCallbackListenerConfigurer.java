@@ -26,7 +26,7 @@ import java.util.UUID;
 
 import static io.finarkein.fiul.notification.ServiceConstants.IN_MEM;
 import static io.finarkein.fiul.notification.ServiceConstants.NOTIFICATION_Q_TYPE_PROPERTY;
-import static io.finarkein.fiul.notification.callback.config.ConfigForInMem.FIUL_EVENT_FACTORY;
+import static io.finarkein.fiul.notification.config.ConfigForInMem.FIUL_EVENT_FACTORY;
 
 @Log4j2
 @EnableJms
