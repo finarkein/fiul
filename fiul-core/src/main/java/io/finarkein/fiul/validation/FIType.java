@@ -11,6 +11,6 @@ import java.util.Set;
 public class FIType {
 
     public static Set<String> fiTypesSet = Set.of(
-            "DEPOSIT", "TERM-DEPOSIT", "RECURRING_DEPOSIT", "INSURANCE_POLICIES", "ULIP");
+            "DEPOSIT", "TERM-DEPOSIT", "RECURRING_DEPOSIT", "INSURANCE_POLICIES", "ULIP", "MUTUAL_FUNDS", "TERM_DEPOSIT");
 
 }
