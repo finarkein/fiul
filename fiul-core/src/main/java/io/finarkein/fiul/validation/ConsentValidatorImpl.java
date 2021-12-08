@@ -6,6 +6,7 @@
  */
 package io.finarkein.fiul.validation;
 
+import io.finarkein.aa.fi.common.FITypeMeta;
 import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.api.aa.consent.*;
 import io.finarkein.api.aa.consent.request.ConsentDetail;
@@ -111,8 +112,8 @@ public class ConsentValidatorImpl implements ConsentValidator {
     }
 
     public void validateFITypes(String txnId, List<String> fiTypes) {
-        if (fiTypes.stream().anyMatch(e -> !FIType.fiTypesSet.contains(e)))
-            throw InvalidRequest.with(txnId, "Invalid FI types");
+        if (fiTypes.stream().anyMatch(fiType -> !FITypeMeta.isFIType(fiType)))
+            throw InvalidRequest.with(txnId, "Invalid FI type, supported types : " + FITypeMeta.getNames());
     }
 
     protected void validateDataConsumer(String txnId, String dataConsumer) {
