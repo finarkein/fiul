@@ -43,22 +43,21 @@ public class EasyDataFlowController {
         return easyDataFlowService.dataRequestStatus(consentHandleId, sessionId);
     }
 
-    @GetMapping({
-            "/FI/data/fetch/{consentHandleId}/{sessionId}/{outputFormat}",
-            "/FI/data/fetch/{consentHandleId}/{sessionId}"
-    })
-    public Mono<FIDataI> dataFetch(@PathVariable String consentHandleId, @PathVariable final String sessionId,
-                                   @PathVariable final Optional<String> outputFormat) {
-        return easyDataFlowService.fetchData(consentHandleId, sessionId, decideOutputFormat(outputFormat));
+    @GetMapping("/FI/data/fetch/{consentHandleId}/{sessionId}")
+    public Mono<FIDataI> dataFetch(@PathVariable String consentHandleId,
+                                   @PathVariable final String sessionId,
+                                   @RequestParam(value = "outputFormat", required = false) String outputFormat) {
+        return easyDataFlowService.fetchData(consentHandleId, sessionId, decideOutputFormat(Optional.ofNullable(outputFormat)));
     }
 
     @GetMapping({
             "/FI/data/{consentHandleId}/{sessionId}/{outputFormat}",
             "/FI/data/{consentHandleId}/{sessionId}"
     })
-    public Mono<FIDataI> getData(@PathVariable String consentHandleId, @PathVariable final String sessionId,
-                                 @PathVariable final Optional<String> outputFormat) {
-        return easyDataFlowService.getData(consentHandleId, sessionId, decideOutputFormat(outputFormat));
+    public Mono<FIDataI> getData(@PathVariable String consentHandleId,
+                                 @PathVariable final String sessionId,
+                                 @RequestParam(value = "outputFormat", required = false) String outputFormat) {
+        return easyDataFlowService.getData(consentHandleId, sessionId, decideOutputFormat(Optional.ofNullable(outputFormat)));
     }
 
     private FIDataOutputFormat decideOutputFormat(Optional<String> outputFormat) {

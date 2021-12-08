@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/")
@@ -31,23 +30,23 @@ public class DataFlowController {
         this.dataFlowService = dataFlowService;
     }
 
-    @PostMapping({"/FI/request/{aaName}", "/FI/request"})
-    public Mono<FIRequestResponse> postFIRequest(@RequestBody FIUFIRequest fiRequest, @PathVariable Optional<String> aaName) {
-        return dataFlowService.createFIRequest(fiRequest, aaName.orElse(null));
+    @PostMapping("/FI/request")
+    public Mono<FIRequestResponse> postFIRequest(@RequestBody FIUFIRequest fiRequest) {
+        return dataFlowService.createFIRequest(fiRequest, fiRequest.getAaName());
     }
 
-    @GetMapping({"/FI/fetch/{dataSessionId}/{aaName}", "/FI/fetch/{dataSessionId}"})
-    public Mono<FIFetchResponse> fetch(@PathVariable String dataSessionId, @PathVariable final Optional<String> aaName,
+    @GetMapping("/FI/fetch/{dataSessionId}")
+    public Mono<FIFetchResponse> fetch(@PathVariable String dataSessionId,
+                                       @RequestParam(value = "aaName", required = false) String aaName,
                                        @RequestHeader(value = "fipId", required = false) final String fipId,
                                        @RequestHeader(value = "linkRefNumber", required = false) final String[] linkRefNumber) {
-
-        return dataFlowService.fiFetch(dataSessionId, aaName.orElse(null), fipId, linkRefNumber);
+        return dataFlowService.fiFetch(dataSessionId, aaName, fipId, linkRefNumber);
     }
 
     @GetMapping("/FI/{dataSessionId}")
     public Mono<FIFetchResponse> getData(@PathVariable String dataSessionId,
-                                       @RequestHeader(value = "fipId", required = false) final String fipId,
-                                       @RequestHeader(value = "linkRefNumber", required = false) final String[] linkRefNumber) {
+                                         @RequestHeader(value = "fipId", required = false) final String fipId,
+                                         @RequestHeader(value = "linkRefNumber", required = false) final String[] linkRefNumber) {
         return dataFlowService.fiGet(dataSessionId, fipId, linkRefNumber);
     }
 

@@ -122,7 +122,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                             .timestamp(timestampToStr.apply(startTime))
                             .consent(new Consent(dataRequest.getConsentId(), null))
                             .callback(dataRequest.getCallback())
-                            .fIDataRange(new FIDataRange(dataRequest.getDataRageFrom(), dataRequest.getDataRageTo()))
+                            .fIDataRange(new FIDataRange(dataRequest.getDataRangeFrom(), dataRequest.getDataRangeTo()))
                             .keyMaterial(serializedKeyPair.getKeyMaterial())
                             .build();
                 })
@@ -150,9 +150,9 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
     protected boolean validateDataRequest(DataRequestInternal dataRequest) {
         String txnId = dataRequest.getTxnId();
         ArgsValidator.checkNotEmpty(txnId, dataRequest.getConsentHandleId(), "consentHandleId");
-        ArgsValidator.checkTimestamp(txnId, dataRequest.getDataRageFrom(), "dataRageFrom");
-        ArgsValidator.checkTimestamp(txnId, dataRequest.getDataRageTo(), "dataRageTo");
-        ArgsValidator.validateDateRange(txnId, dataRequest.getDataRageFrom(), dataRequest.getDataRageTo());
+        ArgsValidator.checkTimestamp(txnId, dataRequest.getDataRangeFrom(), "dataRangeFrom");
+        ArgsValidator.checkTimestamp(txnId, dataRequest.getDataRangeTo(), "dataRangeTo");
+        ArgsValidator.validateDateRange(txnId, dataRequest.getDataRangeFrom(), dataRequest.getDataRangeTo());
 
         if (dataRequest.getCallback() != null)
             ArgsValidator.checkNotEmpty(txnId, dataRequest.getCallback().getUrl(), "Callback.Url");
@@ -167,8 +167,8 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                     .consentHandleId(dataRequest.getConsentHandleId())
                     .consentId(response.getConsentId())
                     .sessionId(response.getSessionId())
-                    .fiDataRangeFrom(strToTimeStamp.apply(dataRequest.getDataRageFrom()))
-                    .fiDataRangeTo(strToTimeStamp.apply(dataRequest.getDataRageTo()))
+                    .fiDataRangeFrom(strToTimeStamp.apply(dataRequest.getDataRangeFrom()))
+                    .fiDataRangeTo(strToTimeStamp.apply(dataRequest.getDataRangeTo()))
                     .txnId(dataRequest.getTxnId())
                     .fiRequestSubmittedOn(startTime)
                     .easyDataFlow(true)
