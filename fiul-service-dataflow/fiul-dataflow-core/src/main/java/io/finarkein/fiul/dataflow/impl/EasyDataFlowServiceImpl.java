@@ -316,7 +316,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
     @Override
     public Mono<FIDataDeleteResponse> deleteData(String consentHandleId) {
-        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentHandleId, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentHandleId, null,false);
 
         fiFetchMetadataStore.deleteByConsentHandleId(consentHandleId);
         final var deletionCounts = easyFIDataStore.deleteFIDataByConsentHandleId(consentHandleId);
@@ -341,7 +341,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
     @Override
     public Mono<FIDataDeleteResponse> deleteData(String consentHandleId, String sessionId) {
-        FIDataDeleteResponse response = new FIDataDeleteResponse(sessionId, consentHandleId, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(sessionId, consentHandleId, null,false);
 
         fiFetchMetadataStore.deleteBySessionId(sessionId);
         final var deletionCounts = easyFIDataStore.deleteFIDataByConsentHandleIdAndSessionId(consentHandleId, sessionId);

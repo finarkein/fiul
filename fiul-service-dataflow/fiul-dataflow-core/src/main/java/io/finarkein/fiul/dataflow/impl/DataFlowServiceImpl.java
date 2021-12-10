@@ -201,7 +201,7 @@ public class DataFlowServiceImpl implements DataFlowService {
 
     @Override
     public Mono<FIDataDeleteResponse> deleteDataForSession(String dataSessionId) {
-        FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, null, false);
         log.debug("Deleting data for sessionId:{}", dataSessionId);
 
         fiFetchMetadataStore.deleteBySessionId(dataSessionId);
@@ -219,7 +219,7 @@ public class DataFlowServiceImpl implements DataFlowService {
     @Override
     public Mono<FIDataDeleteResponse> deleteDataByConsentId(String consentId) {
         log.debug("Deleting data for consentId:{}", consentId);
-        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentId, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(null, null, consentId, false);
 
         fiFetchMetadataStore.deleteByConsentId(consentId);
 

@@ -16,5 +16,6 @@ import lombok.Data;
 public class FIDataDeleteResponse {
     private String dataSessionId;
     private String consentHandleId;
+    private String consentId;
     private boolean deleted;
 }
