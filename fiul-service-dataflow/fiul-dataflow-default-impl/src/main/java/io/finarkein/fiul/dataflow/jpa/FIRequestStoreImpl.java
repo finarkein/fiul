@@ -49,6 +49,7 @@ public class FIRequestStoreImpl implements FIRequestStore {
         final var fiRequestDTO = FIRequestDTO.builder()
                 .sessionId(fiFetchMetadata.getSessionId())
                 .consentId(fiFetchMetadata.getConsentId())
+                .consentHandleId(fiFetchMetadata.getConsentHandleId())
                 .timestamp(timestamp)
                 .version(fiRequest.getVer())
                 .txnId(fiFetchMetadata.getTxnId())
@@ -61,6 +62,7 @@ public class FIRequestStoreImpl implements FIRequestStore {
 
         final var fiRequestState = FIRequestState.builder()
                 .sessionId(fiFetchMetadata.getSessionId())
+                .consentHandleId(fiFetchMetadata.getConsentHandleId())
                 .notifierId(null)
                 .txnId(fiFetchMetadata.getTxnId())
                 .sessionStatus("ACTIVE")
@@ -95,8 +97,8 @@ public class FIRequestStoreImpl implements FIRequestStore {
     }
 
     @Override
-    public Optional<FIRequestDTO> getFIRequest(String consentId, String sessionId) {
-        return repoFIRequestDTO.findById(new FIRequestDTO.Key(consentId, sessionId));
+    public Optional<FIRequestDTO> getFIRequest(String consentHandleId, String sessionId) {
+        return repoFIRequestDTO.findBySessionIdAndConsentHandleId(sessionId, consentHandleId);
     }
 
     @Override
@@ -123,14 +125,17 @@ public class FIRequestStoreImpl implements FIRequestStore {
                 .sessionStatus(fiNotification.getFIStatusNotification().getSessionStatus())
                 .notificationTimestamp(Functions.strToTimeStamp.apply(fiNotification.getTimestamp()))
                 .build();
-        final var fiRequestState = FIRequestState.builder()
-                .sessionId(notificationLogEntry.getSessionId())
-                .notifierId(notificationLogEntry.getNotifierId())
-                .txnId(notificationLogEntry.getTxnId())
-                .sessionStatus(notificationLogEntry.getSessionStatus())
-                .fiStatusResponse(notificationLogEntry.getFiStatusNotification())
-                .notificationTimestamp(notificationLogEntry.getNotificationTimestamp())
-                .build();
+
+        final FIRequestState fiRequestState = repoFIRequestState
+                .findById(fiNotification.getFIStatusNotification().getSessionId())
+                .orElse(new FIRequestState());
+
+        fiRequestState.setSessionId(notificationLogEntry.getSessionId());
+        fiRequestState.setNotifierId(notificationLogEntry.getNotifierId());
+        fiRequestState.setTxnId(notificationLogEntry.getTxnId());
+        fiRequestState.setSessionStatus(notificationLogEntry.getSessionStatus());
+        fiRequestState.setFiStatusResponse(notificationLogEntry.getFiStatusNotification());
+        fiRequestState.setNotificationTimestamp(notificationLogEntry.getNotificationTimestamp());
 
         transactionTemplate.executeWithoutResult(transactionStatus -> {
             repoFINotificationLog.save(notificationLogEntry);
@@ -139,8 +144,8 @@ public class FIRequestStoreImpl implements FIRequestStore {
     }
 
     @Override
-    public Optional<FIRequestState> getFIRequestState(String sessionId) {
-        return repoFIRequestState.findById(sessionId);
+    public Optional<FIRequestState> getFIRequestState(String consentHandleId, String sessionId) {
+        return repoFIRequestState.findBySessionIdAndConsentHandleId(sessionId, consentHandleId);
     }
 
     @Override

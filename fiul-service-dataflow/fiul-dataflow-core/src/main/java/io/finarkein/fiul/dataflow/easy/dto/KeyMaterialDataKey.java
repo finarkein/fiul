@@ -25,8 +25,11 @@ public class KeyMaterialDataKey {
 
     @Id
     String consentId;
+
     @Id
     String sessionId;
+
+    String consentHandleId;
 
     @Column(columnDefinition = "TEXT", nullable = false, updatable = false)
     String encryptedKey;
@@ -41,5 +44,4 @@ public class KeyMaterialDataKey {
         @Id
         String sessionId;
     }
-
 }

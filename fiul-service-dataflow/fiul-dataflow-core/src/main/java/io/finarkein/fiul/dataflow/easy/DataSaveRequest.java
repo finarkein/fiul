@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 public class DataSaveRequest<T> {
     private final String aaName;
     private final String consentId;
+    private final String consentHandleId;
     private final String sessionId;
     private final DataLife dataLife;
     private final Timestamp dataLifeExpireOn;
@@ -33,6 +34,7 @@ public class DataSaveRequest<T> {
         private String aaName;
         private String consentId;
         private String sessionId;
+        private String consentHandleId;
         private DataLife dataLife;
         private Timestamp dataLifeExpireOn;
         private T fiFetchResponse;
@@ -48,6 +50,11 @@ public class DataSaveRequest<T> {
 
         public DataSaveRequest.Builder<T> consentId(@NonNull final String consentId) {
             this.consentId = consentId;
+            return this;
+        }
+
+        public DataSaveRequest.Builder<T> consentHandleId(@NonNull final String consentHandleId) {
+            this.consentHandleId = consentHandleId;
             return this;
         }
 
@@ -67,7 +74,8 @@ public class DataSaveRequest<T> {
         }
 
         public DataSaveRequest<T> build() {
-            return new DataSaveRequest(this.aaName, this.consentId, this.sessionId, this.dataLife, dataLifeExpireOn, this.fiFetchResponse);
+            return new DataSaveRequest(this.aaName, this.consentId, consentHandleId, this.sessionId, this.dataLife,
+                    dataLifeExpireOn, this.fiFetchResponse);
         }
 
         public String toString() {

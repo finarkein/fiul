@@ -45,7 +45,6 @@ class EasyDataFlowServiceTest {
 
         Assertions.assertNotNull(requestResponse);
         Assertions.assertEquals(fiRequestResponse.getConsentId(), requestResponse.getConsentId());
-        Assertions.assertEquals(fiRequestResponse.getTxnid(), requestResponse.getTxnid());
         Assertions.assertNotNull(fiRequestResponse.getVer());
         Assertions.assertNotNull(fiRequestResponse.getSessionId());
         Assertions.assertNotNull(fiRequestResponse.getTimestamp());

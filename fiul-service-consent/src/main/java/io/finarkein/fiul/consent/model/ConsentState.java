@@ -35,6 +35,7 @@ public class ConsentState {
     private String txnId;
     private Boolean isPostConsentSuccessful;
     private String aaId;
+    private String customerAAId;
     private String notifierId;
 
     @LastModifiedDate

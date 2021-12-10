@@ -4,17 +4,20 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.dataflow.dto;
+package io.finarkein.fiul.dataflow;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString
+@Data
 @AllArgsConstructor
-public class FIDataDeleteResponse {
-    private String dataSessionId;
-    private String consentHandleId;
-    private boolean deleted;
+@NoArgsConstructor
+public class DataRequestResponse {
+    protected String consentId;
+    protected String sessionId;
 }

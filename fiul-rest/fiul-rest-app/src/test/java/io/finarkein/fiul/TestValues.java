@@ -31,8 +31,6 @@ import io.finarkein.api.aa.heartbeat.HeartbeatResponse;
 import io.finarkein.api.aa.notification.*;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
-import io.finarkein.fiul.consent.model.ConsentRequestLog;
-import io.finarkein.fiul.consent.model.ErrorOrigin;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.FetchDataRequest;
 import io.finarkein.fiul.dataflow.response.decrypt.DecryptedDatum;
@@ -273,105 +271,6 @@ public final class TestValues {
         consentResponseFin.setConsentHandle(consentHandle);
         return consentResponseFin;
     }
-
-    public static ConsentRequestLog getConsentRequestLogCallback(){
-        ConsentRequestLog consentRequestLog = new ConsentRequestLog();
-        consentRequestLog.setId(1234);
-        consentRequestLog.setVersion("1.1.2");
-        consentRequestLog.setTxnId(txnId);
-        consentRequestLog.setTimestamp(timestamp1);
-        consentRequestLog.setAaId("AA-1");
-        consentRequestLog.setCustomerAAId("CustomerAAId");
-        ConsentDetail consentDetailFin = new ConsentDetail();
-        consentDetailFin.setConsentStart(Functions.currentTimestampSupplier.get());
-        consentDetailFin.setConsentExpiry("2021-12-31T11:39:57.153Z");
-        consentDetailFin.setConsentMode("STORE");
-        consentDetailFin.setFetchType("PERIODIC");
-        consentDetailFin.setConsentTypes( new ArrayList<>(Arrays.asList("TRANSACTIONS","PROFILE","SUMMARY")));
-        consentDetailFin.setFiTypes(new ArrayList<>(Arrays.asList("DEPOSIT")));
-        DataConsumer dataConsumerFin = new DataConsumer();
-        dataConsumerFin.setId("FIN0566");
-        consentDetailFin.setDataConsumer(dataConsumerFin);
-        Purpose purpose = new Purpose();
-        purpose.setCode("101");
-        purpose.setRefUri("https://api.rebit.org.in/aa/purpose/101.xml");
-        purpose.setText("Wealth management service");
-        Category category = new Category();
-        category.setType("string");
-        purpose.setCategory(category);
-        consentDetailFin.setPurpose(purpose);
-        FIDataRange fiDataRange = new FIDataRange();
-        fiDataRange.setFrom("2018-12-06T11:39:57.153Z");
-        fiDataRange.setTo("2020-07-03T14:25:33.440Z");
-        consentDetailFin.setFIDataRange(fiDataRange);
-        DataLife dataLife = new DataLife();
-        dataLife.setUnit("MONTH");
-        dataLife.setValue(1);
-        consentDetailFin.setDataLife(dataLife);
-        Frequency frequency = new Frequency();
-        frequency.setUnit("MONTH");
-        frequency.setValue(100);
-        consentDetailFin.setFrequency(frequency);
-        DataFilter dataFilter = new DataFilter();
-        dataFilter.setType("TRANSACTIONAMOUNT");
-        dataFilter.setOperator(">=");
-        dataFilter.setValue("2000");
-        consentDetailFin.setDataFilter(new ArrayList<>(Arrays.asList(dataFilter)));
-        consentRequestLog.setConsentDetail(consentDetailFin);
-        consentRequestLog.setCreatedOn(timestamp1);
-        return consentRequestLog;
-    }
-
-    public static ConsentRequestLog getConsentRequestLog(){
-        ConsentRequestLog consentRequestLog = new ConsentRequestLog();
-        consentRequestLog.setId(1234);
-        consentRequestLog.setVersion("1.1.1");
-        consentRequestLog.setTxnId(txnId);
-        consentRequestLog.setTimestamp(timestamp1);
-        consentRequestLog.setAaId("AA-1");
-        consentRequestLog.setCustomerAAId("CustomerAAId");
-        ConsentDetail consentDetailFin = new ConsentDetail();
-        consentDetailFin.setConsentStart(Functions.currentTimestampSupplier.get());
-        consentDetailFin.setConsentExpiry("2021-12-31T11:39:57.153Z");
-        consentDetailFin.setConsentMode("STORE");
-        consentDetailFin.setFetchType("PERIODIC");
-        consentDetailFin.setConsentTypes( new ArrayList<>(Arrays.asList("TRANSACTIONS","PROFILE","SUMMARY")));
-        consentDetailFin.setFiTypes(new ArrayList<>(Arrays.asList("DEPOSIT")));
-        DataConsumer dataConsumerFin = new DataConsumer();
-        dataConsumerFin.setId("FIN0566");
-        consentDetailFin.setDataConsumer(dataConsumerFin);
-        Purpose purpose = new Purpose();
-        purpose.setCode("101");
-        purpose.setRefUri("https://api.rebit.org.in/aa/purpose/101.xml");
-        purpose.setText("Wealth management service");
-        Category category = new Category();
-        category.setType("string");
-        purpose.setCategory(category);
-        consentDetailFin.setPurpose(purpose);
-        FIDataRange fiDataRange = new FIDataRange();
-        fiDataRange.setFrom("2018-12-06T11:39:57.153Z");
-        fiDataRange.setTo("2020-07-03T14:25:33.440Z");
-        consentDetailFin.setFIDataRange(fiDataRange);
-        DataLife dataLife = new DataLife();
-        dataLife.setUnit("MONTH");
-        dataLife.setValue(1);
-        consentDetailFin.setDataLife(dataLife);
-        Frequency frequency = new Frequency();
-        frequency.setUnit("MONTH");
-        frequency.setValue(100);
-        consentDetailFin.setFrequency(frequency);
-        DataFilter dataFilter = new DataFilter();
-        dataFilter.setType("TRANSACTIONAMOUNT");
-        dataFilter.setOperator(">=");
-        dataFilter.setValue("2000");
-        consentDetailFin.setDataFilter(new ArrayList<>(Arrays.asList(dataFilter)));
-        consentRequestLog.setConsentDetail(consentDetailFin);
-        consentRequestLog.setCreatedOn(timestamp1);
-        consentRequestLog.setErrorDetails("Test Error");
-        consentRequestLog.setErrorOrigin(ErrorOrigin.ERROR_IN_VALIDATION);
-        return consentRequestLog;
-    }
-
 
     public static ConsentHandleResponse getConsentHandleResponse(){
         ConsentHandleResponse consentHandleResponse = new ConsentHandleResponse();

@@ -10,6 +10,10 @@ import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RepoFIRequestDTO extends JpaRepository<FIRequestDTO, FIRequestDTO.Key> {
+
+    Optional<FIRequestDTO> findBySessionIdAndConsentHandleId(String sessionId, String consentHandleId);
 }

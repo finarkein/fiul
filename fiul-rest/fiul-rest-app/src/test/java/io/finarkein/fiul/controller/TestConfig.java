@@ -87,10 +87,6 @@ public class TestConfig {
 
         Mockito.when(aafiuClient.createConsent(finvuConsentRequest)).thenReturn(Mono.just(getFinvuConsentResponse()));
 
-        Mockito.when(consentStore1.logConsentRequest(consentRequestWithCallback)).thenReturn(getConsentRequestLogCallback());
-
-        Mockito.when(consentStore1.logConsentRequest(consentRequestError)).thenReturn(getConsentRequestLog());
-
         Mockito.when(aafiuClient.createConsent(consentRequestError)).thenReturn(Mono.error(exception));
 
         Mockito.when(aafiuClient.generateJWS("abcd")).thenReturn(Mono.just(expectedValue));

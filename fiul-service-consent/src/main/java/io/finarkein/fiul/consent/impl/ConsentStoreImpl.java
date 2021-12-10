@@ -10,16 +10,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.consent.ConsentMode;
 import io.finarkein.api.aa.consent.FetchType;
 import io.finarkein.api.aa.consent.request.ConsentRequest;
-import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.ConsentStatusNotification;
 import io.finarkein.api.aa.notification.Notifier;
 import io.finarkein.api.aa.util.Functions;
-import io.finarkein.fiul.consent.FIUConsentRequest;
-import io.finarkein.fiul.consent.model.*;
-import io.finarkein.fiul.consent.repo.*;
+import io.finarkein.fiul.consent.model.ConsentNotificationLog;
+import io.finarkein.fiul.consent.model.ConsentRequestDTO;
+import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
+import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
+import io.finarkein.fiul.consent.repo.ConsentStateRepository;
+import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.consent.service.PurposeFetcher;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +33,7 @@ import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
 import static io.finarkein.api.aa.util.Functions.strToTimeStamp;
 
 @Service
+@Log4j2
 class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
@@ -41,9 +46,6 @@ class ConsentStoreImpl implements ConsentStore {
     private ConsentNotificationLogRepository consentNotificationLogRepository;
 
     @Autowired
-    private ConsentRequestLogRepository consentRequestLogRepository;
-
-    @Autowired
     private ConsentTemplateRepository consentTemplateRepository;
 
     @Autowired
@@ -51,28 +53,6 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Override
-    public ConsentRequestLog logConsentRequest(FIUConsentRequest consentRequest) {
-        try {
-            var consentRequestLog = ConsentRequestLog.builder()
-                    .version(consentRequest.getVer())
-                    .txnId(consentRequest.getTxnid())
-                    .timestamp(strToTimeStamp.apply(consentRequest.getTimestamp()))
-                    .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
-                    .customerAAId(consentRequest.getConsentDetail().getCustomer().getId())
-                    .consentDetail(consentRequest.getConsentDetail())
-                    .build();
-            return consentRequestLogRepository.save(consentRequestLog);
-        } catch (Exception e) {
-            throw Errors.InternalError.with(consentRequest.getTxnid(), e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void updateConsentRequestLog(ConsentRequestLog consentRequestLog) {
-        consentRequestLogRepository.save(consentRequestLog);
-    }
 
     @Override
     public void saveConsentRequest(String consentHandle, ConsentRequest consentRequest) {
@@ -124,12 +104,8 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Override
     public void logConsentNotification(ConsentNotificationLog consentNotificationLog) {
-        ConsentState consentState;
-        Optional<ConsentState> optionalConsentState = consentStateRepository.findByTxnId(consentNotificationLog.getTxnId());
-        if (optionalConsentState.isPresent())
-            consentState = optionalConsentState.get();
-        else
-            consentState = new ConsentState();
+        Optional<ConsentState> optionalConsentState = consentStateRepository.findById(consentNotificationLog.getConsentHandle());
+        ConsentState consentState = optionalConsentState.orElseGet(ConsentState::new);
         consentState.setConsentHandle(consentNotificationLog.getConsentHandle());
         consentState.setConsentId(consentNotificationLog.getConsentId());
         consentState.setConsentStatus(consentNotificationLog.getConsentState());
@@ -137,7 +113,8 @@ class ConsentStoreImpl implements ConsentStore {
         consentState.setNotifierId(consentNotificationLog.getNotifierId());
 
         consentNotificationLogRepository.save(consentNotificationLog);
-        consentStateRepository.save(consentState);
+        final ConsentState savedConsentState = consentStateRepository.save(consentState);
+        log.debug("Saved consentState after consentNotification:{}",savedConsentState);
         updateConsentRequest(consentNotificationLog.getConsentHandle(), consentNotificationLog.getConsentId());
     }
 

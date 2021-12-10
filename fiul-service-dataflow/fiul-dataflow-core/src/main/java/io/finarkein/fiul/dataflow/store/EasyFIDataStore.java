@@ -18,17 +18,19 @@ public interface EasyFIDataStore {
 
     void saveKey(KeyMaterialDataKey entry);
 
-    Optional<KeyMaterialDataKey> getKey(String consentId, String sessionId);
+    Optional<KeyMaterialDataKey> getKeyConsentId(String consentId, String sessionId);
+
+    Optional<KeyMaterialDataKey> getKeyConsentHandleId(String consentHandleId, String sessionId);
 
     void deleteKey(String consentId, String sessionId);
 
     void saveFIData(DataSaveRequest<FIFetchResponse> request);
 
-    Optional<FIFetchResponse> getFIData(String consentId, String sessionId);
+    Optional<FIFetchResponse> getFIData(String consentHandleId, String sessionId);
 
-    Map<String, Integer> deleteFIDataByConsentId(String consentId);
+    Map<String, Integer> deleteFIDataByConsentHandleId(String consentHandleId);
 
-    Map<String, Integer> deleteFIDataByConsentIdAndSessionId(String consentId, String sessionId);
+    Map<String, Integer> deleteFIDataByConsentHandleIdAndSessionId(String consentHandleId, String sessionId);
 
     Map<String, Integer> deleteByDataLifeExpireOnBefore(Timestamp triggerTimestamp);
 }

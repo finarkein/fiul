@@ -58,6 +58,7 @@ public class AAFIDataStoreImpl implements AAFIDataStore {
 //                .timestamp(toTimestamp.apply(fiFetchResponse.getTimestamp()))
                 .consentId(consentId)
                 .sessionId(sessionId)
+                .consentHandleId(request.getConsentHandleId())
                 .aaName(aaName)
                 .dataLifeUnit(dataLife.getUnit())
                 .dataLifeValue(dataLife.getValue())

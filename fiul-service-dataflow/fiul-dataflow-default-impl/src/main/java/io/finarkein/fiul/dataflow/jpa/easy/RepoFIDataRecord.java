@@ -23,9 +23,9 @@ public interface RepoFIDataRecord extends JpaRepository<FIDataRecord, FIDataReco
 
     @Modifying(flushAutomatically = true)
     @Transactional
-    int deleteByConsentId(String consentId);
+    int deleteByConsentHandleId(String consentHandleId);
 
     @Modifying(flushAutomatically = true)
     @Transactional
-    int deleteByConsentIdAndSessionId(String consentId, String sessionId);
+    int deleteByConsentHandleIdAndSessionId(String consentHandleId, String sessionId);
 }
