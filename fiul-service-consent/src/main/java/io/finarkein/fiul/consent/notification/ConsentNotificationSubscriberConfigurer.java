@@ -8,6 +8,7 @@ package io.finarkein.fiul.consent.notification;
 
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
+import io.finarkein.fiul.notification.config.JmsUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,9 +19,9 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.annotation.JmsListenerConfigurer;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerEndpointRegistrar;
-import org.springframework.jms.config.SimpleJmsListenerEndpoint;
 import org.springframework.jms.support.converter.MessageConverter;
 
+import javax.jms.Message;
 import java.util.UUID;
 
 import static io.finarkein.fiul.notification.ServiceConstants.IN_MEM;
@@ -32,49 +33,46 @@ import static io.finarkein.fiul.notification.ServiceConstants.NOTIFICATION_Q_TYP
 @ConditionalOnProperty(name = NOTIFICATION_Q_TYPE_PROPERTY, havingValue = IN_MEM, matchIfMissing = true)
 public class ConsentNotificationSubscriberConfigurer implements JmsListenerConfigurer {
 
-    @Value("${fiul.notification.consent-queue-name}")
-    private String consentNotificationTopicName;
+    protected final String consentNotificationTopicName;
+    protected final ConsentStatusNotificationSubscriber subscriber;
+    protected final JmsListenerContainerFactory<?> listenerContainerFactory;
+    protected final MessageConverter jacksonJmsMessageConverter;
+    protected final String queueType;
 
     @Autowired
-    private ConsentStatusNotificationSubscriber subscriber;
+    ConsentNotificationSubscriberConfigurer(@Value("${fiul.notification.consent-queue-name}") String consentNotificationTopicName,
+                                            ConsentStatusNotificationSubscriber subscriber,
+                                            @Qualifier("fiul-events-factory") JmsListenerContainerFactory<?> listenerContainerFactory,
+                                            @Qualifier("JacksonMessageConverter") MessageConverter jacksonJmsMessageConverter,
+                                            @Value("${" + NOTIFICATION_Q_TYPE_PROPERTY + "}") String queueType){
 
-    @Autowired
-    @Qualifier("fiul-events-factory")
-    private JmsListenerContainerFactory<?> listenerContainerFactory;
-
-    @Autowired
-    @Qualifier("JacksonMessageConverter")
-    public MessageConverter jacksonJmsMessageConverter;
-
-    @Value("${" + NOTIFICATION_Q_TYPE_PROPERTY + "}")
-    private String queueType;
+        this.consentNotificationTopicName = consentNotificationTopicName;
+        this.subscriber = subscriber;
+        this.listenerContainerFactory = listenerContainerFactory;
+        this.jacksonJmsMessageConverter = jacksonJmsMessageConverter;
+        this.queueType = queueType;
+    }
 
     @Override
     public void configureJmsListeners(JmsListenerEndpointRegistrar jmsListenerEndpointRegistrar) {
-        var jmsListenerEndpoint = consentServiceEndPointForConsentNotification(jacksonJmsMessageConverter);
+        var jmsListenerEndpoint  = JmsUtil.createSimpleEndpoint(
+                "Consumer.consent-service." + consentNotificationTopicName,
+                message -> handleConsentNotification(message, jacksonJmsMessageConverter)
+                );
         jmsListenerEndpointRegistrar.registerEndpoint(jmsListenerEndpoint, listenerContainerFactory);
 
-        log.info("JmsListenerEndpoint registered with id:{}, destination:{}, queueType:{}",
-                jmsListenerEndpoint.getId(), jmsListenerEndpoint.getDestination(), queueType);
+        log.info("JmsListenerEndpoint registered:{}, queueType:{}", jmsListenerEndpoint, queueType);
     }
 
-    private SimpleJmsListenerEndpoint consentServiceEndPointForConsentNotification(MessageConverter converter) {
-        String consentServiceConsentNotificationListenerName = "Consumer.consent-service." + consentNotificationTopicName;
-        SimpleJmsListenerEndpoint endpoint = new SimpleJmsListenerEndpoint();
-        endpoint.setId("consentServiceConsentNotificationListener_" + System.currentTimeMillis());
-        endpoint.setDestination(consentServiceConsentNotificationListenerName);
-        endpoint.setMessageListener(message -> {
-            try {
-                final ConsentNotification consentNotification = (ConsentNotification) converter.fromMessage(message);
-                subscriber.handleConsentNotification(consentNotification);
-            } catch (Exception e) {
-                final String errorMessage = String
-                        .format("Error in ConsentNotification-consent-service-handler:%s, error:%s",
-                                consentServiceConsentNotificationListenerName, e.getMessage());
-                log.error(errorMessage, e);
-                throw Errors.InternalError.with(UUID.randomUUID().toString(), errorMessage, e);
-            }
-        });
-        return endpoint;
+    protected void handleConsentNotification(Message message, MessageConverter converter) {
+        try {
+            final ConsentNotification consentNotification = (ConsentNotification) converter.fromMessage(message);
+            subscriber.handleConsentNotification(consentNotification);
+        } catch (Exception e) {
+            final String errorMessage = String
+                    .format("Error in ConsentNotification-consent-service-handler error:%s", e.getMessage());
+            log.error(errorMessage, e);
+            throw Errors.InternalError.with(UUID.randomUUID().toString(), errorMessage, e);
+        }
     }
 }

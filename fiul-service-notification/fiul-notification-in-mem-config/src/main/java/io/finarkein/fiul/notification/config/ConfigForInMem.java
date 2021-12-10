@@ -58,8 +58,6 @@ public class ConfigForInMem {
     @Bean
     @Qualifier("notificationConnection")
     public ConnectionFactory connectionFactoryNotification() {
-        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
-        return connectionFactory;
+        return new ActiveMQConnectionFactory("vm://localhost");
     }
-
 }

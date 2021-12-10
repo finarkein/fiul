@@ -9,8 +9,8 @@ package io.finarkein.fiul.dataflow.notification;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
+import io.finarkein.fiul.notification.config.JmsUtil;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,6 +22,8 @@ import org.springframework.jms.config.JmsListenerEndpointRegistrar;
 import org.springframework.jms.config.SimpleJmsListenerEndpoint;
 import org.springframework.jms.support.converter.MessageConverter;
 
+import javax.jms.Message;
+import java.util.Objects;
 import java.util.UUID;
 
 import static io.finarkein.fiul.notification.ServiceConstants.IN_MEM;
@@ -33,83 +35,76 @@ import static io.finarkein.fiul.notification.ServiceConstants.NOTIFICATION_Q_TYP
 @ConditionalOnProperty(name = NOTIFICATION_Q_TYPE_PROPERTY, havingValue = IN_MEM, matchIfMissing = true)
 public class DataFlowNotificationSubscriberConfigurer implements JmsListenerConfigurer {
 
-    @Value("${fiul.notification.consent-queue-name}")
-    private String consentNotificationTopicName;
+    protected final String consentNotificationTopicName;
+    protected final String fiNotificationTopicName;
+    protected final DataFlowConsentNotificationSubscriber dataFlowConsentNotificationSubscriber;
+    protected final DataFlowFINotificationSubscriber dataFlowFINotificationSubscriber;
+    protected final JmsListenerContainerFactory<?> listenerContainerFactory;
+    protected final MessageConverter jacksonJmsMessageConverter;
+    protected final String queueType;
 
-    @Value("${fiul.notification.fi-queue-name}")
-    private String fiNotificationTopicName;
-
-    @Autowired
-    private DataFlowConsentNotificationSubscriber dataFlowConsentNotificationSubscriber;
-
-    @Autowired
-    private DataFlowFINotificationSubscriber dataFlowFINotificationSubscriber;
-
-    @Autowired
-    @Qualifier("fiul-events-factory")
-    private JmsListenerContainerFactory<?> listenerContainerFactory;
-
-    @Autowired
-    @Qualifier("JacksonMessageConverter")
-    public MessageConverter jacksonJmsMessageConverter;
-
-    @Value("${" + NOTIFICATION_Q_TYPE_PROPERTY + "}")
-    private String queueType;
+    protected DataFlowNotificationSubscriberConfigurer(@Value("${fiul.notification.consent-queue-name}") String consentNotificationTopicName,
+                                                       @Value("${fiul.notification.fi-queue-name}") String fiNotificationTopicName,
+                                                       DataFlowConsentNotificationSubscriber dataFlowConsentNotificationSubscriber,
+                                                       DataFlowFINotificationSubscriber dataFlowFINotificationSubscriber,
+                                                       @Qualifier("fiul-events-factory") JmsListenerContainerFactory<?> listenerContainerFactory,
+                                                       @Qualifier("JacksonMessageConverter") MessageConverter jacksonJmsMessageConverter,
+                                                       @Value("${" + NOTIFICATION_Q_TYPE_PROPERTY + "}") String queueType) {
+        this.consentNotificationTopicName = consentNotificationTopicName;
+        this.fiNotificationTopicName = fiNotificationTopicName;
+        this.dataFlowConsentNotificationSubscriber = dataFlowConsentNotificationSubscriber;
+        this.dataFlowFINotificationSubscriber = dataFlowFINotificationSubscriber;
+        this.listenerContainerFactory = listenerContainerFactory;
+        this.jacksonJmsMessageConverter = jacksonJmsMessageConverter;
+        this.queueType = queueType;
+    }
 
     @Override
     public void configureJmsListeners(JmsListenerEndpointRegistrar jmsListenerEndpointRegistrar) {
         //consentNotification subscriber
-        var jmsListenerEndpoint = dataflowServiceEndPointForConsentNotification(jacksonJmsMessageConverter);
+        SimpleJmsListenerEndpoint jmsListenerEndpoint = JmsUtil.createSimpleEndpoint(
+                "Consumer.dataflow-service." + consentNotificationTopicName,
+                message -> processConsentNotification(jacksonJmsMessageConverter, message)
+        );
         jmsListenerEndpointRegistrar.registerEndpoint(jmsListenerEndpoint, listenerContainerFactory);
 
-        log.info("JmsListenerEndpoint registered with id:{}, destination:{}, queueType:{}",
-                jmsListenerEndpoint.getId(), jmsListenerEndpoint.getDestination(), queueType);
+        log.info("ConsentNotification JmsListenerEndpoint registered:{}, queueType:{}", jmsListenerEndpoint, queueType);
 
         //fiNotification subscriber
-        jmsListenerEndpoint = dataflowServiceEndPointForFINotification(jacksonJmsMessageConverter);
+        jmsListenerEndpoint = JmsUtil.createSimpleEndpoint(
+                "Consumer.dataflow-service." + fiNotificationTopicName,
+                message -> processFINotification(jacksonJmsMessageConverter, message)
+        );
         jmsListenerEndpointRegistrar.registerEndpoint(jmsListenerEndpoint, listenerContainerFactory);
 
-        log.info("JmsListenerEndpoint registered with id:{}, destination:{}, queueType:{}",
-                jmsListenerEndpoint.getId(), jmsListenerEndpoint.getDestination(), queueType);
+        log.info("FINotification JmsListenerEndpoint registered:{}, queueType:{}", jmsListenerEndpoint, queueType);
     }
 
-    private SimpleJmsListenerEndpoint dataflowServiceEndPointForConsentNotification(MessageConverter converter) {
-        final String dataflowServiceConsentNotificationListenerName = "Consumer.dataflow-service." + consentNotificationTopicName;
-        SimpleJmsListenerEndpoint endpoint = new SimpleJmsListenerEndpoint();
-        endpoint.setId("dataflowServiceConsentNotificationListener_" + System.currentTimeMillis());
-        endpoint.setDestination(dataflowServiceConsentNotificationListenerName);
-        endpoint.setMessageListener(message -> {
-            try {
-                final ConsentNotification consentNotification = (ConsentNotification) converter.fromMessage(message);
-                dataFlowConsentNotificationSubscriber.handleConsentNotification(consentNotification);
-            } catch (Exception e) {
-                final String errorMessage = String
-                        .format("Error in ConsentNotification-dataflow-service-handler:%s, error:%s"
-                                , dataflowServiceConsentNotificationListenerName, e.getMessage());
-                log.error(errorMessage, e);
-                throw Errors.InternalError.with(UUID.randomUUID().toString(), errorMessage, e);
-            }
-        });
-        return endpoint;
+    protected void processConsentNotification(MessageConverter converter, Message message) {
+        ConsentNotification consentNotification = null;
+        try {
+            consentNotification = (ConsentNotification) converter.fromMessage(message);
+            dataFlowConsentNotificationSubscriber.handleConsentNotification(consentNotification);
+        } catch (Exception e) {
+            final String errorMessage = String
+                    .format("Error in ConsentNotification-dataflow-service-handler error:%s", e.getMessage());
+            log.error(errorMessage, e);
+            throw Errors.InternalError.with(Objects.isNull(consentNotification) ?
+                    UUID.randomUUID().toString() : consentNotification.getTxnid(), errorMessage, e);
+        }
     }
 
-    private SimpleJmsListenerEndpoint dataflowServiceEndPointForFINotification(MessageConverter converter) {
-        String dataflowServiceFINotificationListenerName = "Consumer.dataflow-service." + fiNotificationTopicName;
-        SimpleJmsListenerEndpoint endpoint = new SimpleJmsListenerEndpoint();
-        endpoint.setId("dataflowServiceFINotificationListener_" + System.currentTimeMillis());
-        endpoint.setDestination(dataflowServiceFINotificationListenerName);
-        endpoint.setMessageListener(message -> {
-            try {
-                final FINotification consentNotification = (FINotification) converter.fromMessage(message);
-                dataFlowFINotificationSubscriber.handleFINotification(consentNotification);
-            } catch (Exception e) {
-                final String errorMessage = String
-                        .format("Error in FINotification-dataflow-service-handler:%s, error:%s"
-                                , dataflowServiceFINotificationListenerName, e.getMessage());
-                log.error(errorMessage, e);
-                throw Errors.InternalError.with(UUID.randomUUID().toString(), errorMessage, e);
-            }
-        });
-        return endpoint;
+    protected void processFINotification(MessageConverter converter, Message message) {
+        FINotification fiNotification = null;
+        try {
+            fiNotification = (FINotification) converter.fromMessage(message);
+            dataFlowFINotificationSubscriber.handleFINotification(fiNotification);
+        } catch (Exception e) {
+            final String errorMessage = String
+                    .format("Error in FINotification-dataflow-service-handler error:%s", e.getMessage());
+            log.error(errorMessage, e);
+            throw Errors.InternalError.with(Objects.isNull(fiNotification) ?
+                    UUID.randomUUID().toString() : fiNotification.getTxnid(), errorMessage, e);
+        }
     }
 }
