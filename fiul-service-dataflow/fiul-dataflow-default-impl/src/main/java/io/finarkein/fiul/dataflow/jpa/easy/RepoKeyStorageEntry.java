@@ -10,7 +10,10 @@ import io.finarkein.fiul.dataflow.easy.dto.KeyMaterialDataKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface RepoKeyStorageEntry extends JpaRepository<KeyMaterialDataKey, KeyMaterialDataKey.Key>{
 
+    Optional<KeyMaterialDataKey> findBySessionIdAndConsentHandleId(String sessionId, String consentHandleId);
 }

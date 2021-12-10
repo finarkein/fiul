@@ -6,7 +6,6 @@
  */
 package io.finarkein.fiul.dataflow;
 
-import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
 import io.finarkein.fiul.dataflow.easy.DataRequestStatus;
 import io.finarkein.fiul.dataflow.response.decrypt.FIDataI;
@@ -17,17 +16,17 @@ import java.sql.Timestamp;
 
 public interface EasyDataFlowService {
 
-    Mono<FIRequestResponse> createDataRequest(DataRequest dataRequest);
+    Mono<DataRequestResponse> createDataRequest(DataRequest dataRequest);
 
-    Mono<DataRequestStatus> dataRequestStatus(String consentId, String sessionId);
+    Mono<DataRequestStatus> dataRequestStatus(String consentHandleId, String sessionId);
 
-    Mono<FIDataI> fetchData(String consentId, String sessionId, FIDataOutputFormat fiDataOutputFormat);
+    Mono<FIDataI> fetchData(String consentHandleId, String sessionId, FIDataOutputFormat fiDataOutputFormat);
 
-    Mono<FIDataI> getData(String consentId, String sessionId, FIDataOutputFormat fiDataOutputFormat);
+    Mono<FIDataI> getData(String consentHandleId, String sessionId, FIDataOutputFormat fiDataOutputFormat);
 
-    Mono<FIDataDeleteResponse> deleteData(String consentId, String dataSessionId);
+    Mono<FIDataDeleteResponse> deleteData(String consentHandleId, String dataSessionId);
 
-    Mono<FIDataDeleteResponse> deleteData(String consentId);
+    Mono<FIDataDeleteResponse> deleteData(String consentHandleId);
 
     Mono<Boolean> deleteByDataLifeExpireOnBefore(Timestamp triggerTimestamp);
 }

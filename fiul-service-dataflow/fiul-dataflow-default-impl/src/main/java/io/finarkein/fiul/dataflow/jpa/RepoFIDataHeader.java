@@ -13,9 +13,12 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Repository
 public interface RepoFIDataHeader extends JpaRepository<FIDataHeader, FIDataHeader.Key> {
+
+    Optional<FIDataHeader> findBySessionIdAndConsentHandleId(String sessionId, String consentHandleId);
 
     @Modifying(flushAutomatically = true)
     @Transactional
@@ -23,11 +26,15 @@ public interface RepoFIDataHeader extends JpaRepository<FIDataHeader, FIDataHead
 
     @Modifying(flushAutomatically = true)
     @Transactional
+    int deleteByConsentHandleId(String consentHandleId);
+
+    @Modifying(flushAutomatically = true)
+    @Transactional
     int deleteByConsentId(String consentId);
 
     @Modifying(flushAutomatically = true)
     @Transactional
-    int deleteByConsentIdAndSessionId(String consentId, String sessionId);
+    int deleteByConsentHandleIdAndSessionId(String consentHandleId, String sessionId);
 
     @Modifying(flushAutomatically = true)
     @Transactional

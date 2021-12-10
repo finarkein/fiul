@@ -26,14 +26,23 @@ import java.time.Instant;
         indexes = {
                 @Index(name = "FIDataHeader_Idx1", columnList = "consentId, sessionId, aaName"),
                 @Index(name = "FIDataHeader_Idx2", columnList = "aaName"),
-                @Index(name = "FIDataHeader_Idx3", columnList = "dataLifeExpireOn")
+                @Index(name = "FIDataHeader_Idx3", columnList = "dataLifeExpireOn"),
+                @Index(name = "FIDataHeader_Idx4", columnList = "consentHandleId, sessionId, aaName"),
+                @Index(name = "FIDataHeader_Idx5", columnList = "consentHandleId, sessionId"),
+                @Index(name = "FIDataHeader_Idx6", columnList = "consentHandleId")
         }
 )
 public class FIDataHeader {
     @Id
+    @Column(length = 36)
     private String consentId;
+
     @Id
+    @Column(length = 36)
     private String sessionId;
+
+    @Column(length = 36)
+    private String consentHandleId;
 
     @Column(nullable = false, updatable = false)
     private String aaName;

@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
@@ -81,6 +82,7 @@ class ConsentServiceImpl implements ConsentService {
                             .txnId(response.getTxnid())
                             .isPostConsentSuccessful(true)
                             .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                            .customerAAId(consentRequest.getConsentDetail().getCustomer().getId())
                             .consentHandle(response.getConsentHandle())
                             .postConsentResponseTimestamp(strToTimeStamp.apply(response.getTimestamp()))
                             .build());
@@ -172,18 +174,18 @@ class ConsentServiceImpl implements ConsentService {
         log.debug("GetConsentArtefact: start: consentId:{}, aaName:{}", consentId, aaNameOptional);
         return aaNameOptional
                 .or(consentRequestAANameByConsentId(consentId))
-                .map(aaName -> aafiuClient
-                        .getConsentArtefact(consentId, aaName)
+                .map(aaName -> aafiuClient.getConsentArtefact(consentId, aaName)
                         .flatMap(consentArtefact -> {
+                            final Timestamp artefactCreateTimestamp = strToTimeStamp.apply(consentArtefact.getCreateTimestamp());
                             final ConsentState consentState = consentStore.getConsentStateById(consentArtefact.getConsentId());
-                            if (consentState != null && strToTimeStamp.apply(consentArtefact.getCreateTimestamp())
-                                    .before(consentState.getPostConsentResponseTimestamp())) {
-                                    throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
-                                            + consentArtefact.getCreateTimestamp());
+                            if (consentState != null && consentState.getPostConsentResponseTimestamp() != null
+                                    && artefactCreateTimestamp.before(consentState.getPostConsentResponseTimestamp())) {
+                                throw Errors.InvalidRequest.with(consentState.getTxnId(),
+                                        "Invalid consent artefact timestamp : " + consentArtefact.getCreateTimestamp());
                             }
-                            if (strToTimeStamp.apply(consentArtefact.getCreateTimestamp()).after(strToTimeStamp.apply(currentTimestampSupplierMinusDuration.apply(-5, ChronoUnit.SECONDS)))) {
-                                throw Errors.InvalidRequest.with(consentState.getTxnId(), "Invalid consent artefact timestamp : "
-                                        + consentArtefact.getCreateTimestamp());
+                            if (artefactCreateTimestamp.after(strToTimeStamp.apply(currentTimestampSupplierMinusDuration.apply(-5, ChronoUnit.SECONDS)))) {
+                                throw Errors.InvalidRequest.with(consentState.getTxnId(),
+                                        "Invalid consent artefact timestamp : " + consentArtefact.getCreateTimestamp());
                             }
                             return Mono.just(consentArtefact);
                         })
@@ -269,17 +271,18 @@ class ConsentServiceImpl implements ConsentService {
                                     state.setConsentHandle(consentStatusResponse.getConsentHandle());
                                     state.setConsentId(consentStatusResponse.getConsentStatus().getId());
                                     state.setConsentStatus(consentStatusResponse.getConsentStatus().getStatus());
-                                    state.setUpdatedOn(strToTimeStamp.apply(consentStatusResponse.getTimestamp()));
                                     state.setTxnId(consentStatusResponse.getTxnid());
-                                    /* TODO we can decide to persist this state in store as it was not received
-                                     * through consentNotification
-                                     */
+                                    state.setAaId(aaName);
+                                    customerAAId.ifPresent(state::setCustomerAAId);
+
+                                    //saving consentState
+                                    consentStore.saveConsentState(state);
                                     return Mono.just(state);
                                 })
                                 .onErrorMap(throwable -> Errors.InvalidRequest.with(UUIDSupplier.get(),
                                         throwable.getMessage(), throwable))
                 )
                 .orElseThrow(() -> Errors.InvalidRequest.with(UUIDSupplier.get(),
-                        "Unable to get status for given consentHandle:" + consentHandle));
+                        "Unable to get status for given consentHandle:" + consentHandle + ", try with customerAAId"));
     }
 }
