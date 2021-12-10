@@ -42,6 +42,6 @@ public class CallbackWebClientConfig {
     public WebClient webhookClientQualifiers(@Value("${" + FIUL_CALLBACK_WEB_CLIENT_QUALIFIER + "}") String webclientName,
                                             ApplicationContext context) {
         log.info("Notification-callback webhook: qualifier: {}={}", FIUL_CALLBACK_WEB_CLIENT_QUALIFIER, webclientName);
-        return (WebClient) context.getBean(webclientName);
+        return context.getBean(webclientName, WebClient.class);
     }
 }
