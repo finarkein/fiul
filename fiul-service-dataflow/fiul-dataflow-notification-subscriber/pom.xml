@@ -23,6 +23,10 @@
             <groupId>io.finarkein.fiu</groupId>
             <artifactId>fiul-notification-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-notification-in-mem-config</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

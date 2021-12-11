@@ -16,8 +16,9 @@
         <module>fiul-notification-core</module>
         <module>fiul-notification-callback-core</module>
         <module>fiul-notification-callbacks-jpa</module>
-        <module>fiul-notification-callbacks-pubsub-core</module>
-        <module>fiul-notification-pubsub</module>
+        <module>fiul-notification-callbacks-in-mem-sub</module>
+        <module>fiul-notification-in-mem-pub</module>
+        <module>fiul-notification-in-mem-config</module>
     </modules>
 
     <dependencyManagement>
@@ -52,16 +53,20 @@
                 <groupId>io.finarkein.fiu</groupId>
                 <artifactId>fiul-notification-callbacks-jpa</artifactId>
                 <version>${project.version}</version>
-                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>io.finarkein.fiu</groupId>
-                <artifactId>fiul-notification-callbacks-pubsub-core</artifactId>
+                <artifactId>fiul-notification-callbacks-in-mem-sub</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.finarkein.fiu</groupId>
                 <artifactId>fiul-notification-pubsub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-in-mem-config</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

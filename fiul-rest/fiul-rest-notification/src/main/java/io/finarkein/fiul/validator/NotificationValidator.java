@@ -13,7 +13,7 @@ import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.fiul.config.model.AaApiKeyBody;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -23,17 +23,17 @@ public class NotificationValidator {
 
     private static final String REQUIRED_NOTIFIER_TYPE = "AA";
 
-    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentState consentState,
+    public static void validateConsentNotification(ConsentNotification consentNotification, ConsentStateDTO consentStateDTO,
                                                    EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
         BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(),
                 consentNotification.getTimestamp(), "ConsentNotification");
         if (!consentNotification.getNotifier().getId().equals(aaApiKeyBody.getClientId()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Api key of alternate AA sent");
-        if (consentState == null)
+        if (consentStateDTO == null)
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent data not found for given txnId");
-        if (consentState.getConsentStatus() != null && consentState.getConsentStatus().equalsIgnoreCase("FAILED"))
+        if (consentStateDTO.getConsentStatus() != null && consentStateDTO.getConsentStatus().equalsIgnoreCase("FAILED"))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Status is failed");
-        if (consentState.getIsPostConsentSuccessful() != null && !consentState.getIsPostConsentSuccessful())
+        if (consentStateDTO.getIsPostConsentSuccessful() != null && !consentStateDTO.getIsPostConsentSuccessful())
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent creation was failed");
         if (!consentNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Invalid Notifier type");
@@ -41,7 +41,7 @@ public class NotificationValidator {
         ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getConsentStatusNotification().getConsentId(),
                 "ConsentId");
 
-        if (!consentNotification.getConsentStatusNotification().getConsentHandle().equals(consentState.getConsentHandle()))
+        if (!consentNotification.getConsentStatusNotification().getConsentHandle().equals(consentStateDTO.getConsentHandle()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "ConsentHandle Id is invalid");
 //        if (!consentNotification.getConsentStatusNotification().getConsentId().equals(consentState.getConsentId()))
 //            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Id is invalid");

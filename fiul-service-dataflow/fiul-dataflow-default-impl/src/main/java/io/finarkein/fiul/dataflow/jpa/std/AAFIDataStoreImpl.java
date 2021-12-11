@@ -72,10 +72,8 @@ public class AAFIDataStoreImpl implements AAFIDataStore {
             repoAAFiDataStore.saveAll(fiDataList);
         });
 
-        if (log.isDebugEnabled()) {
-            long end = System.currentTimeMillis();
-            log.debug("Time to store data [{},{},{}] :{} ms", aaName, consentId, sessionId, (end - start));
-        }
+        if (log.isDebugEnabled())
+            log.debug("Time to store data [{},{},{}] :{} ms", aaName, consentId, sessionId, System.currentTimeMillis() - start);
     }
 
     @Override

@@ -115,10 +115,8 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
         CipheredFIData cipheredFIData;
         try {
             cipheredFIData = cryptoService.encrypt(fiFetchResponse);
-            if (log.isDebugEnabled()) {
-                long end = System.currentTimeMillis();
-                log.debug("Time to encrypt FI-Data [{},{},{}] :{} ms", aaName, consentId, sessionId, (end - start));
-            }
+            if (log.isDebugEnabled())
+                log.debug("Time to encrypt FI-Data [{},{},{}] :{} ms", aaName, consentId, sessionId, System.currentTimeMillis() - start);
         } catch (Exception e) {
             log.error("Error while encrypting FI-data, consentId:{}, sessionId:{}, error:{}", consentId, sessionId, e.getMessage());
             throw e;
@@ -157,10 +155,8 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
             repoFIDataRecordDataKey.saveAll(dataKeys);
         });
 
-        if (log.isDebugEnabled()) {
-            long end = System.currentTimeMillis();
-            log.debug("Time to store data [{},{},{}] :{} ms", aaName, consentId, sessionId, (end - start));
-        }
+        if (log.isDebugEnabled())
+            log.debug("Time to store data [{},{},{}] :{} ms", aaName, consentId, sessionId, System.currentTimeMillis() - start);
     }
 
     @Override
@@ -181,10 +177,8 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
         DecipheredFIData decipheredFIData;
         try {
             decipheredFIData = cryptoService.decrypt(cipheredFIData);
-            if (log.isDebugEnabled()) {
-                long end = System.currentTimeMillis();
-                log.debug("Time to decrypt FI-Data [{},{}] :{} ms", consentHandleId, sessionId, (end - start));
-            }
+            if (log.isDebugEnabled())
+                log.debug("Time to decrypt FI-Data [{},{}] :{} ms", consentHandleId, sessionId, System.currentTimeMillis() - start);
         } catch (Exception e) {
             log.error("Error while decrypting FI-Data, consentId:{}, sessionId:{}, error:{}", consentHandleId, sessionId, e.getMessage());
             throw e;

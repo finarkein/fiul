@@ -144,7 +144,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         String[] strings = generateConsentDateRange(consentTemplateDefinition.getConsentStartOffset(), consentTemplateDefinition.getConsentExpiryDuration(), consentStart);
         consentDetail.setConsentStart(strings[0]);
         consentDetail.setConsentExpiry(strings[1]);
-        consentDetail.setFIDataRange(ConsentTemplateUtils.generateFIDataRange(consentTemplateDefinition.getConsentTemplateDataRange(), strings[0], strings[1], currentYear));
+        consentDetail.setFIDataRange(generateFIDataRange(consentTemplateDefinition.getConsentTemplateDataRange(), strings[0], strings[1], currentYear));
         consentDetail.setConsentMode(consentTemplateDefinition.getConsentMode().toString());
         consentDetail.setFetchType(consentTemplateDefinition.getFetchType());
         consentDetail.setConsentTypes(consentTemplateDefinition.getConsentTypes());

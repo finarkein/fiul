@@ -30,6 +30,7 @@ import io.finarkein.fiul.notification.callback.model.FICallback;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
+import org.bouncycastle.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -76,7 +77,7 @@ public class DataFlowServiceImpl implements DataFlowService {
                 .map(aaId -> doCreateFIRequest(fiRequest, aaId))
                 .orElseThrow(() -> Errors
                         .InvalidRequest
-                        .with(fiRequest.getTxnid(), "Cannot find aaName to create FIRequest, please try with aaName"))
+                        .with(fiRequest.getTxnid(), "Cannot find aaHandle to create FIRequest, please try with aaHandle"))
                 ;
     }
 
@@ -148,8 +149,8 @@ public class DataFlowServiceImpl implements DataFlowService {
             var metadataBuilder = FIFetchMetadata.builder()
                     .sessionId(sessionId)
                     .fiFetchSubmittedOn(fiFetchStartTime);
-            var commaSeparatedLinkRefNumbers = (linkRefNumbers != null && linkRefNumbers.length > 0) ?
-                    String.join(",", linkRefNumbers) : null;
+            var commaSeparatedLinkRefNumbers = Arrays.isNullOrEmpty(linkRefNumbers) ?
+                    null : String.join(",", linkRefNumbers);
 
             if (fipId != null && commaSeparatedLinkRefNumbers != null)
                 metadataBuilder.fipId(fipId).linkRefNumbers(commaSeparatedLinkRefNumbers);
@@ -201,7 +202,7 @@ public class DataFlowServiceImpl implements DataFlowService {
 
     @Override
     public Mono<FIDataDeleteResponse> deleteDataForSession(String dataSessionId) {
-        FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, null, false);
         log.debug("Deleting data for sessionId:{}", dataSessionId);
 
         fiFetchMetadataStore.deleteBySessionId(dataSessionId);
@@ -219,7 +220,7 @@ public class DataFlowServiceImpl implements DataFlowService {
     @Override
     public Mono<FIDataDeleteResponse> deleteDataByConsentId(String consentId) {
         log.debug("Deleting data for consentId:{}", consentId);
-        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentId, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(null, null, consentId, false);
 
         fiFetchMetadataStore.deleteByConsentId(consentId);
 

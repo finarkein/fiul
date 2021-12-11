@@ -13,7 +13,7 @@ import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -32,13 +32,13 @@ public interface ConsentService {
 
     void handleConsentNotification(ConsentNotificationLog consentNotificationLog);
 
-    Mono<ConsentState> getConsentState(String consentHandle, Optional<String> customerAAId);
+    Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> customerAAId);
 
-    ConsentState getConsentStateByTxnId(String txnId);
+    ConsentStateDTO getConsentStateByTxnId(String txnId);
 
-    ConsentState getConsentStateByConsentHandle(String consentHandle);
+    ConsentStateDTO getConsentStateByConsentHandle(String consentHandle);
 
     void updateConsentStateNotifier(String txnId, String notifierId);
 
-    void updateConsentState(ConsentState consentState);
+    void updateConsentState(ConsentStateDTO consentStateDTO);
 }
