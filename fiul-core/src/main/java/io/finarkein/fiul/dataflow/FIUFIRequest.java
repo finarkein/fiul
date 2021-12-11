@@ -38,8 +38,8 @@ public class FIUFIRequest extends FIRequest {
     @JsonProperty("callback")
     protected Callback callback;
 
-    @JsonProperty("aaName")
-    protected String aaName;
+    @JsonProperty("aaHandle")
+    protected String aaHandle;
 
     @Builder(builderClassName = "FIUFIRequestBuilder",access = AccessLevel.PUBLIC, builderMethodName = "builder")
     public FIUFIRequest(final String ver, final String timestamp, final String txnid, final FIDataRange fIDataRange,

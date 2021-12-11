@@ -77,7 +77,7 @@ public class DataFlowServiceImpl implements DataFlowService {
                 .map(aaId -> doCreateFIRequest(fiRequest, aaId))
                 .orElseThrow(() -> Errors
                         .InvalidRequest
-                        .with(fiRequest.getTxnid(), "Cannot find aaName to create FIRequest, please try with aaName"))
+                        .with(fiRequest.getTxnid(), "Cannot find aaHandle to create FIRequest, please try with aaHandle"))
                 ;
     }
 

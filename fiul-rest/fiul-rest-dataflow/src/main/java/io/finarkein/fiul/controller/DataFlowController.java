@@ -32,7 +32,7 @@ public class DataFlowController {
 
     @PostMapping("/FI/request")
     public Mono<FIRequestResponse> postFIRequest(@RequestBody FIUFIRequest fiRequest) {
-        return dataFlowService.createFIRequest(fiRequest, fiRequest.getAaName());
+        return dataFlowService.createFIRequest(fiRequest, fiRequest.getAaHandle());
     }
 
     @GetMapping("/FI/fetch/{dataSessionId}")
