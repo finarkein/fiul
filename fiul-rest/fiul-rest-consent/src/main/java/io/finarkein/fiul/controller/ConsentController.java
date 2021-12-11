@@ -38,25 +38,27 @@ public class ConsentController {
 
     @GetMapping("/Consent/handle/{consentHandle}")
     public Mono<ConsentHandleResponse> getConsentHandle(@PathVariable String consentHandle,
-                                                        @RequestParam(value = "aaName", required = false) String aaName) {
-        Optional<String> aaNameOptional = Optional.ofNullable(aaName);
+                                                        @RequestParam(value = "aaHandle", required = false) String aaHandle) {
+        Optional<String> aaNameOptional = Optional.ofNullable(aaHandle);
         return consentService.getConsentStatus(consentHandle, aaNameOptional);
     }
 
     @GetMapping("/Consent/{consentID}")
     public Mono<ConsentArtefact> getConsentArtifact(@PathVariable String consentID,
-                                                    @RequestParam(value = "aaName", required = false) String aaName) {
-        Optional<String> aaNameOptional = Optional.ofNullable(aaName);
+                                                    @RequestParam(value = "aaHandle", required = false) String aaHandle) {
+        Optional<String> aaNameOptional = Optional.ofNullable(aaHandle);
         return consentService.getConsentArtefact(consentID, aaNameOptional);
     }
 
-    @GetMapping("/consent/state/{consentHandleID}/{customerAAId}")
-    public Mono<ConsentState> getConsentState(@PathVariable String consentHandleID, @PathVariable String customerAAId) {
-        return consentService.getConsentState(consentHandleID, Optional.ofNullable(customerAAId));
+    @GetMapping("/consent/state/{consentHandle}/{aaHandle}")
+    public Mono<ConsentState> getConsentState(@PathVariable String consentHandle, @PathVariable String aaHandle) {
+        return consentService.getConsentState(consentHandle, Optional.ofNullable(aaHandle))
+                .map(ConsentState::from);
     }
 
-    @GetMapping("/consent/state/{consentHandleID}")
-    public Mono<ConsentState> getConsentStateByHandleId(@PathVariable String consentHandleID) {
-        return consentService.getConsentState(consentHandleID, Optional.empty());
+    @GetMapping("/consent/state/{consentHandle}")
+    public Mono<ConsentState> getConsentStateByHandleId(@PathVariable String consentHandle) {
+        return consentService.getConsentState(consentHandle, Optional.empty())
+                .map(ConsentState::from);
     }
 }

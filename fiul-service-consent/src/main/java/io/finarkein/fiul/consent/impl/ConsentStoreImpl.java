@@ -6,7 +6,6 @@
  */
 package io.finarkein.fiul.consent.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.consent.ConsentMode;
 import io.finarkein.api.aa.consent.FetchType;
 import io.finarkein.api.aa.consent.request.ConsentRequest;
@@ -16,13 +15,11 @@ import io.finarkein.api.aa.notification.Notifier;
 import io.finarkein.api.aa.util.Functions;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
 import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
 import io.finarkein.fiul.consent.repo.ConsentStateRepository;
-import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import io.finarkein.fiul.consent.service.ConsentStore;
-import io.finarkein.fiul.consent.service.PurposeFetcher;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,15 +41,6 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
     private ConsentNotificationLogRepository consentNotificationLogRepository;
-
-    @Autowired
-    private ConsentTemplateRepository consentTemplateRepository;
-
-    @Autowired
-    private PurposeFetcher purposeFetcher;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Override
     public void saveConsentRequest(String consentHandle, ConsentRequest consentRequest) {
@@ -104,17 +92,17 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Override
     public void logConsentNotification(ConsentNotificationLog consentNotificationLog) {
-        Optional<ConsentState> optionalConsentState = consentStateRepository.findById(consentNotificationLog.getConsentHandle());
-        ConsentState consentState = optionalConsentState.orElseGet(ConsentState::new);
-        consentState.setConsentHandle(consentNotificationLog.getConsentHandle());
-        consentState.setConsentId(consentNotificationLog.getConsentId());
-        consentState.setConsentStatus(consentNotificationLog.getConsentState());
-        consentState.setTxnId(consentNotificationLog.getTxnId());
-        consentState.setNotifierId(consentNotificationLog.getNotifierId());
+        Optional<ConsentStateDTO> optionalConsentState = consentStateRepository.findById(consentNotificationLog.getConsentHandle());
+        ConsentStateDTO consentStateDTO = optionalConsentState.orElseGet(ConsentStateDTO::new);
+        consentStateDTO.setConsentHandle(consentNotificationLog.getConsentHandle());
+        consentStateDTO.setConsentId(consentNotificationLog.getConsentId());
+        consentStateDTO.setConsentStatus(consentNotificationLog.getConsentState());
+        consentStateDTO.setTxnId(consentNotificationLog.getTxnId());
+        consentStateDTO.setNotifierId(consentNotificationLog.getNotifierId());
 
         consentNotificationLogRepository.save(consentNotificationLog);
-        final ConsentState savedConsentState = consentStateRepository.save(consentState);
-        log.debug("Saved consentState after consentNotification:{}",savedConsentState);
+        final ConsentStateDTO savedConsentStateDTO = consentStateRepository.save(consentStateDTO);
+        log.debug("Saved consentState after consentNotification:{}", savedConsentStateDTO);
         updateConsentRequest(consentNotificationLog.getConsentHandle(), consentNotificationLog.getConsentId());
     }
 
@@ -139,27 +127,27 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
-    public void saveConsentState(ConsentState consentState) {
-        consentStateRepository.save(consentState);
+    public void saveConsentState(ConsentStateDTO consentStateDTO) {
+        consentStateRepository.save(consentStateDTO);
     }
 
     @Override
-    public Optional<ConsentState> getConsentStateByHandle(String consentHandle) {
+    public Optional<ConsentStateDTO> getConsentStateByHandle(String consentHandle) {
         return consentStateRepository.findById(consentHandle);
     }
 
     @Override
-    public ConsentState getConsentStateById(String consentId) {
+    public ConsentStateDTO getConsentStateById(String consentId) {
         return consentStateRepository.findByConsentId(consentId).orElse(null);
     }
 
     @Override
-    public ConsentState getConsentStateByTxnId(String txnId) {
+    public ConsentStateDTO getConsentStateByTxnId(String txnId) {
         return consentStateRepository.findByTxnId(txnId).orElse(null);
     }
 
     @Override
-    public ConsentState updateConsentState(ConsentState consentState) {
-        return consentStateRepository.save(consentState);
+    public ConsentStateDTO updateConsentState(ConsentStateDTO consentStateDTO) {
+        return consentStateRepository.save(consentStateDTO);
     }
 }

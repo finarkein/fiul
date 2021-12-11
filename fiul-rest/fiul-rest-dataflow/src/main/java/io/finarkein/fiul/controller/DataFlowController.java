@@ -37,10 +37,10 @@ public class DataFlowController {
 
     @GetMapping("/FI/fetch/{dataSessionId}")
     public Mono<FIFetchResponse> fetch(@PathVariable String dataSessionId,
-                                       @RequestParam(value = "aaName", required = false) String aaName,
+                                       @RequestParam(value = "aaHandle", required = false) String aaHandle,
                                        @RequestHeader(value = "fipId", required = false) final String fipId,
                                        @RequestHeader(value = "linkRefNumber", required = false) final String[] linkRefNumber) {
-        return dataFlowService.fiFetch(dataSessionId, aaName, fipId, linkRefNumber);
+        return dataFlowService.fiFetch(dataSessionId, aaHandle, fipId, linkRefNumber);
     }
 
     @GetMapping("/FI/{dataSessionId}")

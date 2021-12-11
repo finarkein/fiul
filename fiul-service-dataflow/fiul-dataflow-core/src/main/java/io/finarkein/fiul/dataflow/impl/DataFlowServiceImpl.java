@@ -30,6 +30,7 @@ import io.finarkein.fiul.notification.callback.model.FICallback;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
+import org.bouncycastle.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -148,8 +149,8 @@ public class DataFlowServiceImpl implements DataFlowService {
             var metadataBuilder = FIFetchMetadata.builder()
                     .sessionId(sessionId)
                     .fiFetchSubmittedOn(fiFetchStartTime);
-            var commaSeparatedLinkRefNumbers = (linkRefNumbers != null && linkRefNumbers.length > 0) ?
-                    String.join(",", linkRefNumbers) : null;
+            var commaSeparatedLinkRefNumbers = Arrays.isNullOrEmpty(linkRefNumbers) ?
+                    null : String.join(",", linkRefNumbers);
 
             if (fipId != null && commaSeparatedLinkRefNumbers != null)
                 metadataBuilder.fipId(fipId).linkRefNumbers(commaSeparatedLinkRefNumbers);

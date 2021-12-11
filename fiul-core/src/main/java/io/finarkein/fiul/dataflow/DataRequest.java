@@ -17,7 +17,7 @@ import lombok.*;
         "customerAAId",
         "dataRangeFrom",
         "dataRangeTo",
-        "consentHandleId",
+        "consentHandle",
         "callback"
 })
 @ToString
@@ -36,18 +36,18 @@ public class DataRequest {
     @JsonProperty("dataRangeTo")
     protected String dataRangeTo;
 
-    @JsonProperty("consentHandleId")
-    protected String consentHandleId;
+    @JsonProperty("consentHandle")
+    protected String consentHandle;
 
     @JsonProperty("callback")
     protected Callback callback;
 
     protected DataRequest(DataRequest dataRequest){
-        consentHandleId = dataRequest.getConsentHandleId();
+        consentHandle = dataRequest.getConsentHandle();
         customerAAId = dataRequest.getCustomerAAId();
         dataRangeFrom = dataRequest.dataRangeFrom;
         dataRangeTo = dataRequest.dataRangeTo;
-        consentHandleId = dataRequest.getConsentHandleId();
+        consentHandle = dataRequest.getConsentHandle();
         callback = dataRequest.callback;
     }
 
@@ -55,7 +55,7 @@ public class DataRequest {
         private String customerAAId;
         private String dataRangeFrom;
         private String dataRangeTo;
-        private String consentHandleId;
+        private String consentHandle;
         private Callback callback;
 
         Builder() {
@@ -79,9 +79,9 @@ public class DataRequest {
             return this;
         }
 
-        @JsonProperty("consentHandleId")
-        public DataRequest.Builder consentHandleId(@NonNull final String consentHandleId) {
-            this.consentHandleId = consentHandleId;
+        @JsonProperty("consentHandle")
+        public DataRequest.Builder consentHandle(@NonNull final String consentHandle) {
+            this.consentHandle = consentHandle;
             return this;
         }
 
@@ -98,11 +98,11 @@ public class DataRequest {
         }
 
         public DataRequest build() {
-            return new DataRequest(this.customerAAId, this.dataRangeFrom, this.dataRangeTo, this.consentHandleId, this.callback);
+            return new DataRequest(this.customerAAId, this.dataRangeFrom, this.dataRangeTo, this.consentHandle, this.callback);
         }
 
         public String toString() {
-            return "DataRequest.Builder(customerAAId=" + this.customerAAId + ", dataRangeFrom=" + this.dataRangeFrom + ", dataRangeTo=" + this.dataRangeTo + ", consentHandleId=" + this.consentHandleId + ", callback=" + this.callback + ")";
+            return "DataRequest.Builder(customerAAId=" + this.customerAAId + ", dataRangeFrom=" + this.dataRangeFrom + ", dataRangeTo=" + this.dataRangeTo + ", consentHandle=" + this.consentHandle + ", callback=" + this.callback + ")";
         }
     }
 }

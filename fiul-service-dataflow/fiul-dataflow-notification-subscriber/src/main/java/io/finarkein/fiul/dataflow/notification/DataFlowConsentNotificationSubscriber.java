@@ -11,17 +11,11 @@ import io.finarkein.fiul.dataflow.DataFlowNotificationHandler;
 import io.finarkein.fiul.notification.ConsentNotificationSubscriber;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import static io.finarkein.fiul.notification.ServiceConstants.NOTIFICATION_Q_TYPE_PROPERTY;
 
 @Log4j2
 @Component
 public class DataFlowConsentNotificationSubscriber implements ConsentNotificationSubscriber {
-
-    @Value("${" + NOTIFICATION_Q_TYPE_PROPERTY + "}")
-    private String queueType;
 
     protected final DataFlowNotificationHandler dataFlowNotificationHandler;
 
