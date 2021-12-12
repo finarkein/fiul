@@ -8,7 +8,6 @@ package io.finarkein.fiul.dataflow.jpa;
 
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +18,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-@Log4j2
 @Service
 public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
 
