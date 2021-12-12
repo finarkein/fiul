@@ -8,6 +8,7 @@ package io.finarkein.fiul.dataflow.jpa;
 
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+@Log4j2
 @Service
 public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
 
@@ -39,8 +41,8 @@ public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
     }
 
     @Override
-    public void deleteBySessionId(String sessionId) {
-        repoFIFetchMetadata.deleteById(sessionId);
+    public int deleteBySessionId(String sessionId) {
+        return repoFIFetchMetadata.deleteBySessionId(sessionId);
     }
 
     @Override
@@ -64,8 +66,8 @@ public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
     public Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue,
                                                               Timestamp toValue, boolean easyDataFlow) {
         final List<FIFetchMetadata> metadataForGivenWindow = repoFIFetchMetadata.getMetadataForGivenWindow(consentHandleId,
-                fromValue, toValue, easyDataFlow, PageRequest.of(0,1));
-        if(metadataForGivenWindow == null || metadataForGivenWindow.isEmpty())
+                fromValue, toValue, easyDataFlow, PageRequest.of(0, 1));
+        if (metadataForGivenWindow == null || metadataForGivenWindow.isEmpty())
             return Optional.empty();
         return Optional.of(metadataForGivenWindow.get(0));
     }
