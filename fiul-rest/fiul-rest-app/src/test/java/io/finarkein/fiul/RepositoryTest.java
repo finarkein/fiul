@@ -235,10 +235,10 @@ class RepositoryTest {
     @Test
     @DisplayName("Test adding ConsentState in database and fetching it.")
     void saveConsentStateTest() {
-        ConsentState consentState = new ConsentState();
-        consentState.setConsentHandle("consentHandle");
-        consentState.setConsentId("consentId");
-        ConsentState save = consentStateRepository.save(consentState);
+        ConsentStateDTO consentStateDTO = new ConsentStateDTO();
+        consentStateDTO.setConsentHandle("consentHandle");
+        consentStateDTO.setConsentId("consentId");
+        ConsentStateDTO save = consentStateRepository.save(consentStateDTO);
 
         Assertions.assertTrue(consentStateRepository.findById("consentHandle").isPresent());
         Assertions.assertTrue(consentStateRepository.findByConsentId("consentId").isPresent());
@@ -252,15 +252,15 @@ class RepositoryTest {
     @Test
     @DisplayName("Test deleting ConsentState in database.")
     void deleteConsentStateTest() {
-        ConsentState consentState = new ConsentState();
-        consentState.setConsentHandle("consentHandle");
-        consentState.setConsentId("consentId");
-        ConsentState save = consentStateRepository.save(consentState);
+        ConsentStateDTO consentStateDTO = new ConsentStateDTO();
+        consentStateDTO.setConsentHandle("consentHandle");
+        consentStateDTO.setConsentId("consentId");
+        ConsentStateDTO save = consentStateRepository.save(consentStateDTO);
         Assertions.assertTrue(consentStateRepository.findById("consentHandle").isPresent());
         Assertions.assertTrue(consentStateRepository.findByConsentId("consentId").isPresent());
-        ConsentState consentStateDelete = consentStateRepository.findById("consentHandle").get();
-        consentStateRepository.delete(consentStateDelete);
-        Optional<ConsentState> optionalConsentState = consentStateRepository.findById("consentHandle");
+        ConsentStateDTO consentStateDTODelete = consentStateRepository.findById("consentHandle").get();
+        consentStateRepository.delete(consentStateDTODelete);
+        Optional<ConsentStateDTO> optionalConsentState = consentStateRepository.findById("consentHandle");
         Assertions.assertTrue(optionalConsentState.isEmpty());
     }
 

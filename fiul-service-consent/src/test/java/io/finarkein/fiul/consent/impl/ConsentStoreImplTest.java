@@ -17,7 +17,7 @@ import io.finarkein.api.aa.notification.ConsentStatusNotification;
 import io.finarkein.api.aa.notification.Notifier;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
 import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
 import io.finarkein.fiul.consent.repo.ConsentStateRepository;
@@ -138,19 +138,19 @@ class ConsentStoreImplTest {
     void saveConsentNotificationAndConsentState() {
         ConsentNotificationLog consentNotificationLog = createConsentNotificationLog();
 
-        ConsentState consentState = new ConsentState();
-        consentState.setConsentHandle(consentNotificationLog.getConsentHandle());
-        consentState.setConsentId(consentNotificationLog.getConsentId());
-        consentState.setConsentStatus(consentNotificationLog.getConsentState());
-        consentState.setTxnId(consentNotificationLog.getTxnId());
+        ConsentStateDTO consentStateDTO = new ConsentStateDTO();
+        consentStateDTO.setConsentHandle(consentNotificationLog.getConsentHandle());
+        consentStateDTO.setConsentId(consentNotificationLog.getConsentId());
+        consentStateDTO.setConsentStatus(consentNotificationLog.getConsentState());
+        consentStateDTO.setTxnId(consentNotificationLog.getTxnId());
 
         when(consentNotificationLogRepository.save(consentNotificationLog)).thenReturn(consentNotificationLog);
-        when(consentStateRepository.save(consentState)).thenReturn(consentState);
+        when(consentStateRepository.save(consentStateDTO)).thenReturn(consentStateDTO);
 
         assertDoesNotThrow(() -> consentStoreImpl.logConsentNotification(consentNotificationLog));
 
         verify(consentNotificationLogRepository, times(1)).save(consentNotificationLog);
-        verify(consentStateRepository, times(1)).save(consentState);
+        verify(consentStateRepository, times(1)).save(consentStateDTO);
     }
 
     @Test
@@ -188,18 +188,18 @@ class ConsentStoreImplTest {
     @Test
     @DisplayName("Get ConsentState Test")
     void getConsentStateTest() {
-        ConsentState consentState = new ConsentState();
-        consentState.setTxnId("TxnId");
-        consentState.setConsentHandle("consentHandle");
-        consentState.setConsentId("consentId");
-        consentState.setConsentStatus("consentState");
-        when(consentStateRepository.findById("consentHandle")).thenReturn(Optional.of(consentState));
-        when(consentStateRepository.findByConsentId("consentId")).thenReturn(Optional.of(consentState));
+        ConsentStateDTO consentStateDTO = new ConsentStateDTO();
+        consentStateDTO.setTxnId("TxnId");
+        consentStateDTO.setConsentHandle("consentHandle");
+        consentStateDTO.setConsentId("consentId");
+        consentStateDTO.setConsentStatus("consentState");
+        when(consentStateRepository.findById("consentHandle")).thenReturn(Optional.of(consentStateDTO));
+        when(consentStateRepository.findByConsentId("consentId")).thenReturn(Optional.of(consentStateDTO));
 
-        Optional<ConsentState> returnedOptional = consentStoreImpl.getConsentStateByHandle("consentHandle");
-        Assertions.assertEquals(returnedOptional.orElseGet(null), consentState);
+        Optional<ConsentStateDTO> returnedOptional = consentStoreImpl.getConsentStateByHandle("consentHandle");
+        Assertions.assertEquals(returnedOptional.orElseGet(null), consentStateDTO);
 
-        ConsentState returnedConsentState = consentStoreImpl.getConsentStateById("consentId");
-        Assertions.assertEquals(returnedConsentState, consentState);
+        ConsentStateDTO returnedConsentStateDTO = consentStoreImpl.getConsentStateById("consentId");
+        Assertions.assertEquals(returnedConsentStateDTO, consentStateDTO);
     }
 }

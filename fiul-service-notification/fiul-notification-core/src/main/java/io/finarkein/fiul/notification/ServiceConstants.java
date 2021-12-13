@@ -6,13 +6,11 @@
  */
 package io.finarkein.fiul.notification;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class ServiceConstants {
     public static final String NOTIFICATION_Q_TYPE_PROPERTY = "fiul.notification-queue-type";
-    public static final String CHANNEL_NAME_CONSENT = "VirtualTopic.consent-notification-queue";
-    public static final String CHANNEL_NAME_FI = "VirtualTopic.fi-notification-queue";
-    public static final String FIUL_CALLBACK_WEB_CLIENT_QUALIFIER = "fiul.notification.callback.webhook-client.qualifier";
+
+    public static final String IN_MEM = "in-mem";
 }

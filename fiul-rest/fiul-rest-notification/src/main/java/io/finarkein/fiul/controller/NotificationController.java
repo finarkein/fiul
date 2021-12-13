@@ -17,7 +17,7 @@ import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.api.aa.notification.NotificationResponse;
 import io.finarkein.fiul.config.model.AaApiKeyBody;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.dataflow.DataFlowService;
 import io.finarkein.fiul.dataflow.dto.FIRequestState;
@@ -72,6 +72,7 @@ public class NotificationController {
                                                                           @RequestHeader("x-jws-signature") String jwsSignature,
                                                                           @RequestHeader("aa_api_key") String aaApiKey) {
         log.debug("ConsentNotification received:{}", consentNotification);
+
         validateJWS(consentNotification.getTxnid(), jwsSignature);
 
         String[] chunks = aaApiKey.split("\\.");
@@ -86,14 +87,14 @@ public class NotificationController {
 
         ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getTxnid(), "TxnId");
 
-        ConsentState consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
-        if (consentState == null)
-            consentState = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
+        ConsentStateDTO consentStateDTO = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
+        if (consentStateDTO == null)
+            consentStateDTO = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
 
-        if (consentState != null) {
+        if (consentStateDTO != null) {
             try {
-                NotificationValidator.validateConsentNotification(consentNotification, consentState,
-                        registryService.getEntityInfoByAAName(consentState.getAaId()), testScenario, aaApiKeyBody);
+                NotificationValidator.validateConsentNotification(consentNotification, consentStateDTO,
+                        registryService.getEntityInfoByAAName(consentStateDTO.getAaId()), testScenario, aaApiKeyBody);
 
                 publisher.publishConsentNotification(consentNotification);
                 log.debug("NotificationPublisher.publish(consentNotification) done");

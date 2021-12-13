@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(builderClassName = "Builder")
 public class DataRequestStatus {
-    private String consentHandleId;
+    private String consentHandle;
     private String sessionId;
     private SessionStatus sessionStatus;
 }

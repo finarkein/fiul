@@ -10,7 +10,7 @@
 
     <groupId>io.finarkein.fiu</groupId>
     <artifactId>fiul</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -26,7 +26,7 @@
         <version.reactor-netty>1.0.8</version.reactor-netty>
         <version.spring-webflux>5.3.8</version.spring-webflux>
         <version.maven-dependency-plugin>3.1.1</version.maven-dependency-plugin>
-        <version.logger>2.14.0</version.logger>
+        <version.logger>2.15.0</version.logger>
         <version.aa-commons>0.4.5</version.aa-commons>
         <version.fi-meta>1.0.3</version.fi-meta>
 
@@ -48,6 +48,9 @@
 
         <version.junit-jupiter>5.3.1</version.junit-jupiter>
         <version.mockito>3.2.0</version.mockito>
+
+        <pmd.skip>false</pmd.skip>
+        <pmd.failOnViolation>false</pmd.failOnViolation>
     </properties>
 
     <modules>
@@ -127,6 +130,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>io.finarkein.aa</groupId>
+                <artifactId>aa-webclient-core</artifactId>
+                <version>${version.aa-commons}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.finarkein.fiu</groupId>
                 <artifactId>fiul-core</artifactId>
                 <version>${project.version}</version>
@@ -143,7 +151,17 @@
             </dependency>
             <dependency>
                 <groupId>io.finarkein.fiu</groupId>
-                <artifactId>fiul-notification-pubsub</artifactId>
+                <artifactId>fiul-notification-callbacks-in-mem-sub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-in-mem-pub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.fiu</groupId>
+                <artifactId>fiul-notification-in-mem-config</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -358,28 +376,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${version.maven-dependency-plugin}</version>
-                    <executions>
-                        <execution>
-                            <id>tree</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>tree</goal>
-                            </goals>
-                            <configuration>
-                                <outputFile>
-                                    ${project.build.directory}/dependency-${project.artifactId}-${project.version}.txt
-                                </outputFile>
-                                <appendOutput>true</appendOutput>
-                                <excludes>org.kohsuke.metainf-services:metainf-services:jar:*</excludes>
-                                <scope>compile</scope>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <groupId>com.amashchenko.maven.plugin</groupId>
                     <artifactId>gitflow-maven-plugin</artifactId>
                     <version>${version.maven-gitflow}</version>
@@ -395,35 +391,9 @@
                         </gitFlowConfig>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${version.maven-compiler}</version>
-                    <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                        <encoding>${project.build.sourceEncoding}</encoding>
-                        <compilerArgs>
-                            <compilerArg>-parameters</compilerArg>
-                        </compilerArgs>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                    <failOnViolation>false</failOnViolation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${version.maven-compiler}</version>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -438,19 +408,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.8.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>${version.plugin-deploy}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>${version.plugin-versions}</version>
-                <configuration>
-                    <generateBackupPoms>false</generateBackupPoms>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

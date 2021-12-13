@@ -6,14 +6,14 @@
  */
 package io.finarkein.fiul.consent.repo;
 
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ConsentStateRepository extends JpaRepository<ConsentState, String> {
-    Optional<ConsentState> findByConsentId(String consentId);
-    Optional<ConsentState> findByTxnId(String txnId);
+public interface ConsentStateRepository extends JpaRepository<ConsentStateDTO, String> {
+    Optional<ConsentStateDTO> findByConsentId(String consentId);
+    Optional<ConsentStateDTO> findByTxnId(String txnId);
 }
