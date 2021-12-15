@@ -236,6 +236,11 @@ class ConsentServiceImpl implements ConsentService {
     }
 
     @Override
+    public ConsentStateDTO getConsentStateByConsentId(String consentId) {
+        return consentStore.getConsentStateById(consentId);
+    }
+
+    @Override
     public ConsentStateDTO getConsentStateByTxnId(String txnId) {
         return consentStore.getConsentStateByTxnId(txnId);
     }

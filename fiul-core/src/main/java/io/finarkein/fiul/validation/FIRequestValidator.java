@@ -15,9 +15,7 @@ import static io.finarkein.fiul.Functions.UUIDSupplier;
 public class FIRequestValidator extends CommonDataFlowValidator {
 
     public void validateFIRequestBody(FIRequest fiRequest) {
-        final String txnId = fiRequest.getTxnid();
-        if (txnId == null || txnId.isEmpty())
-            throw InvalidRequest.with(UUIDSupplier.get(), "txnId cannot be null/empty");
+        final String txnId = validateTxnId(fiRequest);
 
         validateVersion(txnId, fiRequest.getVer());
         validateForNullsAndEmpty(fiRequest);
@@ -28,15 +26,21 @@ public class FIRequestValidator extends CommonDataFlowValidator {
         validateAfterTimeStamp(txnId, fiRequest.getKeyMaterial().getDhPublicKey().getExpiry());
     }
 
+    public static String validateTxnId(FIRequest fiRequest) {
+        final String txnId = fiRequest.getTxnid();
+        if (txnId == null || txnId.isEmpty())
+            throw InvalidRequest.with(UUIDSupplier.get(), "txnId cannot be null/empty");
+        return txnId;
+    }
+
     protected void validateForNullsAndEmpty(FIRequest fiRequest) {
         final String txnId = fiRequest.getTxnid();
-        ArgsValidator.checkNotEmpty(txnId, fiRequest.getTimestamp(), "T]timestamp");
+        ArgsValidator.checkNotEmpty(txnId, fiRequest.getTimestamp(), "Timestamp");
         ArgsValidator.checkNotNull(txnId, fiRequest.getFIDataRange(), "FIDataRange");
         ArgsValidator.checkNotEmpty(txnId, fiRequest.getFIDataRange().getFrom(), "FIDataRange start date");
         ArgsValidator.checkNotEmpty(txnId, fiRequest.getFIDataRange().getTo(), "FIDataRange end date");
 
-        ArgsValidator.checkNotNull(txnId, fiRequest.getConsent(), "Consent");
-        ArgsValidator.checkNotEmpty(txnId, fiRequest.getConsent().getId(), "Consent ID");
+        validateConsentId(fiRequest, txnId);
 //        ArgsValidator.checkNotEmpty(fiRequest.getConsent().getDigitalSignature(), "DigitalSignature");
 
         ArgsValidator.checkNotNull(txnId, fiRequest.getKeyMaterial(), "KeyMaterial");
@@ -49,5 +53,10 @@ public class FIRequestValidator extends CommonDataFlowValidator {
         ArgsValidator.checkNotEmpty(txnId, fiRequest.getKeyMaterial().getDhPublicKey().getExpiry(), "DH Public Key Expiry");
         ArgsValidator.checkNotEmpty(txnId, fiRequest.getKeyMaterial().getDhPublicKey().getKeyValue(), "DH Public Key Key Value");
 //        ArgsValidator.checkNotEmpty(fiRequest.getKeyMaterial().getDhPublicKey().getParameters(), "DH Public Key Parameters");
+    }
+
+    public static void validateConsentId(FIRequest fiRequest, String txnId) {
+        ArgsValidator.checkNotNull(txnId, fiRequest.getConsent(), "Consent");
+        ArgsValidator.checkNotEmpty(txnId, fiRequest.getConsent().getId(), "Consent ID");
     }
 }

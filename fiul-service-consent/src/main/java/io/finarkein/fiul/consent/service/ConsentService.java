@@ -34,6 +34,8 @@ public interface ConsentService {
 
     Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> customerAAId);
 
+    ConsentStateDTO getConsentStateByConsentId(String consentId);
+
     ConsentStateDTO getConsentStateByTxnId(String txnId);
 
     ConsentStateDTO getConsentStateByConsentHandle(String consentHandle);
