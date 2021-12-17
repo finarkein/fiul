@@ -68,6 +68,7 @@ public class FIRequestStoreImpl implements FIRequestStore {
                 .sessionStatus("ACTIVE")
                 .fiStatusResponse(null)
                 .fiRequestSuccessful(true)
+                .fiRequestSubmittedOn(fiFetchMetadata.getFiRequestSubmittedOn())
                 .notificationTimestamp(timestamp)
                 .aaId(fiFetchMetadata.getAaName())
                 .build();
@@ -80,9 +81,9 @@ public class FIRequestStoreImpl implements FIRequestStore {
     }
 
     @Override
-    public void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName, String dataSessionId) {
+    public void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName, Timestamp fiRequestStartTime, String dataSessionId) {
         if (dataSessionId == null)
-            dataSessionId = uuidSupplier.get();
+            dataSessionId = uuidSupplier.get(); //TODO why this is needed?
         final var fiRequestState = FIRequestState.builder()
                 .sessionId(dataSessionId)
                 .notifierId(null)
@@ -91,6 +92,7 @@ public class FIRequestStoreImpl implements FIRequestStore {
                 .fiStatusResponse(null)
                 .fiRequestSuccessful(false)
                 .aaId(aaName)
+                .fiRequestSubmittedOn(fiRequestStartTime)
                 .notificationTimestamp(strToTimeStamp.apply(fiRequest.getTimestamp()))
                 .build();
         repoFIRequestState.save(fiRequestState);

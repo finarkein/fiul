@@ -45,6 +45,9 @@ public class FIRequestState {
     protected String aaId;
 
     @Column(columnDefinition = "TIMESTAMP(6)")
+    protected Timestamp fiRequestSubmittedOn;
+
+    @Column(columnDefinition = "TIMESTAMP(6)")
     protected Timestamp notificationTimestamp;
 
     @Column(columnDefinition = "text")
