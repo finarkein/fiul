@@ -104,26 +104,23 @@ class ConsentServiceImpl implements ConsentService {
         return buildFromConsentState(consentHandle)
                 .get()
                 .map(Mono::just)
-                .orElseGet(() ->
-                        aaNameOptional
-                                .or(consentRequestAANameByConsentHandle(consentHandle))
-                                .map(aaName ->
-                                        aafiuClient
-                                                .getConsentStatus(consentHandle, aaName)
-                                                .flatMap(consentHandleResponse -> {
-                                                    final Optional<ConsentStateDTO> optionalConsentState = consentStore
-                                                            .getConsentStateByHandle(consentHandle);
-                                                    if (optionalConsentState.isPresent() && strToTimeStamp.apply(consentHandleResponse.getTimestamp())
-                                                            .before(optionalConsentState.get().getPostConsentResponseTimestamp())) {
-                                                        throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
-                                                                "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
-                                                    }
-                                                    return Mono.just(consentHandleResponse);
-                                                })
-                                )
-                                .orElseThrow(() -> Errors
-                                        .NoDataFound
-                                        .with(UUIDSupplier.get(), "ConsentHandle not found, try with aaHandle"))
+                .orElseGet(() -> aaNameOptional
+                        .or(consentRequestAANameByConsentHandle(consentHandle))
+                        .map(aaName -> aafiuClient.getConsentStatus(consentHandle, aaName)
+                                .flatMap(consentHandleResponse -> {
+                                    final Optional<ConsentStateDTO> optionalConsentState = consentStore
+                                            .getConsentStateByHandle(consentHandle);
+                                    if (optionalConsentState.isPresent()
+                                            && Objects.nonNull(optionalConsentState.get().getPostConsentResponseTimestamp())
+                                            && strToTimeStamp.apply(consentHandleResponse.getTimestamp())
+                                            .before(optionalConsentState.get().getPostConsentResponseTimestamp())) {
+                                        throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
+                                                "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
+                                    }
+                                    return Mono.just(consentHandleResponse);
+                                })
+                        )
+                        .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(), "ConsentHandle not found, try with aaHandle"))
                 ).doOnSuccess(consentHandleResponse -> {
                     log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
                     consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(),
