@@ -22,7 +22,10 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "FI_NOTIFICATION_LOG")
+@Table(name = "FI_NOTIFICATION_LOG",
+        indexes = {
+        @Index(name = "fi_notifn_log_idx1", columnList = "sessionId")
+})
 public class FINotificationLogEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FI_NOTIFICATION_LOG")
