@@ -20,6 +20,9 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = {
+        @Index(name = "cs_notifn_log_idx2", columnList = "consentHandle")
+})
 public class ConsentNotificationLog {
 
     @Id
