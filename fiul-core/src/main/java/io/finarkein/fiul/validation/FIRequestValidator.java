@@ -41,7 +41,7 @@ public class FIRequestValidator extends CommonDataFlowValidator {
         ArgsValidator.checkNotEmpty(txnId, fiRequest.getFIDataRange().getTo(), "FIDataRange end date");
 
         validateConsentId(fiRequest, txnId);
-//        ArgsValidator.checkNotEmpty(fiRequest.getConsent().getDigitalSignature(), "DigitalSignature");
+        ArgsValidator.checkNotEmpty(txnId, fiRequest.getConsent().getDigitalSignature(), "DigitalSignature");
 
         ArgsValidator.checkNotNull(txnId, fiRequest.getKeyMaterial(), "KeyMaterial");
         ArgsValidator.checkNotEmpty(txnId, fiRequest.getKeyMaterial().getCryptoAlg(), "KeyMaterial Crypto Alg");

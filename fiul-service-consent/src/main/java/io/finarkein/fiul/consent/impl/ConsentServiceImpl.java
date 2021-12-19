@@ -14,16 +14,17 @@ import io.finarkein.api.aa.consent.handle.ConsentStatus;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
-import io.finarkein.api.aa.util.Functions;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
+import io.finarkein.fiul.consent.model.SignedConsentDTO;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import io.finarkein.fiul.notification.callback.CallbackRegistry;
 import io.finarkein.fiul.notification.callback.model.ConsentCallback;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -43,17 +45,20 @@ import static io.finarkein.fiul.Functions.currentTimestampSupplier;
 @Service
 class ConsentServiceImpl implements ConsentService {
 
-    private final AAFIUClient aafiuClient;
-    private final ConsentStore consentStore;
-    private final CallbackRegistry callbackRegistry;
-    @Autowired
-    private ObjectMapper mapper;
+    protected final AAFIUClient aafiuClient;
+    protected final ConsentStore consentStore;
+    protected final CallbackRegistry callbackRegistry;
+    protected final ObjectMapper mapper;
 
     @Autowired
-    ConsentServiceImpl(AAFIUClient aafiuClient, ConsentStore consentStore, CallbackRegistry callbackRegistry) {
+    ConsentServiceImpl(AAFIUClient aafiuClient,
+                       ConsentStore consentStore,
+                       CallbackRegistry callbackRegistry,
+                       ObjectMapper mapper) {
         this.aafiuClient = aafiuClient;
         this.consentStore = consentStore;
         this.callbackRegistry = callbackRegistry;
+        this.mapper = mapper;
     }
 
     @Override
@@ -195,26 +200,60 @@ class ConsentServiceImpl implements ConsentService {
     }
 
     @Override
+    public Mono<SignedConsentDTO> getSignedConsent(final String consentId, final Optional<String> aaHandleOptional) {
+        final var consentDTOOptional = consentStore.findSignedConsent(consentId);
+        return consentDTOOptional
+                .map(Mono::just)
+                .orElseGet(() -> fetchAndSaveSignedConsent(consentId, aaHandleOptional))
+                ;
+    }
+
+    protected Mono<SignedConsentDTO> fetchAndSaveSignedConsent(final String consentId, @NonNull Optional<String> aaHandleOptional) {
+        final String aaHandle = aaHandleOptional
+                .or(() -> {
+                    var consentState = getConsentStateByConsentId(consentId);
+                    return (consentState != null) ?
+                            Optional.ofNullable(consentState.getAaId()) : Optional.empty();
+                })
+                .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(),"SignedConsent cannot be found, try with aaHandle")
+                        .params(Map.of("consentId", consentId)));
+        return aafiuClient.getConsentArtefact(consentId, aaHandle)
+                .map(consentArtefact -> {
+                    SignedConsentDTO signedConsentDTO = new SignedConsentDTO();
+                    signedConsentDTO.setConsentId(consentId);
+                    signedConsentDTO.setCreateTimestamp(strToTimeStamp.apply(consentArtefact.getCreateTimestamp()));
+
+                    final String[] tokens = decodeJWTToken.apply(consentArtefact.getSignedConsent());
+                    signedConsentDTO.setHeader(tokens[0]);
+                    signedConsentDTO.setPayload(tokens[1]);
+                    signedConsentDTO.setSignature(tokens[2]);
+
+                    return signedConsentDTO;
+                })
+                .doOnSuccess(consentStore::saveSignedConsent);
+    }
+
+    @Override
     public Optional<ConsentRequestDTO> getConsentRequestByConsentId(String consentId) {
         return consentStore.findRequestByConsentId(consentId);
     }
 
     @Override
     public Mono<SignedConsent> getSignedConsentDetail(String consentId, String aaName) {
-        log.debug("GetConsentDetail: start: consentId:{}, aaName:{}", consentId, aaName);
-        return aafiuClient.getConsentArtefact(consentId, aaName)
-                .map(ConsentArtefact::getSignedConsent)
-                .flatMap(signedConsent -> {
-                    final var tokens = Functions.decodeJWTToken.apply(signedConsent);
-                    if (tokens[1] != null) {
+        log.debug("GetSignedConsentDetail: start: consentId:{}, aaName:{}", consentId, aaName);
+
+        return getSignedConsent(consentId, Optional.ofNullable(aaName))
+                .map(SignedConsentDTO::getPayload)
+                .flatMap(payload -> {
+                    if (payload != null) {
                         try {
-                            return Mono.just(mapper.readValue(tokens[1], SignedConsent.class));
+                            return Mono.just(mapper.readValue(payload, SignedConsent.class));
                         } catch (Exception e) {
                             return Mono.error(e);
                         }
                     }
                     return Mono.empty();
-                }).doOnSuccess(details -> log.debug("GetConsentDetail: success: consentId:{}, aaName:{}", consentId, aaName));
+                }).doOnSuccess(details -> log.debug("GetSignedConsentDetail: success: consentId:{}, aaName:{}", consentId, aaName));
     }
 
     @Override
