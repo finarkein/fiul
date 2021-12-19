@@ -11,6 +11,7 @@ import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
+import io.finarkein.fiul.consent.model.SignedConsentDTO;
 
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ public interface ConsentStore {
     void saveConsentRequest(String consentHandle, ConsentRequest consentRequest);
 
     void updateConsentRequest(String consentHandleId, String consentId);
+
+    Optional<SignedConsentDTO> findSignedConsent(String consentId);
 
     Optional<ConsentRequestDTO> findRequestByConsentHandle(String consentHandle);
 
@@ -37,4 +40,6 @@ public interface ConsentStore {
     ConsentStateDTO getConsentStateByTxnId(String txnId);
 
     ConsentStateDTO updateConsentState(ConsentStateDTO consentStateDTO);
+
+    void saveSignedConsent(SignedConsentDTO signedConsentDTO);
 }

@@ -16,9 +16,11 @@ import io.finarkein.api.aa.util.Functions;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
+import io.finarkein.fiul.consent.model.SignedConsentDTO;
 import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
 import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
 import io.finarkein.fiul.consent.repo.ConsentStateRepository;
+import io.finarkein.fiul.consent.repo.RepoSignedConsent;
 import io.finarkein.fiul.consent.service.ConsentStore;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,9 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
     private ConsentNotificationLogRepository consentNotificationLogRepository;
+
+    @Autowired
+    private RepoSignedConsent repoSignedConsent;
 
     @Override
     public void saveConsentRequest(String consentHandle, ConsentRequest consentRequest) {
@@ -78,6 +83,11 @@ class ConsentStoreImpl implements ConsentStore {
             optionalConsentRequestDTO.get().setConsentId(consentId);
             consentRequestDTORepository.save(optionalConsentRequestDTO.get());
         }
+    }
+
+    @Override
+    public Optional<SignedConsentDTO> findSignedConsent(String consentId) {
+        return repoSignedConsent.findByConsentId(consentId);
     }
 
     @Override
@@ -149,5 +159,10 @@ class ConsentStoreImpl implements ConsentStore {
     @Override
     public ConsentStateDTO updateConsentState(ConsentStateDTO consentStateDTO) {
         return consentStateRepository.save(consentStateDTO);
+    }
+
+    @Override
+    public void saveSignedConsent(SignedConsentDTO signedConsentDTO) {
+        repoSignedConsent.save(signedConsentDTO);
     }
 }

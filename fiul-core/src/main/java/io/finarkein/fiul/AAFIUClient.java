@@ -28,7 +28,6 @@ import reactor.core.publisher.Mono;
  * #valid values = {generateIfNull,generateAuto,noop}<br>
  * aa-client.request-timestamp-setter=generateAuto<br>
  * aa-client.request-txn-id-setter=generateAuto<br>
- * aa-client.request-cache-service-name=in-mem/noop/any-other<br>
  * aa-client.crypto-service=defaultCryptoService<br>
  * </code></ul>
  * <li>Java client which connects to FIU microservice(AAController) deployed in secured domain</li>
