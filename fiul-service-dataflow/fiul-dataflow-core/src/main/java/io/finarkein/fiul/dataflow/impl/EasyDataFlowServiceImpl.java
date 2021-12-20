@@ -16,7 +16,6 @@ import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
-import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.converter.xml.XMLConverterFunctions;
 import io.finarkein.fiul.dataflow.*;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
@@ -61,20 +60,20 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
     protected final EasyFIDataStore easyFIDataStore;
     protected final CallbackRegistry callbackRegistry;
     protected final FIFetchMetadataStore fiFetchMetadataStore;
-    protected final ConsentService consentService;
+    protected final ConsentServiceClient consentServiceClient;
 
     @Autowired
     protected EasyDataFlowServiceImpl(AAFIUClient fiuClient, FIRequestStore fiRequestStore,
                                       FIFetchMetadataStore fiFetchMetadataStore,
-                                      ConsentService consentService,
                                       EasyFIDataStore easyFIDataStore,
-                                      CallbackRegistry callbackRegistry) {
+                                      CallbackRegistry callbackRegistry,
+                                      ConsentServiceClient consentServiceClient) {
         this.fiuClient = fiuClient;
         this.fiRequestStore = fiRequestStore;
         this.fiFetchMetadataStore = fiFetchMetadataStore;
-        this.consentService = consentService;
         this.easyFIDataStore = easyFIDataStore;
         this.callbackRegistry = callbackRegistry;
+        this.consentServiceClient = consentServiceClient;
     }
 
     @Override
@@ -91,11 +90,11 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         final var startTime = Timestamp.from(Instant.now());
         final var serializedKeyPair = doGet(fiuClient.generateKeyMaterial());
 
-        Mono<ConsentStateDTO> consentStateMono = consentService
+        Mono<ConsentStateDTO> consentStateMono = consentServiceClient
                 .getConsentState(dataRequest.getConsentHandle(), Optional.ofNullable(dataRequest.getCustomerAAId()))
                 .flatMap(consentState -> {
                     if (consentState.getConsentId() == null) {
-                        return consentService
+                        return consentServiceClient
                                 .getConsentStatus(consentState.getConsentHandle(), Optional.of(consentState.getAaId()))
                                 .flatMap(consentHandleResponse -> {
                                             if (!Objects.equals(consentHandleResponse.getConsentStatus().getStatus(), "READY"))
@@ -126,6 +125,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                             .keyMaterial(serializedKeyPair.getKeyMaterial())
                             .build();
                 })
+                .flatMap(consentServiceClient::setSignatureIfNotSet)
                 .flatMap(fiuFiRequest -> {
                             final var aaName = aaNameExtractor.apply(dataRequest.getCustomerAAId());
                             return fiuClient.createFIRequest(fiuFiRequest, aaName)
@@ -220,7 +220,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
             easyFIDataStore.deleteKey(fiRequestDTO.getConsentId(), sessionId);
 
-            consentService.getSignedConsentDetail(fiRequestDTO.getConsentId(), fiRequestDTO.getAaName())
+            consentServiceClient.getSignedConsentDetail(fiRequestDTO.getConsentId(), fiRequestDTO.getAaName())
                     .subscribe(consentDetail -> {
                         if (ConsentMode.get(consentDetail.getConsentMode()) == STORE) {
                             easyFIDataStore.saveFIData(DataSaveRequest.with(decryptedFIData)

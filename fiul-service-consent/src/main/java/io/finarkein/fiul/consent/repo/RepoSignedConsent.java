@@ -6,13 +6,14 @@
  */
 package io.finarkein.fiul.consent.repo;
 
-import io.finarkein.fiul.consent.model.ConsentNotificationLog;
+import io.finarkein.fiul.consent.model.SignedConsentDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ConsentNotificationLogRepository extends JpaRepository<ConsentNotificationLog, Long> {
-    Optional<ConsentNotificationLog> findConsentNotificationLogByConsentHandle(String consentHandle);
+public interface RepoSignedConsent extends JpaRepository<SignedConsentDTO, String> {
+
+    Optional<SignedConsentDTO> findByConsentId(String consentId);
 }
