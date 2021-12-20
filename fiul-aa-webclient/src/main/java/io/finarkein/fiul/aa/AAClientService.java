@@ -18,7 +18,9 @@ import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.heartbeat.HeartbeatResponse;
-import io.finarkein.fiul.*;
+import io.finarkein.fiul.AAFIUClient;
+import io.finarkein.fiul.CryptoServiceAdapter;
+import io.finarkein.fiul.CryptoServiceAdapterBuilder;
 import io.finarkein.fiul.common.RequestUpdater;
 import io.finarkein.fiul.common.UnSupportedCryptoService;
 import io.finarkein.fiul.consent.FIUConsentRequest;
@@ -33,7 +35,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
-import java.util.Properties;
 
 import static io.finarkein.fiul.Functions.fiFetchResponseDecoder;
 
@@ -42,7 +43,6 @@ import static io.finarkein.fiul.Functions.fiFetchResponseDecoder;
 class AAClientService implements AAFIUClient {
 
     private final AAClient aaClient;
-    private final CacheService cache;
     private final RequestUpdater requestUpdater;
     private final CryptoServiceAdapter crypto;
     private final ConsentValidator consentValidator = new ConsentValidatorImpl();
@@ -52,11 +52,6 @@ class AAClientService implements AAFIUClient {
     public AAClientService(FiulWebClientConfig config, AAClient aaClient, CryptoServiceConfig cryptoServiceConfig) {
         this.aaClient = aaClient;
         requestUpdater = new RequestUpdater(config.getRequestTimestampSetter(), config.getRequestTxnIdSetter());
-
-        cache = RequestCacheServiceBuilder.Registry.builderFor(config.getFiRequestCacheServiceName()).build(new Properties());
-
-        log.info("Using RequestCacheService:{}", config.getFiRequestCacheServiceName());
-
         crypto = buildCryptoService(config.getCryptoServiceName(), cryptoServiceConfig);
     }
 
@@ -92,12 +87,7 @@ class AAClientService implements AAFIUClient {
 
     @Override
     public Mono<ConsentArtefact> getConsentArtefact(String consentID, String aaName) {
-        final var cachedConsentArtefact = cache.getIfPresent(consentID);
-        if (cachedConsentArtefact != null)
-            return Mono.just(cachedConsentArtefact);
-
-        return aaClient.getConsentArtefact(consentID, aaName)
-                .doOnSuccess(cache::putConsentArtefact);
+        return aaClient.getConsentArtefact(consentID, aaName);
     }
 
     @Override
@@ -105,29 +95,8 @@ class AAClientService implements AAFIUClient {
         requestUpdater.updateTxnIdIfNeeded(fiRequest);
         requestUpdater.updateTimestampIfNeeded(fiRequest);
 
-        Mono<String> signatureMono;
-        if (fiRequest.getConsent().getDigitalSignature() == null
-                || "NA".equalsIgnoreCase(fiRequest.getConsent().getDigitalSignature())) {
-
-            final String signedConsentArtefact = cache.getIfSignedConsentArtefactPresent(fiRequest.getConsent().getId());
-            if (signedConsentArtefact == null) {
-                signatureMono = getConsentArtefact(fiRequest.getConsent().getId(), aaName)
-                        .flatMap(consentArtefact -> {
-                            cache.putSignedConsentArtefact(fiRequest.getConsent().getId(), consentArtefact.getSignedConsent());
-                            return Mono.just(Functions.getSignature(consentArtefact.getSignedConsent()));
-                        });
-            } else {
-                signatureMono = Mono.just(Functions.getSignature(signedConsentArtefact));
-            }
-        } else {
-            signatureMono = Mono.just(fiRequest.getConsent().getDigitalSignature());
-        }
-        return signatureMono
-                .flatMap(signature -> {
-                    fiRequest.getConsent().setDigitalSignature(signature);
-                    fiRequestValidator.validateFIRequestBody(fiRequest);
-                    return aaClient.createFIRequest(fiRequest.toAAFIRequest(), aaName);
-                });
+        fiRequestValidator.validateFIRequestBody(fiRequest);
+        return aaClient.createFIRequest(fiRequest.toAAFIRequest(), aaName);
     }
 
     @Override

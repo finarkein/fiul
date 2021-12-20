@@ -14,9 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class FiulWebClientConfig {
 
-    @Value("${aa-client.request-cache-service-name:in-mem}")
-    private String fiRequestCacheServiceName;
-
     @Value("${aa-client.request-timestamp-setter:generateIfNull}")
     private String requestTimestampSetter;
 
