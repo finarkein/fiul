@@ -50,15 +50,10 @@ public class ConsentController {
         return consentService.getConsentArtefact(consentID, aaNameOptional);
     }
 
-    @GetMapping("/consent/state/{consentHandle}/{aaHandle}")
-    public Mono<ConsentState> getConsentState(@PathVariable String consentHandle, @PathVariable String aaHandle) {
-        return consentService.getConsentState(consentHandle, Optional.ofNullable(aaHandle))
-                .map(ConsentState::from);
-    }
-
     @GetMapping("/consent/state/{consentHandle}")
-    public Mono<ConsentState> getConsentStateByHandleId(@PathVariable String consentHandle) {
-        return consentService.getConsentState(consentHandle, Optional.empty())
+    public Mono<ConsentState> getConsentState(@PathVariable String consentHandle,
+                                              @RequestParam(value = "aaHandle", required = false) String aaHandle) {
+        return consentService.getConsentState(consentHandle, Optional.ofNullable(aaHandle))
                 .map(ConsentState::from);
     }
 }
