@@ -7,10 +7,14 @@
 package io.finarkein.fiul.dataflow.easy;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.finarkein.fiul.dataflow.dto.FIStatusResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
@@ -18,7 +22,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(builderClassName = "Builder")
 public class DataRequestStatus {
-    private String consentHandle;
-    private String sessionId;
-    private SessionStatus sessionStatus;
+    protected String aaHandle;
+    protected String consentHandle;
+    protected String sessionId;
+    protected SessionStatus sessionStatus;
+    protected Set<FIStatusResponseDTO> fiStatus;
+    protected Timestamp requestSubmittedOn;
+    protected Timestamp updatedOn;
 }
