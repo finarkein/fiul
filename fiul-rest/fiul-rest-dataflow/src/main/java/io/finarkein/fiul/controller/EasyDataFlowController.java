@@ -38,7 +38,7 @@ public class EasyDataFlowController {
         return easyDataFlowService.createDataRequest(dataRequest);
     }
 
-    @GetMapping("/FI/data/request/status/{consentHandle}/{sessionId}")
+    @GetMapping({"/FI/data/request/status/{consentHandle}/{sessionId}", "/FI/data/request/{consentHandle}/{sessionId}"})
     public Mono<DataRequestStatus> getDataRequestStatus(@PathVariable String consentHandle, @PathVariable String sessionId) {
         return easyDataFlowService.dataRequestStatus(consentHandle, sessionId);
     }

@@ -286,14 +286,16 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
         log.debug("Getting data request status, sessionId:{}", sessionId);
         return fiRequestStore.getFIRequestState(consentHandle, sessionId)
-                .map(fiRequestState -> {
-                    SessionStatus status = SessionStatus.get(fiRequestState.getSessionStatus());
-                    return Mono.just(DataRequestStatus.builder()
-                            .sessionStatus(status)
-                            .sessionId(sessionId)
-                            .consentHandle(consentHandle)
-                            .build());
-                }).orElseThrow(() -> Errors.NoDataFound.with(txnId, "FIRequest not found for given sessionId:" + sessionId))
+                .map(fiRequestState -> Mono.just(DataRequestStatus.builder()
+                        .aaHandle(fiRequestState.getAaId())
+                        .requestSubmittedOn(fiRequestState.getFiRequestSubmittedOn())
+                        .updatedOn(fiRequestState.getUpdatedOn())
+                        .sessionStatus(SessionStatus.get(fiRequestState.getSessionStatus()))
+                        .sessionId(sessionId)
+                        .consentHandle(consentHandle)
+                        .fiStatus(fiRequestState.getFiStatusResponse())
+                        .build()))
+                .orElseThrow(() -> Errors.NoDataFound.with(txnId, "FIRequest not found for given sessionId:" + sessionId))
                 ;
     }
 
@@ -316,7 +318,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
     @Override
     public Mono<FIDataDeleteResponse> deleteData(String consentHandleId) {
-        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentHandleId, null,false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentHandleId, null, false);
 
         fiFetchMetadataStore.deleteByConsentHandleId(consentHandleId);
         final var deletionCounts = easyFIDataStore.deleteFIDataByConsentHandleId(consentHandleId);
@@ -341,7 +343,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
     @Override
     public Mono<FIDataDeleteResponse> deleteData(String consentHandleId, String sessionId) {
-        FIDataDeleteResponse response = new FIDataDeleteResponse(sessionId, consentHandleId, null,false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(sessionId, consentHandleId, null, false);
 
         fiFetchMetadataStore.deleteBySessionId(sessionId);
         final var deletionCounts = easyFIDataStore.deleteFIDataByConsentHandleIdAndSessionId(consentHandleId, sessionId);
