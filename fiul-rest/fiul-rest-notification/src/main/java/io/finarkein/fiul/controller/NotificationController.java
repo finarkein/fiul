@@ -26,6 +26,7 @@ import io.finarkein.fiul.validator.NotificationValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/")
 @Log4j2
+@RefreshScope
 public class NotificationController {
 
     private final NotificationPublisher publisher;

@@ -10,6 +10,7 @@ import io.finarkein.api.aa.webclient.headers.FixedHeaderExchangeFilter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import static io.finarkein.fiul.notification.callback.Constants.FIUL_CALLBACK_WE
 
 @Configuration
 @Log4j2
+@RefreshScope
 public class CallbackWebClientConfig {
     /**
      * Note: should match with method name mentioned below
@@ -30,6 +32,7 @@ public class CallbackWebClientConfig {
 
     @Bean(DEFAULT_WEBCLIENT_NAME)
     @ConditionalOnProperty(name = FIUL_CALLBACK_WEB_CLIENT_QUALIFIER, havingValue = DEFAULT_WEBCLIENT_NAME, matchIfMissing = true)
+    @RefreshScope
     WebClient getWebClient(@Value("${fiul.notification.callback.request.header}") String header,
                                @Value("${fiul.notification.callback.request.value}") String value) {
         WebClient.Builder client = WebClient.builder();
@@ -39,6 +42,7 @@ public class CallbackWebClientConfig {
     }
 
     @Bean(WEBHOOK_QUALIFIER_SUPPLIER_METHOD)
+    @RefreshScope
     public WebClient webhookClientQualifiers(@Value("${" + FIUL_CALLBACK_WEB_CLIENT_QUALIFIER + "}") String webclientName,
                                             ApplicationContext context) {
         log.info("Notification-callback webhook: qualifier: {}={}", FIUL_CALLBACK_WEB_CLIENT_QUALIFIER, webclientName);
