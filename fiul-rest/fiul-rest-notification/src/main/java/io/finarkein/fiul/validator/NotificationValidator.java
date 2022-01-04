@@ -24,7 +24,7 @@ public class NotificationValidator {
     private static final String REQUIRED_NOTIFIER_TYPE = "AA";
 
     public static void validateConsentNotification(ConsentNotification consentNotification, ConsentStateDTO consentStateDTO,
-                                                   EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
+                                                   EntityInfo entityInfo, AaApiKeyBody aaApiKeyBody) {
         BasicResponseValidator.basicValidation(consentNotification.getTxnid(), consentNotification.getVer(),
                 consentNotification.getTimestamp(), "ConsentNotification");
         if (!consentNotification.getNotifier().getId().equals(aaApiKeyBody.getClientId()))
@@ -50,7 +50,7 @@ public class NotificationValidator {
     }
 
     public static void validateFINotification(FINotification fiNotification, FIRequestState fiRequestState,
-                                              EntityInfo entityInfo, boolean test, AaApiKeyBody aaApiKeyBody) {
+                                              EntityInfo entityInfo, AaApiKeyBody aaApiKeyBody) {
         BasicResponseValidator.basicValidation(fiNotification.getTxnid(), fiNotification.getVer(), fiNotification.getTimestamp(),
                 "FINotification");
         if (!fiNotification.getNotifier().getId().equals(aaApiKeyBody.getClientId()))
