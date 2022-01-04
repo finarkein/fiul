@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListenerConfigurer;
 import org.springframework.jms.config.JmsListenerContainerFactory;
@@ -33,6 +34,7 @@ import static io.finarkein.fiul.notification.config.ConfigForInMem.FIUL_EVENT_FA
 @Log4j2
 @Configuration
 @ConditionalOnProperty(name = NOTIFICATION_Q_TYPE_PROPERTY, havingValue = IN_MEM, matchIfMissing = true)
+@RefreshScope
 public class InMemCallbackListenerConfigurer implements JmsListenerConfigurer {
 
     private final JmsListenerContainerFactory<?> listenerContainerFactory;
