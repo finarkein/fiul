@@ -117,6 +117,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
 
                     return FIUFIRequest.builder()
                             .ver(FIRequest.VERSION)
+                            .aaHandle(consentState.getAaId())
                             .txnid(dataRequest.getTxnId())
                             .timestamp(timestampToStr.apply(startTime))
                             .consent(new Consent(dataRequest.getConsentId(), null))

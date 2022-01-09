@@ -41,14 +41,84 @@ public class FIUFIRequest extends FIRequest {
     @JsonProperty("aaHandle")
     protected String aaHandle;
 
-    @Builder(builderClassName = "FIUFIRequestBuilder",access = AccessLevel.PUBLIC, builderMethodName = "builder")
-    public FIUFIRequest(final String ver, final String timestamp, final String txnid, final FIDataRange fIDataRange,
-                        final Consent consent, final KeyMaterial keyMaterial, Callback callback) {
+    FIUFIRequest(final String ver, final String timestamp, final String txnid, final FIDataRange fIDataRange,
+                        final Consent consent, final KeyMaterial keyMaterial, Callback callback, String aaHandle) {
         super(ver, timestamp, txnid, fIDataRange, consent, keyMaterial);
         this.callback = callback;
+        this.aaHandle = aaHandle;
+    }
+
+    public static Builder builder(){
+        return new Builder();
     }
 
     public FIRequest toAAFIRequest(){
         return new FIRequest(ver, timestamp, txnid, fIDataRange, consent, keyMaterial);
+    }
+
+    public static class Builder {
+        private String ver;
+        private String timestamp;
+        private String txnid;
+        private FIDataRange fIDataRange;
+        private Consent consent;
+        private KeyMaterial keyMaterial;
+        private Callback callback;
+        private String aaHandle;
+
+        Builder() {
+        }
+
+        public FIUFIRequest.Builder ver(final String ver) {
+            this.ver = ver;
+            return this;
+        }
+
+        public FIUFIRequest.Builder timestamp(final String timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
+        public FIUFIRequest.Builder txnid(final String txnid) {
+            this.txnid = txnid;
+            return this;
+        }
+
+        public FIUFIRequest.Builder fIDataRange(final FIDataRange fIDataRange) {
+            this.fIDataRange = fIDataRange;
+            return this;
+        }
+
+        public FIUFIRequest.Builder consent(final Consent consent) {
+            this.consent = consent;
+            return this;
+        }
+
+        public FIUFIRequest.Builder keyMaterial(final KeyMaterial keyMaterial) {
+            this.keyMaterial = keyMaterial;
+            return this;
+        }
+
+        public FIUFIRequest.Builder callback(final Callback callback) {
+            this.callback = callback;
+            return this;
+        }
+
+        public FIUFIRequest.Builder aaHandle(final String aaHandle) {
+            this.aaHandle = aaHandle;
+            return this;
+        }
+
+        public FIUFIRequest build() {
+            return new FIUFIRequest(this.ver, this.timestamp, this.txnid, this.fIDataRange, this.consent,
+                    this.keyMaterial, this.callback, aaHandle);
+        }
+
+        public String toString() {
+            return "Builder(ver=" + this.ver + ", timestamp=" + this.timestamp + ", txnid=" + this.txnid
+                    + ", fIDataRange=" + this.fIDataRange + ", consent=" + this.consent
+                    + ", keyMaterial=" + this.keyMaterial + ", callback=" + this.callback
+                    + ", aaHandle=" + this.aaHandle +")";
+        }
     }
 }

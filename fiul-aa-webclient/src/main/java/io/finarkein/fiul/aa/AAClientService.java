@@ -36,6 +36,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
+import static io.finarkein.fiul.Functions.UUIDSupplier;
 import static io.finarkein.fiul.Functions.fiFetchResponseDecoder;
 
 @Log4j2
@@ -140,9 +141,14 @@ class AAClientService implements AAFIUClient {
     }
 
     private FIUFIRequest createFIRequest(FetchDataRequest fetchDataRequest, ConsentStatus consentStatus) {
-        return new FIUFIRequest(fetchDataRequest.getVer(), RequestUpdater.TimestampUpdaters.currentTimestamp(),
-                null, new FIDataRange(fetchDataRequest.getFrom(), fetchDataRequest.getTo()),
-                new Consent(consentStatus.getId(), "NA"), fetchDataRequest.getKeyMaterial(), null);
+        return FIUFIRequest.builder()
+                .ver(fetchDataRequest.getVer())
+                .timestamp(RequestUpdater.TimestampUpdaters.currentTimestamp())
+                .txnid(UUIDSupplier.get())
+                .fIDataRange(new FIDataRange(fetchDataRequest.getFrom(), fetchDataRequest.getTo()))
+                .consent(new Consent(consentStatus.getId(), "NA"))
+                .keyMaterial(fetchDataRequest.getKeyMaterial())
+                .build();
     }
 
     @Override
