@@ -10,7 +10,7 @@
 
     <groupId>io.finarkein.fiu</groupId>
     <artifactId>fiul</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.6.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -26,7 +26,7 @@
         <version.reactor-netty>1.0.8</version.reactor-netty>
         <version.spring-webflux>5.3.8</version.spring-webflux>
         <version.maven-dependency-plugin>3.1.1</version.maven-dependency-plugin>
-        <version.logger>2.15.0</version.logger>
+        <version.logger>2.17.1</version.logger>
         <version.aa-commons>0.4.6</version.aa-commons>
         <version.fi-meta>1.0.3</version.fi-meta>
 
