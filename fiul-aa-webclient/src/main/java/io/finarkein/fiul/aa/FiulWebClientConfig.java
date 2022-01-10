@@ -8,14 +8,13 @@ package io.finarkein.fiul.aa;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
+@RefreshScope
 public class FiulWebClientConfig {
-
-    @Value("${aa-client.request-cache-service-name:in-mem}")
-    private String fiRequestCacheServiceName;
 
     @Value("${aa-client.request-timestamp-setter:generateIfNull}")
     private String requestTimestampSetter;

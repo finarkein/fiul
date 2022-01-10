@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.finarkein.fiu</groupId>
         <artifactId>fiul-service-notification</artifactId>
-        <version>0.5.0</version>
+        <version>0.6.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,8 +16,33 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.finarkein.fiu</groupId>
+            <artifactId>fiul-notification-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.auth</groupId>
+            <artifactId>finarkein-auth-oauth2</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.finarkein.aa</groupId>
+            <artifactId>aa-webclient-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
     </dependencies>
 

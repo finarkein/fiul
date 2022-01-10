@@ -80,4 +80,8 @@ public interface RepoFIFetchMetadata extends JpaRepository<FIFetchMetadata, Stri
     @Modifying(flushAutomatically = true)
     @Transactional
     int deleteByConsentId(String consentId);
+
+    @Modifying(flushAutomatically = true)
+    @Transactional
+    int deleteBySessionId(String sessionId);
 }

@@ -15,9 +15,9 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "customerAAId",
-        "dataRageFrom",
-        "dataRageTo",
-        "consentHandleId",
+        "dataRangeFrom",
+        "dataRangeTo",
+        "consentHandle",
         "callback"
 })
 @ToString
@@ -30,32 +30,32 @@ public class DataRequest {
     @JsonProperty("customerAAId")
     protected String customerAAId;
 
-    @JsonProperty("dataRageFrom")
-    protected String dataRageFrom;
+    @JsonProperty("dataRangeFrom")
+    protected String dataRangeFrom;
 
-    @JsonProperty("dataRageTo")
-    protected String dataRageTo;
+    @JsonProperty("dataRangeTo")
+    protected String dataRangeTo;
 
-    @JsonProperty("consentHandleId")
-    protected String consentHandleId;
+    @JsonProperty("consentHandle")
+    protected String consentHandle;
 
     @JsonProperty("callback")
     protected Callback callback;
 
     protected DataRequest(DataRequest dataRequest){
-        consentHandleId = dataRequest.getConsentHandleId();
+        consentHandle = dataRequest.getConsentHandle();
         customerAAId = dataRequest.getCustomerAAId();
-        dataRageFrom = dataRequest.dataRageFrom;
-        dataRageTo = dataRequest.dataRageTo;
-        consentHandleId = dataRequest.getConsentHandleId();
+        dataRangeFrom = dataRequest.dataRangeFrom;
+        dataRangeTo = dataRequest.dataRangeTo;
+        consentHandle = dataRequest.getConsentHandle();
         callback = dataRequest.callback;
     }
 
     public static class Builder {
         private String customerAAId;
-        private String dataRageFrom;
-        private String dataRageTo;
-        private String consentHandleId;
+        private String dataRangeFrom;
+        private String dataRangeTo;
+        private String consentHandle;
         private Callback callback;
 
         Builder() {
@@ -68,20 +68,20 @@ public class DataRequest {
         }
 
         @JsonProperty("dataRageFrom")
-        public DataRequest.Builder dataRageFrom(@NonNull final String dataRageFrom) {
-            this.dataRageFrom = dataRageFrom;
+        public DataRequest.Builder dataRangeFrom(@NonNull final String dataRangeFrom) {
+            this.dataRangeFrom = dataRangeFrom;
             return this;
         }
 
-        @JsonProperty("dataRageTo")
-        public DataRequest.Builder dataRageTo(@NonNull final String dataRageTo) {
-            this.dataRageTo = dataRageTo;
+        @JsonProperty("dataRangeTo")
+        public DataRequest.Builder dataRangeTo(@NonNull final String dataRangeTo) {
+            this.dataRangeTo = dataRangeTo;
             return this;
         }
 
-        @JsonProperty("consentHandleId")
-        public DataRequest.Builder consentHandleId(@NonNull final String consentHandleId) {
-            this.consentHandleId = consentHandleId;
+        @JsonProperty("consentHandle")
+        public DataRequest.Builder consentHandle(@NonNull final String consentHandle) {
+            this.consentHandle = consentHandle;
             return this;
         }
 
@@ -98,11 +98,11 @@ public class DataRequest {
         }
 
         public DataRequest build() {
-            return new DataRequest(this.customerAAId, this.dataRageFrom, this.dataRageTo, this.consentHandleId, this.callback);
+            return new DataRequest(this.customerAAId, this.dataRangeFrom, this.dataRangeTo, this.consentHandle, this.callback);
         }
 
         public String toString() {
-            return "DataRequest.Builder(customerAAId=" + this.customerAAId + ", dataRageFrom=" + this.dataRageFrom + ", dataRageTo=" + this.dataRageTo + ", consentHandleId=" + this.consentHandleId + ", callback=" + this.callback + ")";
+            return "DataRequest.Builder(customerAAId=" + this.customerAAId + ", dataRangeFrom=" + this.dataRangeFrom + ", dataRangeTo=" + this.dataRangeTo + ", consentHandle=" + this.consentHandle + ", callback=" + this.callback + ")";
         }
     }
 }

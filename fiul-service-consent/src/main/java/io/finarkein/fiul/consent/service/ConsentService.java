@@ -13,7 +13,8 @@ import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
+import io.finarkein.fiul.consent.model.SignedConsentDTO;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -26,19 +27,23 @@ public interface ConsentService {
 
     Mono<ConsentArtefact> getConsentArtefact(String consentId, Optional<String> aaName);
 
+    Mono<SignedConsentDTO> getSignedConsent(String consentId, Optional<String> aaName);
+
     Optional<ConsentRequestDTO> getConsentRequestByConsentId(String consentId);
 
     Mono<SignedConsent> getSignedConsentDetail(String consentId, String aaName);
 
     void handleConsentNotification(ConsentNotificationLog consentNotificationLog);
 
-    Mono<ConsentState> getConsentState(String consentHandle, Optional<String> customerAAId);
+    Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> customerAAId);
 
-    ConsentState getConsentStateByTxnId(String txnId);
+    ConsentStateDTO getConsentStateByConsentId(String consentId);
 
-    ConsentState getConsentStateByConsentHandle(String consentHandle);
+    ConsentStateDTO getConsentStateByTxnId(String txnId);
+
+    ConsentStateDTO getConsentStateByConsentHandle(String consentHandle);
 
     void updateConsentStateNotifier(String txnId, String notifierId);
 
-    void updateConsentState(ConsentState consentState);
+    void updateConsentState(ConsentStateDTO consentStateDTO);
 }

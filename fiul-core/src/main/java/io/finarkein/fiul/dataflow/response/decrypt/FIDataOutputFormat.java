@@ -19,6 +19,6 @@ public enum FIDataOutputFormat {
         if (json.name().equalsIgnoreCase(outputFormatAsString))
             return json;
 
-        throw Errors.InvalidRequest.with(UUID.randomUUID().toString(), "Invalid value specified:" + outputFormatAsString);
+        throw Errors.InvalidRequest.with(UUID.randomUUID().toString(), "Invalid outputFormat specified:" + outputFormatAsString);
     }
 }

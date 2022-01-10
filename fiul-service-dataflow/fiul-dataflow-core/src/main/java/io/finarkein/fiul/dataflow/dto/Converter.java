@@ -13,6 +13,7 @@ import io.finarkein.api.aa.notification.FIStatusResponse;
 import io.finarkein.fiul.common.JSONAttrConverter;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -33,6 +34,15 @@ abstract class Converter {
 
         protected List<FIStatusResponse> readValue(String input) throws JsonProcessingException {
             return mapper.readValue(input, new TypeReference<List<FIStatusResponse>>() {
+            });
+        }
+    }
+
+    @javax.persistence.Converter
+    public static class OfFIStatusResponseDTOSet extends JSONAttrConverter<Set<FIStatusResponseDTO>> {
+
+        protected Set<FIStatusResponseDTO> readValue(String input) throws JsonProcessingException {
+            return mapper.readValue(input, new TypeReference<Set<FIStatusResponseDTO>>() {
             });
         }
     }

@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ConsentNotificationLogRepository extends JpaRepository<ConsentNotificationLog, String> {
+public interface ConsentNotificationLogRepository extends JpaRepository<ConsentNotificationLog, Long> {
     Optional<ConsentNotificationLog> findConsentNotificationLogByConsentHandle(String consentHandle);
 }

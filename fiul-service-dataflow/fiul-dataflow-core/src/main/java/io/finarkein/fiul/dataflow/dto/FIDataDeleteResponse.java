@@ -15,6 +15,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class FIDataDeleteResponse {
     private String dataSessionId;
-    private String consentHandleId;
+    private String consentHandle;
+    private String consentId;
     private boolean deleted;
 }

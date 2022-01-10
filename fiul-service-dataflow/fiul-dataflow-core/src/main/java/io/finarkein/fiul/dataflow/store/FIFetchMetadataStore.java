@@ -17,7 +17,7 @@ public interface FIFetchMetadataStore {
 
     int deleteByConsentHandleId(String consentHandleId);
 
-    void deleteBySessionId(String sessionId);
+    int deleteBySessionId(String sessionId);
 
     FIFetchMetadata saveFIFetchMetadata(FIFetchMetadata metadata);
 
