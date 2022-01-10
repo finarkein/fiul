@@ -12,13 +12,14 @@ import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FIRequestDTO;
 import io.finarkein.fiul.dataflow.dto.FIRequestState;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 public interface FIRequestStore {
 
     void saveFIRequestAndFetchMetadata(FIFetchMetadata fiFetchMetadata, FIUFIRequest fiRequest);
 
-    void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName, String dataSessionId);
+    void updateFIRequestStateOnError(FIUFIRequest fiRequest, String aaName, Timestamp fiRequestStartTime, String dataSessionId);
 
     Optional<FIRequestDTO> getFIRequest(String consentHandleId, String sessionId);
 

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.crypto.SerializedKeyPair;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.service.ConsentService;
+import io.finarkein.fiul.dataflow.ConsentServiceClient;
 import io.finarkein.fiul.dataflow.EasyDataFlowService;
 import io.finarkein.fiul.dataflow.store.AAFIDataStore;
 import io.finarkein.fiul.dataflow.store.EasyFIDataStore;
@@ -41,14 +42,16 @@ public class TestConfig {
     private ConsentService consentService;
     @MockBean
     private CallbackRegistry callbackRegistry;
+    @MockBean
+    private ConsentServiceClient consentServiceClient;
 
     @Bean
     EasyDataFlowService getDataFlowServiceImpl() {
         final var serializedKeyPair = loadJsonFromFile("serializedKeyPair.json", SerializedKeyPair.class);
         Mockito.when(fiuClient.generateKeyMaterial()).thenReturn(Mono.just(serializedKeyPair));
 
-        return new EasyDataFlowServiceImpl(fiuClient, fiRequestStore, fiFetchMetadataStore, consentService, easyFIDataStore,
-                callbackRegistry);
+        return new EasyDataFlowServiceImpl(fiuClient, fiRequestStore, fiFetchMetadataStore, easyFIDataStore,
+                callbackRegistry, consentServiceClient);
     }
 
     @Bean

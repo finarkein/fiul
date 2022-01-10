@@ -39,8 +39,8 @@ public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
     }
 
     @Override
-    public void deleteBySessionId(String sessionId) {
-        repoFIFetchMetadata.deleteById(sessionId);
+    public int deleteBySessionId(String sessionId) {
+        return repoFIFetchMetadata.deleteBySessionId(sessionId);
     }
 
     @Override
@@ -64,8 +64,8 @@ public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
     public Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue,
                                                               Timestamp toValue, boolean easyDataFlow) {
         final List<FIFetchMetadata> metadataForGivenWindow = repoFIFetchMetadata.getMetadataForGivenWindow(consentHandleId,
-                fromValue, toValue, easyDataFlow, PageRequest.of(0,1));
-        if(metadataForGivenWindow == null || metadataForGivenWindow.isEmpty())
+                fromValue, toValue, easyDataFlow, PageRequest.of(0, 1));
+        if (metadataForGivenWindow == null || metadataForGivenWindow.isEmpty())
             return Optional.empty();
         return Optional.of(metadataForGivenWindow.get(0));
     }

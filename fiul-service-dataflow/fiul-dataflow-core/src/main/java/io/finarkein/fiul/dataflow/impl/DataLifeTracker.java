@@ -11,6 +11,7 @@ import io.finarkein.fiul.dataflow.EasyDataFlowService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import java.time.Instant;
 
 @Log4j2
 @Component
+@RefreshScope
 public class DataLifeTracker {
 
     @Autowired

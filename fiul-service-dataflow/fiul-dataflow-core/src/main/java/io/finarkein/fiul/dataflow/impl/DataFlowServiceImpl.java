@@ -7,13 +7,14 @@
 package io.finarkein.fiul.dataflow.impl;
 
 import io.finarkein.api.aa.consent.ConsentMode;
+import io.finarkein.api.aa.consent.artefact.SignedConsent;
 import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
-import io.finarkein.fiul.consent.model.ConsentRequestDTO;
-import io.finarkein.fiul.consent.service.ConsentService;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
+import io.finarkein.fiul.dataflow.ConsentServiceClient;
 import io.finarkein.fiul.dataflow.DataFlowService;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.dto.FIDataDeleteResponse;
@@ -27,9 +28,11 @@ import io.finarkein.fiul.dataflow.store.FIRequestStore;
 import io.finarkein.fiul.ext.Callback;
 import io.finarkein.fiul.notification.callback.CallbackRegistry;
 import io.finarkein.fiul.notification.callback.model.FICallback;
+import io.finarkein.fiul.validation.FIRequestValidator;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
+import org.bouncycastle.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -50,61 +53,79 @@ public class DataFlowServiceImpl implements DataFlowService {
     protected final FIRequestStore fiRequestStore;
     protected final AAFIDataStore aafiDataStore;
     protected final FIFetchMetadataStore fiFetchMetadataStore;
-    protected final ConsentService consentService;
     protected final CallbackRegistry callbackRegistry;
+    protected final ConsentServiceClient consentServiceClient;
 
     @Autowired
     protected DataFlowServiceImpl(AAFIUClient fiuClient, FIRequestStore fiRequestStore,
-                        FIFetchMetadataStore fiFetchMetadataStore,
-                        ConsentService consentService,
-                        AAFIDataStore aafiDataStore,
-                        CallbackRegistry callbackRegistry) {
+                                  FIFetchMetadataStore fiFetchMetadataStore,
+                                  AAFIDataStore aafiDataStore,
+                                  CallbackRegistry callbackRegistry,
+                                  ConsentServiceClient consentServiceClient) {
         this.fiuClient = fiuClient;
         this.fiRequestStore = fiRequestStore;
         this.fiFetchMetadataStore = fiFetchMetadataStore;
-        this.consentService = consentService;
         this.aafiDataStore = aafiDataStore;
         this.callbackRegistry = callbackRegistry;
+        this.consentServiceClient = consentServiceClient;
     }
 
     @Override
     public Mono<FIRequestResponse> createFIRequest(FIUFIRequest fiRequest, String aaName) {
-        return Optional.ofNullable(aaName)
-                .or(() -> consentService
-                        .getConsentRequestByConsentId(fiRequest.getConsent().getId())
-                        .map(ConsentRequestDTO::getAaName))
-                .map(aaId -> doCreateFIRequest(fiRequest, aaId))
-                .orElseThrow(() -> Errors
-                        .InvalidRequest
-                        .with(fiRequest.getTxnid(), "Cannot find aaName to create FIRequest, please try with aaName"))
+        validateFIUFIParam(fiRequest);
+
+        ConsentStateDTO consentState = null;
+        if (aaName == null) {
+            consentState = consentServiceClient.getConsentStateByConsentId(fiRequest.getConsent().getId());
+            if (consentState != null)
+                aaName = consentState.getAaId();
+        }
+        if (aaName != null) {
+            return doCreateFIRequest(fiRequest, aaName, consentState);
+        }
+
+        return Mono.error(() ->
+                Errors.InvalidRequest.with(fiRequest.getTxnid(),
+                        "Cannot find aaHandle to create FIRequest, please try with aaHandle"))
                 ;
     }
 
-    protected Mono<FIRequestResponse> doCreateFIRequest(FIUFIRequest fiRequest, String aaName) {
+    private void validateFIUFIParam(FIUFIRequest fiRequest) {
+        final String txnId = FIRequestValidator.validateTxnId(fiRequest);
+        FIRequestValidator.validateConsentId(fiRequest, txnId);
+    }
+
+    protected Mono<FIRequestResponse> doCreateFIRequest(FIUFIRequest fiRequest, String aaName, final ConsentStateDTO retrievedConsentState) {
         log.debug("SubmitFIRequest: start: request:{}", fiRequest);
         final var fiRequestStartTime = Timestamp.from(Instant.now());
 
-        return fiuClient.createFIRequest(fiRequest, aaName)
-                .doOnSuccess(response -> {
-                    final var fiFetchMetadata = FIFetchMetadata.builder()
-                            .txnId(fiRequest.getTxnid())
-                            .aaName(aaName)
-                            .consentId(response.getConsentId())
-                            .sessionId(response.getSessionId())
-                            .fiDataRangeFrom(strToTimeStamp.apply(fiRequest.getFIDataRange().getFrom()))
-                            .fiDataRangeTo(strToTimeStamp.apply(fiRequest.getFIDataRange().getTo()))
-                            .fiRequestSubmittedOn(fiRequestStartTime)
-                            .build();
-                    fiRequestStore.saveFIRequestAndFetchMetadata(fiFetchMetadata, fiRequest);
-                    log.debug("SubmitFIRequest: success: response:{}", response);
-//                    consentService.updateConsentStateDataSession(response.getTxnid(), response.getSessionId(), true);
-                })
-                .doOnSuccess(saveRegisterCallback(fiRequest.getCallback()))
-                .doOnError(SystemException.class, error -> {
-                    fiRequestStore.updateFIRequestStateOnError(fiRequest, aaName, error.getParamValue("dataSessionId"));
-//                    consentService.updateConsentStateDataSession(error.txnId(), null, false);
-                    log.error("SubmitFIRequest: error: {}", error.getMessage(), error);
-                });
+        return consentServiceClient.setSignatureIfNotSet(fiRequest)
+                .flatMap(fiufiRequest -> fiuClient.createFIRequest(fiufiRequest, aaName)
+                        .doOnSuccess(response -> {
+                            final var builder = FIFetchMetadata.builder()
+                                    .txnId(fiufiRequest.getTxnid())
+                                    .aaName(aaName)
+                                    .consentId(response.getConsentId())
+                                    .sessionId(response.getSessionId())
+                                    .fiDataRangeFrom(strToTimeStamp.apply(fiufiRequest.getFIDataRange().getFrom()))
+                                    .fiDataRangeTo(strToTimeStamp.apply(fiufiRequest.getFIDataRange().getTo()))
+                                    .fiRequestSubmittedOn(fiRequestStartTime);
+
+                            ConsentStateDTO consentState = retrievedConsentState;
+                            if (consentState == null)
+                                consentState = consentServiceClient.getConsentStateByConsentId(response.getConsentId());
+                            if (consentState != null)
+                                builder.consentHandleId(consentState.getConsentHandle());
+
+                            fiRequestStore.saveFIRequestAndFetchMetadata(builder.build(), fiufiRequest);
+                            log.debug("SubmitFIRequest: success: response:{}", response);
+                        })
+                        .doOnSuccess(saveRegisterCallback(fiufiRequest.getCallback()))
+                        .doOnError(SystemException.class, error -> {
+                            fiRequestStore.updateFIRequestStateOnError(fiufiRequest, aaName, fiRequestStartTime, error.getParamValue("dataSessionId"));
+                            log.error("SubmitFIRequest: error: {}", error.getMessage(), error);
+                        }))
+                ;
     }
 
     protected Consumer<FIRequestResponse> saveRegisterCallback(Callback fiCallback) {
@@ -148,8 +169,8 @@ public class DataFlowServiceImpl implements DataFlowService {
             var metadataBuilder = FIFetchMetadata.builder()
                     .sessionId(sessionId)
                     .fiFetchSubmittedOn(fiFetchStartTime);
-            var commaSeparatedLinkRefNumbers = (linkRefNumbers != null && linkRefNumbers.length > 0) ?
-                    String.join(",", linkRefNumbers) : null;
+            var commaSeparatedLinkRefNumbers = Arrays.isNullOrEmpty(linkRefNumbers) ?
+                    null : String.join(",", linkRefNumbers);
 
             if (fipId != null && commaSeparatedLinkRefNumbers != null)
                 metadataBuilder.fipId(fipId).linkRefNumbers(commaSeparatedLinkRefNumbers);
@@ -164,7 +185,7 @@ public class DataFlowServiceImpl implements DataFlowService {
         return fiFetchResponse -> {
             final var fiRequest = fiRequestStore.getFIRequestByAANameAndSessionId(sessionId, aaName);
             final var consentId = fiRequest.map(FIRequestDTO::getConsentId).orElse(null);
-            final var consentDetailMono = consentService.getSignedConsentDetail(consentId, aaName);
+            final Mono<SignedConsent> consentDetailMono = consentServiceClient.getSignedConsentDetail(consentId, aaName);
             consentDetailMono.subscribe(consentDetail -> {
                 if (consentId == null || ConsentMode.get(consentDetail.getConsentMode()) != STORE)
                     return;
@@ -201,7 +222,7 @@ public class DataFlowServiceImpl implements DataFlowService {
 
     @Override
     public Mono<FIDataDeleteResponse> deleteDataForSession(String dataSessionId) {
-        FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(dataSessionId, null, null, false);
         log.debug("Deleting data for sessionId:{}", dataSessionId);
 
         fiFetchMetadataStore.deleteBySessionId(dataSessionId);
@@ -219,7 +240,7 @@ public class DataFlowServiceImpl implements DataFlowService {
     @Override
     public Mono<FIDataDeleteResponse> deleteDataByConsentId(String consentId) {
         log.debug("Deleting data for consentId:{}", consentId);
-        FIDataDeleteResponse response = new FIDataDeleteResponse(null, consentId, false);
+        FIDataDeleteResponse response = new FIDataDeleteResponse(null, null, consentId, false);
 
         fiFetchMetadataStore.deleteByConsentId(consentId);
 

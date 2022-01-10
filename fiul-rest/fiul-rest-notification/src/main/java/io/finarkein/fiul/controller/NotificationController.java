@@ -17,7 +17,7 @@ import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.api.aa.notification.NotificationResponse;
 import io.finarkein.fiul.config.model.AaApiKeyBody;
-import io.finarkein.fiul.consent.model.ConsentState;
+import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.dataflow.DataFlowService;
 import io.finarkein.fiul.dataflow.dto.FIRequestState;
@@ -25,7 +25,7 @@ import io.finarkein.fiul.notification.NotificationPublisher;
 import io.finarkein.fiul.validator.NotificationValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +39,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/")
 @Log4j2
+@RefreshScope
 public class NotificationController {
 
     private final NotificationPublisher publisher;
@@ -52,9 +53,6 @@ public class NotificationController {
     private final Base64.Decoder decoder = Base64.getDecoder();
 
     private final ObjectMapper objectMapper;
-
-    @Value("${test.scenario:false}")
-    private boolean testScenario;
 
 
     @Autowired
@@ -72,6 +70,7 @@ public class NotificationController {
                                                                           @RequestHeader("x-jws-signature") String jwsSignature,
                                                                           @RequestHeader("aa_api_key") String aaApiKey) {
         log.debug("ConsentNotification received:{}", consentNotification);
+
         validateJWS(consentNotification.getTxnid(), jwsSignature);
 
         String[] chunks = aaApiKey.split("\\.");
@@ -86,14 +85,14 @@ public class NotificationController {
 
         ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getTxnid(), "TxnId");
 
-        ConsentState consentState = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
-        if (consentState == null)
-            consentState = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
+        ConsentStateDTO consentStateDTO = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
+        if (consentStateDTO == null)
+            consentStateDTO = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
 
-        if (consentState != null) {
+        if (consentStateDTO != null) {
             try {
-                NotificationValidator.validateConsentNotification(consentNotification, consentState,
-                        registryService.getEntityInfoByAAName(consentState.getAaId()), testScenario, aaApiKeyBody);
+                NotificationValidator.validateConsentNotification(consentNotification, consentStateDTO,
+                        registryService.getEntityInfoByAAName(consentStateDTO.getAaId()), aaApiKeyBody);
 
                 publisher.publishConsentNotification(consentNotification);
                 log.debug("NotificationPublisher.publish(consentNotification) done");
@@ -135,7 +134,7 @@ public class NotificationController {
             try {
                 NotificationValidator.validateFINotification(fiNotification, optionalFIRequestState.get(),
                         registryService.getEntityInfoByAAName(optionalFIRequestState.get().getAaId()),
-                        testScenario, aaApiKeyBody);
+                        aaApiKeyBody);
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
