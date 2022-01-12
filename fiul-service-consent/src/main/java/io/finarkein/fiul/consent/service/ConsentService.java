@@ -35,7 +35,7 @@ public interface ConsentService {
 
     void handleConsentNotification(ConsentNotificationLog consentNotificationLog);
 
-    Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> customerAAId);
+    Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> aaHandle);
 
     ConsentStateDTO getConsentStateByConsentId(String consentId);
 
