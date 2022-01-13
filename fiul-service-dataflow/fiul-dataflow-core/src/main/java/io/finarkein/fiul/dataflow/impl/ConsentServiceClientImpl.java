@@ -18,6 +18,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
+
 @Service
 public class ConsentServiceClientImpl implements ConsentServiceClient {
 
@@ -55,7 +57,8 @@ public class ConsentServiceClientImpl implements ConsentServiceClient {
 
     @Override
     public Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> customerAAId) {
-        return consentService.getConsentState(consentHandle, customerAAId);
+        final Optional<String> aaHandle = customerAAId.map(aaNameExtractor);
+        return consentService.getConsentState(consentHandle, aaHandle);
     }
 
     @Override
