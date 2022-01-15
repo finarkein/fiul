@@ -44,10 +44,10 @@ public class ConsentRequestDTO {
     private String aaName;
     private String customerId;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp consentStartDate;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp consentEndDate;
 
     private ConsentMode consentMode;
@@ -65,17 +65,17 @@ public class ConsentRequestDTO {
     @Basic(fetch = javax.persistence.FetchType.LAZY)
     private List<DataFilter> dataFilterJson;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp fiDateRangeFrom;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp fiDateRangeTo;
 
     private FetchType fetchType;
     private String frequencyUnit;
     private int frequencyValue;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp createdOn;
 
     @PrePersist

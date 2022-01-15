@@ -56,10 +56,10 @@ public class AAFIDatum {
     @Convert(converter = ZippedBlobAttrConverter.OfKeyMaterial.class)
     private KeyMaterial keyMaterial;
 
-    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)
     private Timestamp dataLifeExpireOn;
 
-    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)
     private Timestamp createdOn;
 
     @PrePersist
