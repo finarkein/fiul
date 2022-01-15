@@ -40,7 +40,10 @@ public class ConsentRequestDTO {
     private String consentId;
     private String txnId;
     private String version;
+
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp timestamp;
+    
     private String aaName;
     private String customerId;
 
