@@ -42,10 +42,10 @@ public class ConsentStateDTO {
     private String notifierId;
 
     @LastModifiedDate
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp updatedOn;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp postConsentResponseTimestamp;
 
     @PrePersist

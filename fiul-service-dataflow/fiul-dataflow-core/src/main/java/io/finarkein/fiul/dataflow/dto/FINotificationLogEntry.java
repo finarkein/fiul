@@ -33,7 +33,7 @@ public class FINotificationLogEntry {
     protected long id;
 
     protected String version;
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp notificationTimestamp;
 
     protected String txnId;
@@ -46,7 +46,7 @@ public class FINotificationLogEntry {
     @Convert(converter = Converter.OfFIStatusResponseList.class)
     protected List<FIStatusResponse> fiStatusNotification;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp createdOn;
 
     @PrePersist
