@@ -33,11 +33,11 @@ public class ConsentTemplate {
     @Convert(converter = ConsentJsonAttrConverter.OfTypeConsentTemplateDefinition.class)
     private ConsentTemplateDefinition consentTemplateDefinition;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp createdOn;
 
     @LastModifiedDate
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private Timestamp updatedOn;
 
     @PrePersist
