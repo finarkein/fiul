@@ -9,6 +9,7 @@ package io.finarkein.fiul.config;
 import io.finarkein.api.aa.jws.JWSSigner;
 import io.finarkein.fiul.filter.NotificationJwsWebFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.util.pattern.PathPattern;
@@ -43,6 +44,7 @@ public class NotificationConfig {
      * @return instance configured to sign body
      */
     @Bean // Attach a web filter for server response header: x-jws-signature
+    @ConditionalOnProperty(name = "fiul.notification.jws-filter-qualifier", havingValue = "fiul", matchIfMissing = true)
     public NotificationJwsWebFilter jwsFilter(JWSSigner signer, @Qualifier(NOTIFICATION_API_PATTERNS) List<PathPattern> pathPatterns) {
         return new NotificationJwsWebFilter(signer, pathPatterns);
     }
