@@ -42,8 +42,8 @@ public class PostResponseSchedulerConfig {
                     .map(Integer::parseInt)
                     .orElse(100000);
             scheduler = Schedulers.newBoundedElastic(threadCap, queueSize, responseProcessor);
-            log.info("PostResponseSchedulerConfig = schedulerType:{}, threadCap:{}, queueSize:{}", schedulerType
-                    , threadCap, queueSize);
+            log.info("PostResponseSchedulerConfig = name:{}, schedulerType:{}, threadCap:{}, queueSize:{}",
+                    responseProcessor, schedulerType, threadCap, queueSize);
         } else {
             scheduler = Schedulers.immediate();
         }
