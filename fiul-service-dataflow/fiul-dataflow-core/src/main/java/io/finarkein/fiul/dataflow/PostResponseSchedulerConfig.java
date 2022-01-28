@@ -29,8 +29,8 @@ public class PostResponseSchedulerConfig {
 
     static final String BOUNDED_ELASTIC = "boundedElastic";
 
-    public PostResponseSchedulerConfig(@Value("${fiul.post-response.scheduler-type:immediate}") String schedulerType,
-                                       @Value("${fiul.post-response.scheduler-name:response-processor}") String responseProcessor) {
+    public PostResponseSchedulerConfig(@Value("${fiul.response-processor.scheduler-type:immediate}") String schedulerType,
+                                       @Value("${fiul.response-processor.scheduler-name:response-processor}") String responseProcessor) {
         this.schedulerType = schedulerType;
         if (BOUNDED_ELASTIC.equalsIgnoreCase(schedulerType)) {
             final int threadCap = Optional
