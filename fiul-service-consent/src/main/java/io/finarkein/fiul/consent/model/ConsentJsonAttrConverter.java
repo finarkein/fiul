@@ -6,14 +6,27 @@
  */
 package io.finarkein.fiul.consent.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.fiul.common.JSONAttrConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Converter;
 
 public class ConsentJsonAttrConverter extends JSONAttrConverter {
 
+    @Autowired
+    protected ConsentJsonAttrConverter(ObjectMapper mapper) {
+        super(mapper);
+    }
+
     @Converter
     public static final class OfTypeConsentTemplateDefinition extends JSONAttrConverter<ConsentTemplateDefinition> {
+
+        @Autowired
+        protected OfTypeConsentTemplateDefinition(ObjectMapper mapper) {
+            super(mapper);
+        }
+
         @Override
         public Class<ConsentTemplateDefinition> type() {
             return ConsentTemplateDefinition.class;
