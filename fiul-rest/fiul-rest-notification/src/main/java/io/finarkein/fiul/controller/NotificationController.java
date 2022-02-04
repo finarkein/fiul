@@ -129,19 +129,19 @@ public class NotificationController {
                 NotificationValidator.validateFINotification(fiNotification, optionalFIRequestState.get(),
                         registryService.getEntityInfoByAAName(optionalFIRequestState.get().getAaId()),
                         aaApiKeyBody);
+                publisher.publishFINotification(fiNotification);
+                log.debug("FINotification.publish(fiNotification) done");
+                return ResponseEntity.ok(Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()))));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
                 return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+            } catch (Exception e) {
+                log.error("Error while publishing fiNotification for handling:{}", e.getMessage(), e);
+                throw new IllegalStateException(e);
             }
         }
-        try {
-            publisher.publishFINotification(fiNotification);
-            log.debug("FINotification.publish(fiNotification) done");
-        } catch (Exception e) {
-            log.error("Error while publishing fiNotification for handling:{}", e.getMessage(), e);
-            throw new IllegalStateException(e);
-        }
-        return ResponseEntity.ok(Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()))));
+        return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(),
+                Timestamp.from(Instant.now()), "Invalid Request")));
     }
 }
