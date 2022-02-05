@@ -53,13 +53,13 @@ public class FIFetchMetadata {
     @Column(columnDefinition = "boolean default false")
     protected boolean easyDataFlow;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiDataRangeFrom;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiDataRangeTo;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiRequestSubmittedOn;
 
     @Column(length = 36)
@@ -68,13 +68,13 @@ public class FIFetchMetadata {
     @Column(length = 36)
     protected String linkRefNumbers;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiFetchSubmittedOn;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiFetchCompletedOn;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp updatedOn;
 
     @PrePersist

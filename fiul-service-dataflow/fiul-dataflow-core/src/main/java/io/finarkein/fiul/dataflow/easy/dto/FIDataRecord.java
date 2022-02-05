@@ -54,10 +54,10 @@ public final class FIDataRecord {
     @Column(columnDefinition="BYTEA", nullable = false, updatable = false)
     private byte[] fiData;
 
-    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)
     private Timestamp dataLifeExpireOn;
 
-    @Column(columnDefinition = "TIMESTAMP(6)", nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)
     private Timestamp createdOn;
 
     @PrePersist
