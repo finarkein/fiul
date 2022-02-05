@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.aa.registry.RegistryService;
 import io.finarkein.aa.validators.ArgsValidator;
-import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.FINotification;
@@ -67,11 +66,8 @@ public class NotificationController {
 
     @PostMapping("/Consent/Notification")
     public ResponseEntity<Mono<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification,
-                                                                          @RequestHeader("x-jws-signature") String jwsSignature,
                                                                           @RequestHeader("aa_api_key") String aaApiKey) {
         log.debug("ConsentNotification received:{}", consentNotification);
-
-        validateJWS(consentNotification.getTxnid(), jwsSignature);
 
         String[] chunks = aaApiKey.split("\\.");
 
@@ -114,10 +110,8 @@ public class NotificationController {
 
     @PostMapping("/FI/Notification")
     public ResponseEntity<Mono<NotificationResponse>> fiNotification(@RequestBody FINotification fiNotification,
-                                                                     @RequestHeader("x-jws-signature") String jwsSignature,
                                                                      @RequestHeader("aa_api_key") String aaApiKey) {
         log.debug("FINotification received:{}", fiNotification);
-        validateJWS(fiNotification.getTxnid(), jwsSignature);
         String[] chunks = aaApiKey.split("\\.");
         String payload = new String(decoder.decode(chunks[1]));
         AaApiKeyBody aaApiKeyBody = null;
@@ -135,26 +129,19 @@ public class NotificationController {
                 NotificationValidator.validateFINotification(fiNotification, optionalFIRequestState.get(),
                         registryService.getEntityInfoByAAName(optionalFIRequestState.get().getAaId()),
                         aaApiKeyBody);
+                publisher.publishFINotification(fiNotification);
+                log.debug("FINotification.publish(fiNotification) done");
+                return ResponseEntity.ok(Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()))));
             } catch (SystemException e) {
                 if (e.errorCode().httpStatusCode() == 404)
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
                 return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+            } catch (Exception e) {
+                log.error("Error while publishing fiNotification for handling:{}", e.getMessage(), e);
+                throw new IllegalStateException(e);
             }
         }
-        try {
-            publisher.publishFINotification(fiNotification);
-            log.debug("FINotification.publish(fiNotification) done");
-        } catch (Exception e) {
-            log.error("Error while publishing fiNotification for handling:{}", e.getMessage(), e);
-            throw new IllegalStateException(e);
-        }
-        return ResponseEntity.ok(Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()))));
-    }
-
-    private static void validateJWS(String txnId, String jwsSignature) {
-        if (jwsSignature == null)
-            throw Errors.InvalidRequest.with(txnId, "Null JWS Signature");
-        if (jwsSignature.split("\\.").length != 3)
-            throw Errors.InvalidRequest.with(txnId, "Invalid JWS Signature");
+        return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(),
+                Timestamp.from(Instant.now()), "Invalid Request")));
     }
 }

@@ -44,17 +44,17 @@ public class FIRequestState {
     protected String txnId;
     protected String aaId;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiRequestSubmittedOn;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp notificationTimestamp;
 
     @Column(columnDefinition = "text")
     @Convert(converter = Converter.OfFIStatusResponseDTOSet.class)
     protected Set<FIStatusResponseDTO> fiStatusResponse;
 
-    @Column(columnDefinition = "TIMESTAMP(6)")
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp updatedOn;
 
     @PrePersist
