@@ -86,6 +86,11 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     @Override
+    public Mono<Page<ConsentTemplate>> getAllConsentTemplates(Pageable pageable) {
+        return Mono.just(consentTemplateRepository.findAll(pageable));
+    }
+
+    @Override
     public Mono<ConsentTemplateDeleteResponse> deleteConsentTemplate(String id) {
         consentTemplateRepository.deleteById(id);
         return Mono.just(new ConsentTemplateDeleteResponse(id, true));
@@ -119,7 +124,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
                 .txnId(consentRequestInput.getTxnId())
                 .timestamp(currentTimestampSupplier.get())
                 .consentDetail(consentDetail)
-                .callback(consentRequestInput.getCallback() != null? consentRequestInput.getCallback() : consentTemplateDefinition.getCallback())
+                .callback(consentRequestInput.getCallback() != null ? consentRequestInput.getCallback() : consentTemplateDefinition.getCallback())
                 .build());
     }
 
