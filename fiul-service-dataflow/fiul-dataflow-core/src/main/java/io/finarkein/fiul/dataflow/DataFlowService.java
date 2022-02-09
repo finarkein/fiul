@@ -30,4 +30,6 @@ public interface DataFlowService {
     Mono<Boolean> deleteByDataLifeExpireOnBefore(Timestamp triggerTimestamp);
 
     Optional<FIRequestState> getFIRequestStateByTxnId(String txnId);
+
+    Optional<FIRequestState> getFIRequestStateBySessionId(String sessionId);
 }
