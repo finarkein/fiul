@@ -32,4 +32,6 @@ public interface FIRequestStore {
     Optional<FIRequestState> getFIRequestState(String consentHandleId, String sessionId);
 
     Optional<FIRequestState> getFIRequestStateByTxnId(String txnId);
+
+    Optional<FIRequestState> getFIRequestStateBySessionId(String sessionId);
 }

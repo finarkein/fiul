@@ -268,6 +268,11 @@ public class DataFlowServiceImpl implements DataFlowService {
         return fiRequestStore.getFIRequestStateByTxnId(txnId);
     }
 
+    @Override
+    public Optional<FIRequestState> getFIRequestStateBySessionId(String sessionId) {
+        return fiRequestStore.getFIRequestStateBySessionId(sessionId);
+    }
+
     @Data
     @Accessors(fluent = true)
     protected static class FIFetchInput {
