@@ -43,7 +43,7 @@ public class DefaultFINotificationProcessor implements FINotificationProcessor {
     protected final ObjectMapper objectMapper;
 
     @Autowired
-    DefaultFINotificationProcessor(NotificationPublisher publisher,
+    protected DefaultFINotificationProcessor(NotificationPublisher publisher,
                                    final DataFlowService dataFlowService,
                                    RegistryService registryService,
                                    ObjectMapper objectMapper) {
