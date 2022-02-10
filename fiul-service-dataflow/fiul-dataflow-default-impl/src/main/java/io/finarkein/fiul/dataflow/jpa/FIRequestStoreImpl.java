@@ -155,4 +155,9 @@ public class FIRequestStoreImpl implements FIRequestStore {
     public Optional<FIRequestState> getFIRequestStateByTxnId(String txnId) {
         return repoFIRequestState.findByTxnId(txnId);
     }
+
+    @Override
+    public Optional<FIRequestState> getFIRequestStateBySessionId(String sessionId) {
+        return repoFIRequestState.findBySessionId(sessionId);
+    }
 }
