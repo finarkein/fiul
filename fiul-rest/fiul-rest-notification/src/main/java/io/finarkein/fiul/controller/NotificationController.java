@@ -18,8 +18,6 @@ import io.finarkein.api.aa.notification.NotificationResponse;
 import io.finarkein.fiul.config.model.AaApiKeyBody;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.consent.service.ConsentService;
-import io.finarkein.fiul.dataflow.DataFlowService;
-import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import io.finarkein.fiul.notification.NotificationPublisher;
 import io.finarkein.fiul.validator.NotificationValidator;
 import lombok.extern.log4j.Log4j2;
@@ -32,8 +30,9 @@ import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Optional;
+import java.util.*;
+
+import static io.finarkein.fiul.controller.DefaultFINotificationProcessor.DEFAULT_PROCESSOR_NAME;
 
 @RestController
 @RequestMapping("/")
@@ -45,23 +44,31 @@ public class NotificationController {
 
     private final ConsentService consentService;
 
-    private final DataFlowService dataFlowService;
-
     private final RegistryService registryService;
 
     private final Base64.Decoder decoder = Base64.getDecoder();
 
     private final ObjectMapper objectMapper;
 
+    private final Map<String, FINotificationProcessor> applicableProcessors;
 
     @Autowired
     public NotificationController(NotificationPublisher publisher, ConsentService consentService,
-                                  RegistryService registryService, DataFlowService dataFlowService) {
+                                  RegistryService registryService,
+                                  List<FINotificationProcessor> fiNotificationProcessors,
+                                  ObjectMapper mapper) {
         this.publisher = publisher;
         this.consentService = consentService;
         this.registryService = registryService;
-        this.dataFlowService = dataFlowService;
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = mapper;
+
+        Map<String, FINotificationProcessor> processorMap = new HashMap<>();
+        for (FINotificationProcessor processor : fiNotificationProcessors) {
+            processor.applicableEntities()
+                    .forEach(entity -> processorMap.put(entity, processor));
+        }
+        applicableProcessors = Collections.unmodifiableMap(processorMap);
+        log.debug("applicableProcessorsMap: {}",applicableProcessors);
     }
 
     @PostMapping("/Consent/Notification")
@@ -111,37 +118,18 @@ public class NotificationController {
     @PostMapping("/FI/Notification")
     public ResponseEntity<Mono<NotificationResponse>> fiNotification(@RequestBody FINotification fiNotification,
                                                                      @RequestHeader("aa_api_key") String aaApiKey) {
-        log.debug("FINotification received:{}", fiNotification);
-        String[] chunks = aaApiKey.split("\\.");
-        String payload = new String(decoder.decode(chunks[1]));
-        AaApiKeyBody aaApiKeyBody = null;
-        try {
-            aaApiKeyBody = objectMapper.readValue(payload, AaApiKeyBody.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(),
-                    Timestamp.from(Instant.now()), e.getMessage())));
-        }
-        ArgsValidator.isValidUUID(fiNotification.getTxnid(), fiNotification.getTxnid(), "TxnId");
+        String processorName = DEFAULT_PROCESSOR_NAME;
 
-        Optional<FIRequestState> optionalFIRequestState = dataFlowService.getFIRequestStateByTxnId(fiNotification.getTxnid());
-        if (optionalFIRequestState.isPresent()) {
-            try {
-                NotificationValidator.validateFINotification(fiNotification, optionalFIRequestState.get(),
-                        registryService.getEntityInfoByAAName(optionalFIRequestState.get().getAaId()),
-                        aaApiKeyBody);
-            } catch (SystemException e) {
-                if (e.errorCode().httpStatusCode() == 404)
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
-                return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
-            }
+        if (fiNotification.getNotifier() != null && fiNotification.getNotifier().getId() != null)
+            processorName = fiNotification.getNotifier().getId();
+
+        FINotificationProcessor processor = applicableProcessors.get(processorName);
+        if(processor == null) {
+            processorName = DEFAULT_PROCESSOR_NAME;
+            processor = applicableProcessors.get(processorName);
         }
-        try {
-            publisher.publishFINotification(fiNotification);
-            log.debug("FINotification.publish(fiNotification) done");
-        } catch (Exception e) {
-            log.error("Error while publishing fiNotification for handling:{}", e.getMessage(), e);
-            throw new IllegalStateException(e);
-        }
-        return ResponseEntity.ok(Mono.just(NotificationResponse.okResponse(fiNotification.getTxnid(), Timestamp.from(Instant.now()))));
+
+        log.debug("FINotification processorName:{}, className:{}", processorName, processor.getClass().getName());
+        return processor.process(fiNotification, aaApiKey);
     }
 }

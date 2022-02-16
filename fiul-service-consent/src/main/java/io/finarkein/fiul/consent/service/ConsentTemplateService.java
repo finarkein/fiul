@@ -23,6 +23,8 @@ public interface ConsentTemplateService {
 
     Optional<ConsentTemplate> getConsentTemplate(String id);
 
+    Mono<Page<ConsentTemplate>> getAllConsentTemplates(Pageable pageable);
+
     Mono<ConsentTemplateDeleteResponse> deleteConsentTemplate(String id);
 
     Mono<ConsentResponse> createConsentRequestUsingTemplate(ConsentRequestInput consentRequestInput);
