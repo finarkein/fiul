@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,6 +34,7 @@ import java.time.Instant;
                 @Index(name = "FIFetchMD_Idx7", columnList = "consentHandleId"),
                 @Index(name = "FIFetchMD_Idx8", columnList = "fiFetchCompletedOn, consentHandleId, fiDataRangeFrom, fiDataRangeTo, easyDataFlow"),
         })
+@Cache(region = "fiFetchMetadataCache", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class FIFetchMetadata {
 
     @Id

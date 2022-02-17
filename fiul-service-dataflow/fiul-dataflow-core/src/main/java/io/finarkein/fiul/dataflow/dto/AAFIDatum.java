@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -28,6 +30,7 @@ import java.time.Instant;
         indexes = {
                 @Index(name = "AAFIDatum_Idx1", columnList = "dataLifeExpireOn")
         })
+@Cache(region = "aaFiDataCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AAFIDatum {
     @Id
     @Column(length = 36)

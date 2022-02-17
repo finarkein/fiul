@@ -11,7 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.Cache;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -29,6 +31,7 @@ import java.time.Instant;
                 @Index(name = "cs_consentStatus_idx", columnList = "consentStatus"),
                 @Index(name = "cs_txnId_idx", columnList = "txnId")
         })
+@Cache(region = "consentStateDtoCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ConsentStateDTO {
 
     @Id

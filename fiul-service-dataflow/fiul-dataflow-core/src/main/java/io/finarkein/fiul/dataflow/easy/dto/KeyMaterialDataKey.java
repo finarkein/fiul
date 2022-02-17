@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,6 +23,7 @@ import java.io.Serializable;
 @Builder(builderClassName = "Builder")
 @IdClass(KeyMaterialDataKey.Key.class)
 @Table(name = "FI_KM_DATA_KEY")
+@Cache(region = "keyMaterialDataKeyCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class KeyMaterialDataKey {
 
     @Id

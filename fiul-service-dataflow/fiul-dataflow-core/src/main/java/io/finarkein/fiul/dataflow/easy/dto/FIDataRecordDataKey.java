@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -28,6 +30,7 @@ import java.time.Instant;
                 @Index(name = "FIDataRecordDK_Idx2", columnList = "consentHandleId")
         })
 @EntityListeners(FIDataKeyEntityListener.class)
+@Cache(region = "fiDataRecordDataKeyCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public final class FIDataRecordDataKey {
     @Id
     @Column(length = 36)

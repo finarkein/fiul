@@ -8,6 +8,8 @@ package io.finarkein.fiul.consent.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -18,6 +20,7 @@ import java.time.Instant;
 @Data
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Cache(region = "consentTemplateCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ConsentTemplate {
 
     @Id

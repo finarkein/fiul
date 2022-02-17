@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -30,6 +32,7 @@ import java.time.Instant;
                 @Index(name = "FIReq_Idx1", columnList = "sessionId, aaName"),
                 @Index(name = "FIReq_Idx2", columnList = "sessionId, consentHandleId")
         })
+@Cache(region = "fiRequestDtoCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FIRequestDTO {
     @Id
     @Column(length = 36)

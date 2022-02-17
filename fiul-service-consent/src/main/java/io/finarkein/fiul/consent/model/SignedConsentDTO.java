@@ -10,6 +10,8 @@ import io.finarkein.fiul.common.ZippedBlobAttrConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -19,6 +21,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "signed_consent")
+@Cache(region = "signedConsentDtoCache", usage = CacheConcurrencyStrategy.READ_WRITE)
 public class SignedConsentDTO {
     @Id
     protected String consentId;
