@@ -206,7 +206,10 @@ class AAClientService implements AAFIUClient {
         return Mono.just(fiFetchResponseDecoder.decode(response, crypto, keyPair));
     }
 
-    @Scheduled(initialDelay = 600000, fixedDelayString = "${aa-client.key-material-refresh-frequency-in-sec:600000}")
+    /**
+     * default refresh in every 10 minutes
+     */
+    @Scheduled(initialDelay = 600000, fixedDelayString = "${aa-client.key-material-refresh-frequency-in-millis:600000}")
     public void refreshRegistry() {
         cachedK = crypto.generateKey();
         log.info("refreshKM: done");
