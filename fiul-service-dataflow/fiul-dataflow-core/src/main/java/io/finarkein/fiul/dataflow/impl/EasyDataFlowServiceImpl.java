@@ -15,6 +15,7 @@ import io.finarkein.api.aa.dataflow.FIRequest;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.fiul.AAFIUClient;
+import io.finarkein.fiul.config.AAResponseHandlerConfig;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.converter.xml.XMLConverterFunctions;
 import io.finarkein.fiul.dataflow.*;
@@ -69,7 +70,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                                       EasyFIDataStore easyFIDataStore,
                                       CallbackRegistry callbackRegistry,
                                       ConsentServiceClient consentServiceClient,
-                                      PostResponseSchedulerConfig schedulerConfig) {
+                                      AAResponseHandlerConfig schedulerConfig) {
         this.fiuClient = fiuClient;
         this.fiRequestStore = fiRequestStore;
         this.fiFetchMetadataStore = fiFetchMetadataStore;

@@ -4,7 +4,7 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.dataflow;
+package io.finarkein.fiul.config;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @Configuration
 @Getter
 @Log4j2
-public class PostResponseSchedulerConfig {
+public class AAResponseHandlerConfig {
 
     @ToString.Include
     private final String schedulerType;
@@ -28,24 +28,28 @@ public class PostResponseSchedulerConfig {
     private final Scheduler scheduler;
 
     static final String BOUNDED_ELASTIC = "boundedElastic";
+    static final String PROPERTY_PREFIX = "fiul.aa-response-handler";
 
-    public PostResponseSchedulerConfig(@Value("${fiul.response-processor.scheduler-type:immediate}") String schedulerType,
-                                       @Value("${fiul.response-processor.scheduler-name:response-processor}") String responseProcessor) {
+    public AAResponseHandlerConfig(@Value("${" + PROPERTY_PREFIX + ".scheduler-type:immediate}")
+                                               String schedulerType,
+                                   @Value("${" + PROPERTY_PREFIX + ".scheduler-name:aa-response-handler}")
+                                               String responseProcessor) {
         this.schedulerType = schedulerType;
         if (BOUNDED_ELASTIC.equalsIgnoreCase(schedulerType)) {
             final int threadCap = Optional
-                    .ofNullable(System.getProperty("fiul.post-response.scheduler.size"))
+                    .ofNullable(System.getProperty(PROPERTY_PREFIX + ".boundedElastic.threadCap"))
                     .map(Integer::parseInt)
                     .orElseGet(() -> 10 * Runtime.getRuntime().availableProcessors());
             final int queueSize = Optional
-                    .ofNullable(System.getProperty("fiul.post-response.scheduler.queue-size"))
+                    .ofNullable(System.getProperty(PROPERTY_PREFIX + ".boundedElastic.queue-size"))
                     .map(Integer::parseInt)
                     .orElse(100000);
             scheduler = Schedulers.newBoundedElastic(threadCap, queueSize, responseProcessor);
-            log.info("PostResponseSchedulerConfig = name:{}, schedulerType:{}, threadCap:{}, queueSize:{}",
+            log.info("AAResponseHandlerSchedulerConfig = name:{}, schedulerType:{}, threadCap:{}, queueSize:{}",
                     responseProcessor, schedulerType, threadCap, queueSize);
         } else {
             scheduler = Schedulers.immediate();
+            log.info("AAResponseHandlerSchedulerConfig: schedulerType:{}", schedulerType);
         }
     }
 }
