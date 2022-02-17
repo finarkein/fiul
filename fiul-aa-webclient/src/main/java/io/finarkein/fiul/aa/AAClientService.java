@@ -31,6 +31,7 @@ import io.finarkein.fiul.validation.ConsentValidatorImpl;
 import io.finarkein.fiul.validation.FIRequestValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -48,12 +49,14 @@ class AAClientService implements AAFIUClient {
     private final CryptoServiceAdapter crypto;
     private final ConsentValidator consentValidator = new ConsentValidatorImpl();
     private final FIRequestValidator fiRequestValidator = new FIRequestValidator();
+    protected SerializedKeyPair cachedK;
 
     @Autowired
     public AAClientService(FiulWebClientConfig config, AAClient aaClient, CryptoServiceConfig cryptoServiceConfig) {
         this.aaClient = aaClient;
         requestUpdater = new RequestUpdater(config.getRequestTimestampSetter(), config.getRequestTxnIdSetter());
         crypto = buildCryptoService(config.getCryptoServiceName(), cryptoServiceConfig);
+        cachedK = crypto.generateKey();
     }
 
     private CryptoServiceAdapter buildCryptoService(String serviceName, CryptoServiceConfig cryptoServiceConfig) {
@@ -178,6 +181,11 @@ class AAClientService implements AAFIUClient {
     }
 
     @Override
+    public SerializedKeyPair getOrCreateKeyMaterial() {
+        return cachedK;
+    }
+
+    @Override
     public Mono<String> generateJWS(String body) {
         try {
             log.debug("Generating jws-signature for:{}", body);
@@ -196,5 +204,11 @@ class AAClientService implements AAFIUClient {
             throw Errors.InternalError.with(response.getTxnid(), msg);
         }
         return Mono.just(fiFetchResponseDecoder.decode(response, crypto, keyPair));
+    }
+
+    @Scheduled(initialDelay = 600000, fixedDelayString = "${aa-client.key-material-refresh-frequency-in-sec:600000}")
+    public void refreshRegistry() {
+        cachedK = crypto.generateKey();
+        log.info("refreshKM: done");
     }
 }

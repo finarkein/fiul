@@ -12,6 +12,7 @@ import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.dataflow.ConsentServiceClient;
 import io.finarkein.fiul.dataflow.EasyDataFlowService;
+import io.finarkein.fiul.dataflow.PostResponseSchedulerConfig;
 import io.finarkein.fiul.dataflow.store.AAFIDataStore;
 import io.finarkein.fiul.dataflow.store.EasyFIDataStore;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
@@ -51,7 +52,7 @@ public class TestConfig {
         Mockito.when(fiuClient.generateKeyMaterial()).thenReturn(Mono.just(serializedKeyPair));
 
         return new EasyDataFlowServiceImpl(fiuClient, fiRequestStore, fiFetchMetadataStore, easyFIDataStore,
-                callbackRegistry, consentServiceClient);
+                callbackRegistry, consentServiceClient , new PostResponseSchedulerConfig("immediate", "immediate"));
     }
 
     @Bean
