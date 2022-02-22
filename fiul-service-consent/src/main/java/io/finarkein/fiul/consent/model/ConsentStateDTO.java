@@ -31,7 +31,7 @@ import java.time.Instant;
                 @Index(name = "cs_consentStatus_idx", columnList = "consentStatus"),
                 @Index(name = "cs_txnId_idx", columnList = "txnId")
         })
-@Cache(region = "consentStateDtoCache", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ConsentStateDTO {
 
     @Id

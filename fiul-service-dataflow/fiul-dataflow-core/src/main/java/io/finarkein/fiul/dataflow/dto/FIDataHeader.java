@@ -34,7 +34,7 @@ import java.time.Instant;
                 @Index(name = "FIDataHeader_Idx6", columnList = "consentHandleId")
         }
 )
-@Cache(region = "fiDataHeaderCache", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FIDataHeader {
     @Id
     @Column(length = 36)

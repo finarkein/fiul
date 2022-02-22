@@ -20,7 +20,7 @@ import java.time.Instant;
 @Data
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Cache(region = "consentTemplateCache", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ConsentTemplate {
 
     @Id

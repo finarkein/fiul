@@ -34,7 +34,7 @@ import java.time.Instant;
                 @Index(name = "FIFetchMD_Idx7", columnList = "consentHandleId"),
                 @Index(name = "FIFetchMD_Idx8", columnList = "fiFetchCompletedOn, consentHandleId, fiDataRangeFrom, fiDataRangeTo, easyDataFlow"),
         })
-@Cache(region = "fiFetchMetadataCache", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class FIFetchMetadata {
 
     @Id

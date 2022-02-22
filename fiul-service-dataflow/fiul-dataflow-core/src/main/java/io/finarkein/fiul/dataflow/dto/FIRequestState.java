@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
                 @Index(name = "FIReqState_Idx1", columnList = "sessionId, consentHandleId"),
                 @Index(name = "FIReqState_Idx2", columnList = "sessionStatus")
         })
-@Cache(region = "fiRequestStateCache", usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class FIRequestState {
 
     @Id

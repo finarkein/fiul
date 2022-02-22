@@ -32,7 +32,7 @@ import java.time.Instant;
                 @Index(name = "FIReq_Idx1", columnList = "sessionId, aaName"),
                 @Index(name = "FIReq_Idx2", columnList = "sessionId, consentHandleId")
         })
-@Cache(region = "fiRequestDtoCache", usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FIRequestDTO {
     @Id
     @Column(length = 36)

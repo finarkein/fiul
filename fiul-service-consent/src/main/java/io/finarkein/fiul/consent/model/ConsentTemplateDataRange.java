@@ -12,11 +12,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConsentTemplateDataRange {
+public class ConsentTemplateDataRange implements Serializable {
     @JsonProperty("type")
     private DataRangeType dataRangeType;
     private String year;
