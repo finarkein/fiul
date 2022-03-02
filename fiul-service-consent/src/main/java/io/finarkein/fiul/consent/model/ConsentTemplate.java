@@ -14,6 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 
@@ -21,7 +22,7 @@ import java.time.Instant;
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class ConsentTemplate {
+public class ConsentTemplate implements Serializable {
 
     @Id
     @GeneratedValue(generator = "UUIDConsentTemplate")

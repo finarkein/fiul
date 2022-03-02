@@ -24,7 +24,7 @@ import java.io.Serializable;
 @IdClass(KeyMaterialDataKey.Key.class)
 @Table(name = "FI_KM_DATA_KEY")
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class KeyMaterialDataKey {
+public class KeyMaterialDataKey implements Serializable {
 
     @Id
     String consentId;

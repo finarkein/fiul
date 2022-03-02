@@ -14,6 +14,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
@@ -22,7 +23,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Table(name = "signed_consent")
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class SignedConsentDTO {
+public class SignedConsentDTO implements Serializable {
     @Id
     protected String consentId;
 

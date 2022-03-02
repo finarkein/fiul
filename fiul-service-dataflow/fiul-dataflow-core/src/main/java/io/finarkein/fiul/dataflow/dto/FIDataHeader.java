@@ -35,7 +35,7 @@ import java.time.Instant;
         }
 )
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class FIDataHeader {
+public class FIDataHeader implements Serializable {
     @Id
     @Column(length = 36)
     private String consentId;

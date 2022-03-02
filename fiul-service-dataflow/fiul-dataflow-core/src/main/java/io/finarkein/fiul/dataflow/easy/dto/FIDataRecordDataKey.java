@@ -31,7 +31,7 @@ import java.time.Instant;
         })
 @EntityListeners(FIDataKeyEntityListener.class)
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public final class FIDataRecordDataKey {
+public final class FIDataRecordDataKey implements Serializable {
     @Id
     @Column(length = 36)
     private String consentId;

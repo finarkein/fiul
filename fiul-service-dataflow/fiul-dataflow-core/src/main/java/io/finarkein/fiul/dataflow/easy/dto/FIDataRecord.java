@@ -31,7 +31,7 @@ import java.time.Instant;
                 @Index(name = "FIDataRecord_Idx3", columnList = "consentHandleId")
         })
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public final class FIDataRecord {
+public final class FIDataRecord implements Serializable {
     @Id
     @Column(length = 36)
     private String consentId;

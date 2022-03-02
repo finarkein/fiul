@@ -31,7 +31,7 @@ import java.time.Instant;
                 @Index(name = "AAFIDatum_Idx1", columnList = "dataLifeExpireOn")
         })
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class AAFIDatum {
+public class AAFIDatum implements Serializable {
     @Id
     @Column(length = 36)
     private String consentId;
