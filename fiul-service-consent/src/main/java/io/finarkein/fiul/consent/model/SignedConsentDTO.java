@@ -10,8 +10,11 @@ import io.finarkein.fiul.common.ZippedBlobAttrConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
@@ -19,7 +22,8 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "signed_consent")
-public class SignedConsentDTO {
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+public class SignedConsentDTO implements Serializable {
     @Id
     protected String consentId;
 

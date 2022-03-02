@@ -79,19 +79,19 @@ public class FIRequestState {
         if (fiStatusResponse != null) {
             if (inputFIStatusResponseDTOMap != null) {
                 fiStatusResponse.forEach(savedDto -> {
-                            final var inputDto = inputFIStatusResponseDTOMap.remove(savedDto.getFipID());
-                            if(inputDto != null) {
-                                final var accounts = savedDto.getAccounts();
-                                if(accounts != null) {
-                                    accounts.removeAll(inputDto.getAccounts());
-                                    accounts.addAll(inputDto.getAccounts());
-                                }else
-                                    savedDto.setAccounts(inputDto.getAccounts());
-                            }
-                        });
+                    final var inputDto = inputFIStatusResponseDTOMap.remove(savedDto.getFipID());
+                    if (inputDto != null) {
+                        final var accounts = savedDto.getAccounts();
+                        if (accounts != null) {
+                            accounts.removeAll(inputDto.getAccounts());
+                            accounts.addAll(inputDto.getAccounts());
+                        } else
+                            savedDto.setAccounts(inputDto.getAccounts());
+                    }
+                });
                 fiStatusResponse.addAll(inputFIStatusResponseDTOMap.values());
             }
-        } else if(inputFIStatusResponseDTOMap != null){
+        } else if (inputFIStatusResponseDTOMap != null) {
             fiStatusResponse = new HashSet<>(inputFIStatusResponseDTOMap.values());
         }
     }

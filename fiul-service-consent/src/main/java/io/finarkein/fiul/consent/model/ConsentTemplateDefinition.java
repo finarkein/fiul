@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder(builderClassName = "Builder")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ConsentTemplateDefinition {
+public class ConsentTemplateDefinition implements Serializable {
     private String consentStartOffset;
     private String consentExpiryDuration;
     private ConsentMode consentMode;

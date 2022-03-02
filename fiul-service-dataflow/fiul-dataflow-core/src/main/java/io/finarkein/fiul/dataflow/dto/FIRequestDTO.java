@@ -57,11 +57,11 @@ public class FIRequestDTO {
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiDataRangeTo;
 
-    @Column(columnDefinition="text")
+    @Column(columnDefinition = "text")
     @Convert(converter = JSONAttrConverter.OfKeyMaterial.class)
     protected KeyMaterial keyMaterial;
 
-    @Column(columnDefinition="text")
+    @Column(columnDefinition = "text")
     @Convert(converter = JSONAttrConverter.OfCallback.class)
     protected Callback callback;
 
