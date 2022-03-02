@@ -13,8 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,7 +30,6 @@ import java.time.Instant;
                 @Index(name = "FIReq_Idx1", columnList = "sessionId, aaName"),
                 @Index(name = "FIReq_Idx2", columnList = "sessionId, consentHandleId")
         })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FIRequestDTO {
     @Id
     @Column(length = 36)
@@ -60,11 +57,11 @@ public class FIRequestDTO {
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp fiDataRangeTo;
 
-    @Column(columnDefinition="text")
+    @Column(columnDefinition = "text")
     @Convert(converter = JSONAttrConverter.OfKeyMaterial.class)
     protected KeyMaterial keyMaterial;
 
-    @Column(columnDefinition="text")
+    @Column(columnDefinition = "text")
     @Convert(converter = JSONAttrConverter.OfCallback.class)
     protected Callback callback;
 

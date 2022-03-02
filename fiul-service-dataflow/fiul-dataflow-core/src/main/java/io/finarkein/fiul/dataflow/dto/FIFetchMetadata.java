@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,7 +21,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Entity
 @Builder(builderClassName = "Builder")
-@Table( name = "FI_FETCH_METADATA",
+@Table(name = "FI_FETCH_METADATA",
         indexes = {
                 @Index(name = "FIFetchMD_Idx1", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo, fipId, " +
                         "linkRefNumbers, fiFetchSubmittedOn"),
@@ -34,7 +32,6 @@ import java.time.Instant;
                 @Index(name = "FIFetchMD_Idx7", columnList = "consentHandleId"),
                 @Index(name = "FIFetchMD_Idx8", columnList = "fiFetchCompletedOn, consentHandleId, fiDataRangeFrom, fiDataRangeTo, easyDataFlow"),
         })
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class FIFetchMetadata {
 
     @Id

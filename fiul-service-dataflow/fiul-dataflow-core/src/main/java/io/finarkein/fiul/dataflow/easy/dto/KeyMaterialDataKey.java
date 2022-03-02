@@ -23,7 +23,7 @@ import java.io.Serializable;
 @Builder(builderClassName = "Builder")
 @IdClass(KeyMaterialDataKey.Key.class)
 @Table(name = "FI_KM_DATA_KEY")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class KeyMaterialDataKey {
 
     @Id

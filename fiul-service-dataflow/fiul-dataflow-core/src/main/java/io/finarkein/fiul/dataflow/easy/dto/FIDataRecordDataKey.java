@@ -30,7 +30,7 @@ import java.time.Instant;
                 @Index(name = "FIDataRecordDK_Idx2", columnList = "consentHandleId")
         })
 @EntityListeners(FIDataKeyEntityListener.class)
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public final class FIDataRecordDataKey {
     @Id
     @Column(length = 36)

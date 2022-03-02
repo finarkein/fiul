@@ -30,7 +30,7 @@ import java.time.Instant;
                 @Index(name = "FIDataRecord_Idx2", columnList = "consentHandleId, sessionId"),
                 @Index(name = "FIDataRecord_Idx3", columnList = "consentHandleId")
         })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public final class FIDataRecord {
     @Id
     @Column(length = 36)
@@ -54,7 +54,7 @@ public final class FIDataRecord {
     @Column(length = 36, nullable = false, updatable = false)
     private String consentHandleId;
 
-    @Column(columnDefinition="BYTEA", nullable = false, updatable = false)
+    @Column(columnDefinition = "BYTEA", nullable = false, updatable = false)
     private byte[] fiData;
 
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)

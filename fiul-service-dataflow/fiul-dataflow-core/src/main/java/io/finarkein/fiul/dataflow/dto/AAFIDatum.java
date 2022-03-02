@@ -30,7 +30,7 @@ import java.time.Instant;
         indexes = {
                 @Index(name = "AAFIDatum_Idx1", columnList = "dataLifeExpireOn")
         })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class AAFIDatum {
     @Id
     @Column(length = 36)

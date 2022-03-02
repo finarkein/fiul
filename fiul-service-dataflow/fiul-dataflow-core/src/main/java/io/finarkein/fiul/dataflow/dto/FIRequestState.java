@@ -11,8 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -32,7 +30,6 @@ import java.util.stream.Collectors;
                 @Index(name = "FIReqState_Idx1", columnList = "sessionId, consentHandleId"),
                 @Index(name = "FIReqState_Idx2", columnList = "sessionStatus")
         })
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class FIRequestState {
 
     @Id
@@ -82,19 +79,19 @@ public class FIRequestState {
         if (fiStatusResponse != null) {
             if (inputFIStatusResponseDTOMap != null) {
                 fiStatusResponse.forEach(savedDto -> {
-                            final var inputDto = inputFIStatusResponseDTOMap.remove(savedDto.getFipID());
-                            if(inputDto != null) {
-                                final var accounts = savedDto.getAccounts();
-                                if(accounts != null) {
-                                    accounts.removeAll(inputDto.getAccounts());
-                                    accounts.addAll(inputDto.getAccounts());
-                                }else
-                                    savedDto.setAccounts(inputDto.getAccounts());
-                            }
-                        });
+                    final var inputDto = inputFIStatusResponseDTOMap.remove(savedDto.getFipID());
+                    if (inputDto != null) {
+                        final var accounts = savedDto.getAccounts();
+                        if (accounts != null) {
+                            accounts.removeAll(inputDto.getAccounts());
+                            accounts.addAll(inputDto.getAccounts());
+                        } else
+                            savedDto.setAccounts(inputDto.getAccounts());
+                    }
+                });
                 fiStatusResponse.addAll(inputFIStatusResponseDTOMap.values());
             }
-        } else if(inputFIStatusResponseDTOMap != null){
+        } else if (inputFIStatusResponseDTOMap != null) {
             fiStatusResponse = new HashSet<>(inputFIStatusResponseDTOMap.values());
         }
     }
