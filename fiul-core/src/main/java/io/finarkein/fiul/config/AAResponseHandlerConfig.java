@@ -45,11 +45,11 @@ public class AAResponseHandlerConfig {
                     .map(Integer::parseInt)
                     .orElse(100000);
             scheduler = Schedulers.newBoundedElastic(threadCap, queueSize, responseProcessor);
-            log.info("name:{}, scheduler-Type:{}, threadCap:{}, queueSize:{}",
+            log.info("name:{}, scheduler-type:{}, threadCap:{}, queueSize:{}",
                     responseProcessor, schedulerType, threadCap, queueSize);
         } else {
             scheduler = Schedulers.immediate();
-            log.info("scheduler-Type:{}", schedulerType);
+            log.info("scheduler-type:{}", schedulerType);
         }
     }
 }
