@@ -20,7 +20,11 @@ import javax.persistence.Converter;
 import java.util.List;
 
 public abstract class JSONAttrConverter<T> implements AttributeConverter<T, String> {
-    protected static ObjectMapper mapper = new ObjectMapper();
+    protected final ObjectMapper mapper;
+
+    protected JSONAttrConverter(ObjectMapper mapper){
+        this.mapper = mapper;
+    }
 
     protected Class<T> type() {
         return null;
@@ -51,6 +55,10 @@ public abstract class JSONAttrConverter<T> implements AttributeConverter<T, Stri
     @Converter
     public static class OfKeyMaterial extends JSONAttrConverter<KeyMaterial> {
 
+        protected OfKeyMaterial(ObjectMapper mapper) {
+            super(mapper);
+        }
+
         @Override
         public Class<KeyMaterial> type() {
             return KeyMaterial.class;
@@ -60,6 +68,10 @@ public abstract class JSONAttrConverter<T> implements AttributeConverter<T, Stri
     @Converter
     public static class OfCallback extends JSONAttrConverter<Callback> {
 
+        protected OfCallback(ObjectMapper mapper) {
+            super(mapper);
+        }
+
         @Override
         public Class<Callback> type() {
             return Callback.class;
@@ -68,6 +80,10 @@ public abstract class JSONAttrConverter<T> implements AttributeConverter<T, Stri
 
     @Converter
     public static final class OfTypeConsentDetail extends JSONAttrConverter<ConsentDetail> {
+        protected OfTypeConsentDetail(ObjectMapper mapper) {
+            super(mapper);
+        }
+
         @Override
         public Class<ConsentDetail> type() {
             return ConsentDetail.class;
@@ -76,6 +92,10 @@ public abstract class JSONAttrConverter<T> implements AttributeConverter<T, Stri
 
     @Converter
     public static final class OfTypePurpose extends JSONAttrConverter<Purpose> {
+        protected OfTypePurpose(ObjectMapper mapper) {
+            super(mapper);
+        }
+
         @Override
         public Class<Purpose> type() {
             return Purpose.class;
@@ -84,6 +104,10 @@ public abstract class JSONAttrConverter<T> implements AttributeConverter<T, Stri
 
     @Converter
     public static final class OfTypeDataFilterList extends JSONAttrConverter<List<DataFilter>> {
+        protected OfTypeDataFilterList(ObjectMapper mapper) {
+            super(mapper);
+        }
+
         @Override
         protected List<DataFilter> readValue(String input) throws JsonProcessingException {
             return mapper.readValue(input, new TypeReference<List<DataFilter>>() {
