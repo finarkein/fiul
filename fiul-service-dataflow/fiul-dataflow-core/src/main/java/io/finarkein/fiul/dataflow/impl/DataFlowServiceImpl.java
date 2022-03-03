@@ -13,6 +13,7 @@ import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
+import io.finarkein.fiul.config.AAResponseHandlerConfig;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.dataflow.ConsentServiceClient;
 import io.finarkein.fiul.dataflow.DataFlowService;
@@ -36,6 +37,7 @@ import org.bouncycastle.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -55,19 +57,22 @@ public class DataFlowServiceImpl implements DataFlowService {
     protected final FIFetchMetadataStore fiFetchMetadataStore;
     protected final CallbackRegistry callbackRegistry;
     protected final ConsentServiceClient consentServiceClient;
+    protected final Scheduler postResponseProcessingScheduler;
 
     @Autowired
     protected DataFlowServiceImpl(AAFIUClient fiuClient, FIRequestStore fiRequestStore,
                                   FIFetchMetadataStore fiFetchMetadataStore,
                                   AAFIDataStore aafiDataStore,
                                   CallbackRegistry callbackRegistry,
-                                  ConsentServiceClient consentServiceClient) {
+                                  ConsentServiceClient consentServiceClient,
+                                  AAResponseHandlerConfig schedulerConfig) {
         this.fiuClient = fiuClient;
         this.fiRequestStore = fiRequestStore;
         this.fiFetchMetadataStore = fiFetchMetadataStore;
         this.aafiDataStore = aafiDataStore;
         this.callbackRegistry = callbackRegistry;
         this.consentServiceClient = consentServiceClient;
+        this.postResponseProcessingScheduler = schedulerConfig.getScheduler();
     }
 
     @Override
@@ -101,6 +106,7 @@ public class DataFlowServiceImpl implements DataFlowService {
 
         return consentServiceClient.setSignatureIfNotSet(fiRequest)
                 .flatMap(fiufiRequest -> fiuClient.createFIRequest(fiufiRequest, aaName)
+                        .publishOn(postResponseProcessingScheduler)
                         .doOnSuccess(response -> {
                             final var builder = FIFetchMetadata.builder()
                                     .txnId(fiufiRequest.getTxnid())
@@ -154,6 +160,7 @@ public class DataFlowServiceImpl implements DataFlowService {
                 })
                 .flatMap(input -> fiuClient
                         .fiFetch(input.dataSessionId, input.aaName, input.fipId, input.linkRefNumbers)
+                        .publishOn(postResponseProcessingScheduler)
                         .doOnSuccess(saveDataIfStoreConsentMode(input.dataSessionId, input.aaName))
                         .doOnSuccess(updateFetchMetadata(input.dataSessionId, input.fipId, input.linkRefNumbers, input.startTime))
                         .doOnSuccess(response -> log.debug("FIFetch: success: sessionId:{}, aaName:{}, fipId:{}, linkRefNumbers:{}",
