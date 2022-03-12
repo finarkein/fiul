@@ -130,18 +130,18 @@ class ConsentServiceImpl implements ConsentService {
 
     private Mono<ConsentHandleResponse> getConsentHandleResponseMono(String consentHandle, String aaName) {
         return aafiuClient.getConsentStatus(consentHandle, aaName)
-                .flatMap(consentHandleResponse -> {
-                    final Optional<ConsentStateDTO> optionalConsentState = consentStore
-                            .getConsentStateByHandle(consentHandle);
-                    if (optionalConsentState.isPresent()
-                            && Objects.nonNull(optionalConsentState.get().getPostConsentResponseTimestamp())
-                            && strToTimeStamp.apply(consentHandleResponse.getTimestamp())
-                            .before(optionalConsentState.get().getPostConsentResponseTimestamp())) {
-                        throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
-                                "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
-                    }
-                    return Mono.just(consentHandleResponse);
-                });
+                .flatMap(consentHandleResponse -> consentStore.consentStateByHandle(consentHandle)
+                        .flatMap(optionalConsentState -> {
+                            if (optionalConsentState.isPresent()
+                                    && Objects.nonNull(optionalConsentState.get().getPostConsentResponseTimestamp())
+                                    && strToTimeStamp.apply(consentHandleResponse.getTimestamp())
+                                    .before(optionalConsentState.get().getPostConsentResponseTimestamp())) {
+                                throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
+                                        "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
+                            }
+                            return Mono.just(consentHandleResponse);
+                        })
+                );
     }
 
     private void consentStateUpdateHelper(String txnId, String consentId, String consentStatus) {
