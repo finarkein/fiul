@@ -12,6 +12,7 @@ import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.consent.model.SignedConsentDTO;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public interface ConsentStore {
 
     Optional<SignedConsentDTO> findSignedConsent(String consentId);
 
-    Optional<ConsentRequestDTO> findRequestByConsentHandle(String consentHandle);
+    Mono<Optional<ConsentRequestDTO>> findRequestByConsentHandle(String consentHandle);
 
     Optional<ConsentRequestDTO> findRequestByConsentId(String consentId);
 
@@ -35,9 +36,13 @@ public interface ConsentStore {
 
     Optional<ConsentStateDTO> getConsentStateByHandle(String consentHandle);
 
+    Mono<Optional<ConsentStateDTO>> consentStateByHandle(String consentHandle);
+
     ConsentStateDTO getConsentStateById(String consentId);
 
     ConsentStateDTO getConsentStateByTxnId(String txnId);
+
+    Mono<ConsentStateDTO> consentStateByTxnId(String txnId);
 
     ConsentStateDTO updateConsentState(ConsentStateDTO consentStateDTO);
 

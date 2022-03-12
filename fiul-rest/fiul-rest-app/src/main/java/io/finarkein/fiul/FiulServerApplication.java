@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import reactor.blockhound.BlockHound;
 
 @Log4j2
 @EntityScan(basePackages = {"io.finarkein.fiul", "io.finarkein.api.aa"})
@@ -22,7 +23,12 @@ import org.springframework.context.annotation.ComponentScan;
 public class FiulServerApplication {
 
     public static void main(String[] args) {
+        try {
+            BlockHound.install();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         SpringApplication.run(FiulServerApplication.class, args);
     }
-
 }
