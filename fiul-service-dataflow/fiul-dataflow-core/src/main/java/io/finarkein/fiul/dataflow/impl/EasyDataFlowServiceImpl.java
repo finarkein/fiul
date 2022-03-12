@@ -16,6 +16,7 @@ import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.config.AAResponseHandlerConfig;
+import io.finarkein.fiul.config.DBCallHandlerSchedulerConfig;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.converter.xml.XMLConverterFunctions;
 import io.finarkein.fiul.dataflow.*;
@@ -63,6 +64,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
     protected final FIFetchMetadataStore fiFetchMetadataStore;
     protected final ConsentServiceClient consentServiceClient;
     protected final Scheduler postResponseProcessingScheduler;
+    protected final DBCallHandlerSchedulerConfig dbCallHandlerSchedulerConfig;
 
     @Autowired
     protected EasyDataFlowServiceImpl(AAFIUClient fiuClient, FIRequestStore fiRequestStore,
@@ -70,7 +72,8 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                                       EasyFIDataStore easyFIDataStore,
                                       CallbackRegistry callbackRegistry,
                                       ConsentServiceClient consentServiceClient,
-                                      AAResponseHandlerConfig schedulerConfig) {
+                                      AAResponseHandlerConfig schedulerConfig,
+                                      DBCallHandlerSchedulerConfig dbCallHandlerSchedulerConfig) {
         this.fiuClient = fiuClient;
         this.fiRequestStore = fiRequestStore;
         this.fiFetchMetadataStore = fiFetchMetadataStore;
@@ -78,6 +81,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         this.callbackRegistry = callbackRegistry;
         this.consentServiceClient = consentServiceClient;
         this.postResponseProcessingScheduler = schedulerConfig.getScheduler();
+        this.dbCallHandlerSchedulerConfig = dbCallHandlerSchedulerConfig;
     }
 
     @Override
@@ -137,6 +141,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                                     .publishOn(postResponseProcessingScheduler)
                                     .map(fiRequestResponse -> new DataRequestResponse(fiRequestResponse.getConsentId(),
                                             fiRequestResponse.getSessionId()))
+                                    .publishOn(dbCallHandlerSchedulerConfig.getScheduler())
 
                                     .map(dataRequestResponse -> {
                                         saveKeyMaterialDataKey(serializedKeyPair, dataRequest).accept(dataRequestResponse);
