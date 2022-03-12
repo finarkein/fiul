@@ -9,6 +9,7 @@ package io.finarkein.fiul.dataflow.store;
 import io.finarkein.fiul.dataflow.easy.DataSaveRequest;
 import io.finarkein.fiul.dataflow.easy.dto.KeyMaterialDataKey;
 import io.finarkein.fiul.dataflow.response.decrypt.FIFetchResponse;
+import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -20,7 +21,7 @@ public interface EasyFIDataStore {
 
     Optional<KeyMaterialDataKey> getKeyConsentId(String consentId, String sessionId);
 
-    Optional<KeyMaterialDataKey> getKeyConsentHandleId(String consentHandleId, String sessionId);
+    Mono<Optional<KeyMaterialDataKey>> getKeyConsentHandleId(String consentHandleId, String sessionId);
 
     void deleteKey(String consentId, String sessionId);
 

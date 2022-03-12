@@ -8,6 +8,7 @@ package io.finarkein.fiul.dataflow.jpa.easy;
 
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.notification.ConsentStatusNotification;
+import io.finarkein.fiul.config.DBCallHandlerSchedulerConfig;
 import io.finarkein.fiul.dataflow.dto.FIDataHeader;
 import io.finarkein.fiul.dataflow.easy.DataSaveRequest;
 import io.finarkein.fiul.dataflow.easy.crypto.CipheredFIData;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
@@ -61,6 +63,9 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
     @Autowired
     private RepoKeyStorageEntry repoKeyStorage;
 
+    @Autowired
+    private DBCallHandlerSchedulerConfig schedulerConfig;
+
     @Value("${" + SERVICE_NAME_PROPERTY + "}")
     private String cryptServiceName;
 
@@ -80,8 +85,9 @@ public class EasyFIDataStoreImpl implements EasyFIDataStore {
     }
 
     @Override
-    public Optional<KeyMaterialDataKey> getKeyConsentHandleId(String consentHandleId, String sessionId) {
-        return repoKeyStorage.findBySessionIdAndConsentHandleId(sessionId, consentHandleId);
+    public Mono<Optional<KeyMaterialDataKey>> getKeyConsentHandleId(String consentHandleId, String sessionId) {
+        return Mono.fromCallable(() -> repoKeyStorage.findBySessionIdAndConsentHandleId(sessionId, consentHandleId))
+                .subscribeOn(schedulerConfig.getScheduler());
     }
 
     @Override
