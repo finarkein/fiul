@@ -137,17 +137,21 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                                     .publishOn(postResponseProcessingScheduler)
                                     .map(fiRequestResponse -> new DataRequestResponse(fiRequestResponse.getConsentId(),
                                             fiRequestResponse.getSessionId()))
-                                    .doOnSuccess(saveKeyMaterialDataKey(serializedKeyPair, dataRequest))
-                                    .doOnSuccess(saveFIRequestAndFetchMetadata(aaName, dataRequest, startTime, fiuFiRequest))
-                                    .doOnSuccess(response -> {
+
+                                    .map(dataRequestResponse -> {
+                                        saveKeyMaterialDataKey(serializedKeyPair, dataRequest).accept(dataRequestResponse);
+                                        saveFIRequestAndFetchMetadata(aaName, dataRequest, startTime, fiuFiRequest).accept(dataRequestResponse);
+
                                         final var fiCallback = dataRequest.getCallback();
                                         if (Objects.isNull(fiCallback) || Objects.isNull(fiCallback.getUrl()))
-                                            return;
+                                            return dataRequestResponse;
                                         var callback = new FICallback();
-                                        callback.setSessionId(response.getSessionId());
-                                        callback.setConsentId(response.getConsentId());
+                                        callback.setSessionId(dataRequestResponse.getSessionId());
+                                        callback.setConsentId(dataRequestResponse.getConsentId());
                                         callback.setCallbackUrl(fiCallback.getUrl());
                                         callbackRegistry.registerFICallback(callback);
+
+                                        return dataRequestResponse;
                                     });
                         }
                 );
