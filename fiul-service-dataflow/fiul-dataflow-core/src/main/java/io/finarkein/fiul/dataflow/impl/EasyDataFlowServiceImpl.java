@@ -64,7 +64,6 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
     protected final CallbackRegistry callbackRegistry;
     protected final FIFetchMetadataStore fiFetchMetadataStore;
     protected final ConsentServiceClient consentServiceClient;
-    protected final Scheduler postResponseProcessingScheduler;
     protected final DBCallHandlerSchedulerConfig dbCallHandlerSchedulerConfig;
 
     @Autowired
@@ -73,7 +72,6 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                                       EasyFIDataStore easyFIDataStore,
                                       CallbackRegistry callbackRegistry,
                                       ConsentServiceClient consentServiceClient,
-                                      AAResponseHandlerConfig schedulerConfig,
                                       DBCallHandlerSchedulerConfig dbCallHandlerSchedulerConfig) {
         this.fiuClient = fiuClient;
         this.fiRequestStore = fiRequestStore;
@@ -81,7 +79,6 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         this.easyFIDataStore = easyFIDataStore;
         this.callbackRegistry = callbackRegistry;
         this.consentServiceClient = consentServiceClient;
-        this.postResponseProcessingScheduler = schedulerConfig.getScheduler();
         this.dbCallHandlerSchedulerConfig = dbCallHandlerSchedulerConfig;
     }
 
@@ -139,11 +136,9 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                 .flatMap(fiuFiRequest -> {
                             final var aaName = aaNameExtractor.apply(dataRequest.getCustomerAAId());
                             return fiuClient.createFIRequest(fiuFiRequest, aaName)
-                                    .publishOn(postResponseProcessingScheduler)
+                                    .publishOn(dbCallHandlerSchedulerConfig.getScheduler())
                                     .map(fiRequestResponse -> new DataRequestResponse(fiRequestResponse.getConsentId(),
                                             fiRequestResponse.getSessionId()))
-                                    .publishOn(dbCallHandlerSchedulerConfig.getScheduler())
-
                                     .map(dataRequestResponse -> {
                                         saveKeyMaterialDataKey(serializedKeyPair, dataRequest).accept(dataRequestResponse);
                                         saveFIRequestAndFetchMetadata(aaName, dataRequest, startTime, fiuFiRequest).accept(dataRequestResponse);
@@ -216,7 +211,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                 .map(Tuple2::getT1)
                 .flatMap(fiRequestDto -> fiuClient
                         .fiFetch(sessionId, fiRequestDto.getAaName())
-                        .publishOn(postResponseProcessingScheduler)
+                        .publishOn(dbCallHandlerSchedulerConfig.getScheduler())
                         .flatMap(saveDataIfStoreConsentMode(fiRequestDto, consentHandleId, sessionId, fiDataOutputFormat))
                         .doOnSuccess(updateFetchMetadata(sessionId, fetchDataStartTime))
                         .doOnSuccess(response -> log.debug("FetchData: success: consentHandleId:{}, sessionId:{}", consentHandleId, sessionId))
