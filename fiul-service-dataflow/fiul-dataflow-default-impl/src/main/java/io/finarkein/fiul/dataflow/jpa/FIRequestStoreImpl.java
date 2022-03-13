@@ -8,6 +8,7 @@ package io.finarkein.fiul.dataflow.jpa;
 
 import io.finarkein.api.aa.notification.FINotification;
 import io.finarkein.api.aa.util.Functions;
+import io.finarkein.fiul.config.DBCallHandlerSchedulerConfig;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.dto.FINotificationLogEntry;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.util.Optional;
@@ -42,6 +44,9 @@ public class FIRequestStoreImpl implements FIRequestStore {
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    @Autowired
+    private DBCallHandlerSchedulerConfig schedulerConfig;
 
     @Override
     public void saveFIRequestAndFetchMetadata(FIFetchMetadata fiFetchMetadata, FIUFIRequest fiRequest) {
@@ -99,8 +104,9 @@ public class FIRequestStoreImpl implements FIRequestStore {
     }
 
     @Override
-    public Optional<FIRequestDTO> getFIRequest(String consentHandleId, String sessionId) {
-        return repoFIRequestDTO.findBySessionIdAndConsentHandleId(sessionId, consentHandleId);
+    public Mono<Optional<FIRequestDTO>> getFIRequest(String consentHandleId, String sessionId) {
+        return Mono.fromCallable(() -> repoFIRequestDTO.findBySessionIdAndConsentHandleId(sessionId, consentHandleId))
+                .subscribeOn(schedulerConfig.getScheduler());
     }
 
     @Override
