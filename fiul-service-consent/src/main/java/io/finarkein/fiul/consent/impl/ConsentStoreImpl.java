@@ -13,6 +13,7 @@ import io.finarkein.api.aa.notification.ConsentNotification;
 import io.finarkein.api.aa.notification.ConsentStatusNotification;
 import io.finarkein.api.aa.notification.Notifier;
 import io.finarkein.api.aa.util.Functions;
+import io.finarkein.fiul.config.DBCallHandlerSchedulerConfig;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
@@ -25,6 +26,7 @@ import io.finarkein.fiul.consent.service.ConsentStore;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
@@ -46,6 +48,9 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Autowired
     private RepoSignedConsent repoSignedConsent;
+
+    @Autowired
+    protected DBCallHandlerSchedulerConfig dbBlockingCallSchedulerConfig;
 
     @Override
     public void saveConsentRequest(String consentHandle, ConsentRequest consentRequest) {
@@ -91,8 +96,9 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
-    public Optional<ConsentRequestDTO> findRequestByConsentHandle(String consentHandle) {
-        return consentRequestDTORepository.findById(consentHandle);
+    public Mono<Optional<ConsentRequestDTO>> findRequestByConsentHandle(String consentHandle) {
+        return Mono.fromCallable(() -> consentRequestDTORepository.findById(consentHandle))
+                .subscribeOn(dbBlockingCallSchedulerConfig.getScheduler());
     }
 
     @Override
@@ -147,6 +153,12 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
+    public Mono<Optional<ConsentStateDTO>> consentStateByHandle(String consentHandle) {
+        return Mono.fromCallable(() -> consentStateRepository.findById(consentHandle))
+                .subscribeOn(dbBlockingCallSchedulerConfig.getScheduler());
+    }
+
+    @Override
     public ConsentStateDTO getConsentStateById(String consentId) {
         return consentStateRepository.findByConsentId(consentId).orElse(null);
     }
@@ -154,6 +166,12 @@ class ConsentStoreImpl implements ConsentStore {
     @Override
     public ConsentStateDTO getConsentStateByTxnId(String txnId) {
         return consentStateRepository.findByTxnId(txnId).orElse(null);
+    }
+
+    @Override
+    public Mono<ConsentStateDTO> consentStateByTxnId(String txnId){
+        return Mono.fromCallable(() -> consentStateRepository.findByTxnId(txnId).orElse(null))
+                .subscribeOn(dbBlockingCallSchedulerConfig.getScheduler());
     }
 
     @Override

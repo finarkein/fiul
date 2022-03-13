@@ -46,14 +46,14 @@ public class TestConfig {
     @MockBean
     private ConsentServiceClient consentServiceClient;
 
-    @Bean
-    EasyDataFlowService getDataFlowServiceImpl() {
-        final var serializedKeyPair = loadJsonFromFile("serializedKeyPair.json", SerializedKeyPair.class);
-        Mockito.when(fiuClient.generateKeyMaterial()).thenReturn(Mono.just(serializedKeyPair));
-
-        return new EasyDataFlowServiceImpl(fiuClient, fiRequestStore, fiFetchMetadataStore, easyFIDataStore,
-                callbackRegistry, consentServiceClient , new AAResponseHandlerConfig("immediate", "immediate"));
-    }
+//    @Bean
+//    EasyDataFlowService getDataFlowServiceImpl() {
+//        final var serializedKeyPair = loadJsonFromFile("serializedKeyPair.json", SerializedKeyPair.class);
+//        Mockito.when(fiuClient.generateKeyMaterial()).thenReturn(Mono.just(serializedKeyPair));
+//
+//        return new EasyDataFlowServiceImpl(fiuClient, fiRequestStore, fiFetchMetadataStore, easyFIDataStore,
+//                callbackRegistry, consentServiceClient , new AAResponseHandlerConfig("immediate", "immediate"));
+//    }
 
     @Bean
     ObjectMapper mapper(){
