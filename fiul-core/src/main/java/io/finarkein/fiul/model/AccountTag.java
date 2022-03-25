@@ -10,29 +10,24 @@ import io.finarkein.fiul.Functions;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountTag {
-    private String linkedAccRef;
-    private String maskedAccNumber;
-    private String xmlns;
-    private String xmlnsXsi;
-    private String xsiSchemaLocation;
     private String version;
     private String type;
 
     private static final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    public static final Pattern fiTypePattern = Pattern.compile("type=(\"|\\\\\")(.*?)(\"|\\\\\")");
+    public static final Pattern versionPattern = Pattern.compile("<Account.*\\sversion=(\"|\\\\\")(.*?)(\"|\\\\\")");
 
     public static AccountTag readFromXml(String xml) {
         try {
@@ -48,18 +43,23 @@ public class AccountTag {
     }
 
     private static AccountTag getAccountTag(String xml) throws ParserConfigurationException, SAXException, IOException {
-        var db = dbf.newDocumentBuilder();
-        final Document parse = db.parse(new ByteArrayInputStream(xml.getBytes()));
-        final NodeList account = parse.getElementsByTagName("Account");
-        final Node item = account.item(0);
         var tag = new AccountTag();
-        tag.setLinkedAccRef(item.getAttributes().getNamedItem("linkedAccRef").getNodeValue());
-        tag.setVersion(item.getAttributes().getNamedItem("version").getNodeValue());
-        tag.setType(item.getAttributes().getNamedItem("type").getNodeValue());
-        tag.setMaskedAccNumber(item.getAttributes().getNamedItem("maskedAccNumber").getNodeValue());
-//        tag.setXmlns(item.getAttributes().getNamedItem("xmlns").getNodeValue());
-//        tag.setXmlnsXsi(item.getAttributes().getNamedItem("xmlns:xsi").getNodeValue());
-//        tag.setXsiSchemaLocation(item.getAttributes().getNamedItem("xsi:schemaLocation").getNodeValue());
+        tag.setType(extractFiType(xml));
+        tag.setVersion(extractVersion(xml));
         return tag;
+    }
+
+    public static String extractVersion(String xml) {
+        Matcher matcher = versionPattern.matcher(xml);
+        if (matcher.find())
+            return matcher.group(2);
+        throw new IllegalStateException("Unable to extract FIType from given xml");
+    }
+
+    public static String extractFiType(String xml) {
+        Matcher matcher = fiTypePattern.matcher(xml);
+        if (matcher.find())
+            return matcher.group(2);
+        throw new IllegalStateException("Unable to extract FIType from given xml");
     }
 }

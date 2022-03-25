@@ -7,13 +7,14 @@
 package io.finarkein.fiul.dataflow.impl;
 
 import io.finarkein.api.aa.consent.ConsentMode;
-import io.finarkein.api.aa.consent.artefact.SignedConsent;
+import io.finarkein.api.aa.consent.DataLife;
 import io.finarkein.api.aa.dataflow.FIRequestResponse;
 import io.finarkein.api.aa.dataflow.response.FIFetchResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
-import io.finarkein.fiul.config.AAResponseHandlerConfig;
+import io.finarkein.fiul.config.DBCallHandlerSchedulerConfig;
+import io.finarkein.fiul.consent.ConsentShortMeta;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.dataflow.ConsentServiceClient;
 import io.finarkein.fiul.dataflow.DataFlowService;
@@ -65,7 +66,7 @@ public class DataFlowServiceImpl implements DataFlowService {
                                   AAFIDataStore aafiDataStore,
                                   CallbackRegistry callbackRegistry,
                                   ConsentServiceClient consentServiceClient,
-                                  AAResponseHandlerConfig schedulerConfig) {
+                                  DBCallHandlerSchedulerConfig schedulerConfig) {
         this.fiuClient = fiuClient;
         this.fiRequestStore = fiRequestStore;
         this.fiFetchMetadataStore = fiFetchMetadataStore;
@@ -192,17 +193,17 @@ public class DataFlowServiceImpl implements DataFlowService {
         return fiFetchResponse -> {
             final var fiRequest = fiRequestStore.getFIRequestByAANameAndSessionId(sessionId, aaName);
             final var consentId = fiRequest.map(FIRequestDTO::getConsentId).orElse(null);
-            final Mono<SignedConsent> consentDetailMono = consentServiceClient.getSignedConsentDetail(consentId, aaName);
-            consentDetailMono.subscribe(consentDetail -> {
-                if (consentId == null || ConsentMode.get(consentDetail.getConsentMode()) != STORE)
+            final Mono<ConsentShortMeta> consentMetaMono = consentServiceClient.getConsentMeta(consentId, aaName);
+            consentMetaMono.subscribe(consentMeta -> {
+                if (consentId == null || ConsentMode.get(consentMeta.getMode()) != STORE)
                     return;
-
+                final DataLife dataLife = new DataLife(consentMeta.getDataLifeUnit(), consentMeta.getDataLifeValue());
                 aafiDataStore.saveFIData(DataSaveRequest.with(fiFetchResponse)
                         .consentId(consentId)
                         .sessionId(sessionId)
                         .aaName(aaName)
-                        .dataLife(consentDetail.getDataLife())
-                        .dataLifeExpireOn(calculateExpireTime.apply(consentDetail.getDataLife())).build());
+                        .dataLife(dataLife)
+                        .dataLifeExpireOn(calculateExpireTime.apply(dataLife)).build());
             });
         };
     }

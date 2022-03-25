@@ -14,9 +14,30 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 class AccountTagTest {
+
+    @Test
+    void accountTagTest() {
+        var xmlFiles = new String[]{"Deposit.xml", "Deposit2.xml", "Deposit3.xml", "Deposit4.xml"};
+        final var collect = Arrays.stream(xmlFiles)
+                .map(fileName -> new File(Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).getFile()))
+                .map(file -> {
+                    try {
+                        return inputStreamToString(new FileInputStream(file));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).map(AccountTag::readFromXml)
+                .peek(accountTag -> {
+                    Assertions.assertEquals("deposit", accountTag.getType());
+                    Assertions.assertEquals("1.1", accountTag.getVersion());
+                })
+                .collect(Collectors.toList());
+        Assertions.assertNotNull(collect);
+    }
 
     @Test
     void readXMLJackson() {
