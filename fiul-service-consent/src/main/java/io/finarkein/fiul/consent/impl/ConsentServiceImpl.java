@@ -15,6 +15,7 @@ import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
+import io.finarkein.fiul.consent.ConsentShortMeta;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
@@ -230,7 +231,7 @@ class ConsentServiceImpl implements ConsentService {
                 .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(), "SignedConsent cannot be found, try with aaHandle")
                         .params(Map.of("consentId", consentId)));
         return aafiuClient.getConsentArtefact(consentId, aaHandle)
-                .map(consentArtefact -> {
+                .flatMap(consentArtefact -> {
                     SignedConsentDTO signedConsentDTO = new SignedConsentDTO();
                     signedConsentDTO.setConsentId(consentId);
                     signedConsentDTO.setCreateTimestamp(strToTimeStamp.apply(consentArtefact.getCreateTimestamp()));
@@ -240,7 +241,18 @@ class ConsentServiceImpl implements ConsentService {
                     signedConsentDTO.setPayload(tokens[1]);
                     signedConsentDTO.setSignature(tokens[2]);
 
-                    return signedConsentDTO;
+                    if (signedConsentDTO.getPayload() != null) {
+                        try {
+                            final SignedConsent signedConsent = mapper.readValue(signedConsentDTO.getPayload(), SignedConsent.class);
+                            signedConsentDTO.setConsentMode(signedConsent.getConsentMode());
+                            signedConsentDTO.setDataLifeUnit(signedConsent.getDataLife().getUnit());
+                            signedConsentDTO.setDataLifeValue(signedConsent.getDataLife().getValue());
+                        } catch (Exception e) {
+                            return Mono.error(e);
+                        }
+                    }
+
+                    return Mono.just(signedConsentDTO);
                 })
                 .doOnSuccess(consentStore::saveSignedConsent);
     }
@@ -257,15 +269,42 @@ class ConsentServiceImpl implements ConsentService {
         return getSignedConsent(consentId, Optional.ofNullable(aaName))
                 .map(SignedConsentDTO::getPayload)
                 .flatMap(payload -> {
-                    if (payload != null) {
-                        try {
-                            return Mono.just(mapper.readValue(payload, SignedConsent.class));
-                        } catch (Exception e) {
-                            return Mono.error(e);
-                        }
-                    }
-                    return Mono.empty();
+                    SignedConsent signedConsent = deserializeSingedConsent(payload);
+                    if (signedConsent == null)
+                        return Mono.empty();
+                    return Mono.just(signedConsent);
                 }).doOnSuccess(details -> log.debug("GetSignedConsentDetail: success: consentId:{}, aaName:{}", consentId, aaName));
+    }
+
+    SignedConsent deserializeSingedConsent(String json) {
+        if (json != null) {
+            try {
+                return mapper.readValue(json, SignedConsent.class);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Mono<ConsentShortMeta> getConsentMeta(String consentId, String aaName) {
+        return getSignedConsent(consentId, Optional.ofNullable(aaName))
+                .map(signedConsentDTO -> {
+                            if (signedConsentDTO.getConsentMode() == null) {
+                                final SignedConsent signedConsent = deserializeSingedConsent(signedConsentDTO.getPayload());
+                                if (signedConsent != null) {
+                                    signedConsentDTO.setConsentMode(signedConsent.getConsentMode());
+                                    signedConsentDTO.setDataLifeUnit(signedConsent.getDataLife().getUnit());
+                                    signedConsentDTO.setDataLifeValue(signedConsent.getDataLife().getValue());
+                                    consentStore.saveSignedConsent(signedConsentDTO);
+                                }
+                            }
+                            return new ConsentShortMeta(signedConsentDTO.getConsentMode(),
+                                    signedConsentDTO.getDataLifeUnit(),
+                                    signedConsentDTO.getDataLifeValue());
+                        }
+                );
     }
 
     @Override

@@ -27,7 +27,7 @@
         <version.maven-dependency-plugin>3.1.1</version.maven-dependency-plugin>
         <version.logger>2.17.1</version.logger>
         <version.aa-commons>0.5.1-SNAPSHOT</version.aa-commons>
-        <version.fi-meta>1.0.3</version.fi-meta>
+        <version.fi-meta>1.0.4</version.fi-meta>
 
         <version.maven-compiler>3.8.1</version.maven-compiler>
         <version.plugin-deploy>3.0.0-M1</version.plugin-deploy>

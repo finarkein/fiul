@@ -7,24 +7,17 @@
 package io.finarkein.fiul.dataflow.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.finarkein.api.aa.crypto.SerializedKeyPair;
 import io.finarkein.fiul.AAFIUClient;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.dataflow.ConsentServiceClient;
-import io.finarkein.fiul.dataflow.EasyDataFlowService;
-import io.finarkein.fiul.config.AAResponseHandlerConfig;
 import io.finarkein.fiul.dataflow.store.AAFIDataStore;
 import io.finarkein.fiul.dataflow.store.EasyFIDataStore;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
 import io.finarkein.fiul.dataflow.store.FIRequestStore;
 import io.finarkein.fiul.notification.callback.CallbackRegistry;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.core.publisher.Mono;
-
-import static io.finarkein.fiul.dataflow.Util.loadJsonFromFile;
 
 @Configuration
 public class TestConfig {

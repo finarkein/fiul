@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Account xmlns="http://api.rebit.org.in/FISchema/deposit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.rebit.org.in/FISchema/deposit ../FISchema/deposit.xsd" linkedAccRef="" maskedAccNumber="" version="1.1" type="deposit">
+<Account xmlns="http://api.rebit.org.in/FISchema/deposit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://api.rebit.org.in/FISchema/deposit ../FISchema/deposit.xsd" version="1.1" type="deposit" linkedAccRef="" maskedAccNumber="">
     <Profile>
         <Holders type="JOINT">
             <Holder name="" dob="2002-09-24" mobile="91729391923" nominee="NOT-REGISTERED" email="qw@gmail.com" pan="AAAPL1234C" ckycCompliance="true"/>

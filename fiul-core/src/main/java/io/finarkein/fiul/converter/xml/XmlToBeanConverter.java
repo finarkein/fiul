@@ -6,24 +6,15 @@
  */
 package io.finarkein.fiul.converter.xml;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.type.SimpleType;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import io.finarkein.aa.fi.FIAccount;
 import io.finarkein.fiul.Functions;
+import lombok.NoArgsConstructor;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
+@NoArgsConstructor
 public abstract class XmlToBeanConverter {
-    public static final XmlMapper xmlMapper;
-
-    static {
-        xmlMapper = new XmlMapper();
-        xmlMapper.setAnnotationIntrospector(new JaxbAnnotationIntrospector());
-        xmlMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    }
 
     public abstract String name();
 
@@ -31,6 +22,7 @@ public abstract class XmlToBeanConverter {
 
     public Function<String, ? extends FIAccount> converter() {
         return xmlStr -> {
+            XmlMapper xmlMapper = ThreadLocalXmlMapperUtil.getOrCreate();
             try {
                 return (FIAccount) xmlMapper.readValue(xmlStr, getType());
             } catch (ClassCastException e) {
@@ -46,9 +38,5 @@ public abstract class XmlToBeanConverter {
                 }
             }
         };
-    }
-
-    public BiFunction<String, Class<?>, Boolean> canDeserialize() {
-        return (xml, fiType) -> xmlMapper.canDeserialize(SimpleType.constructUnsafe(getType()));
     }
 }

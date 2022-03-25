@@ -9,6 +9,7 @@ package io.finarkein.fiul.dataflow.impl;
 import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.api.aa.common.FIDataRange;
 import io.finarkein.api.aa.consent.ConsentMode;
+import io.finarkein.api.aa.consent.DataLife;
 import io.finarkein.api.aa.crypto.SerializedKeyPair;
 import io.finarkein.api.aa.dataflow.Consent;
 import io.finarkein.api.aa.dataflow.FIRequest;
@@ -210,8 +211,8 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
                 .flatMap(fiRequestDto -> fiuClient
                         .fiFetch(sessionId, fiRequestDto.getAaName())
                         .publishOn(dbCallHandlerSchedulerConfig.getScheduler())
-                        .flatMap(saveDataIfStoreConsentMode(fiRequestDto, consentHandleId, sessionId, fiDataOutputFormat))
                         .doOnSuccess(updateFetchMetadata(sessionId, fetchDataStartTime))
+                        .flatMap(saveDataIfStoreConsentMode(fiRequestDto, consentHandleId, sessionId, fiDataOutputFormat))
                         .doOnSuccess(response -> log.debug("FetchData: success: consentHandleId:{}, sessionId:{}", consentHandleId, sessionId))
                         .doOnError(error -> log.error("FetchData: error: consentId:{}, consentHandleId:{}, error:{}", consentHandleId, sessionId, error.getMessage(), error)))
                 ;
@@ -224,28 +225,27 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
             log.debug("inside saveDataIfStoreConsentMode:{},{}", consentHandleId, sessionId);
             return easyFIDataStore
                     .getKeyConsentId(fiRequestDTO.getConsentId(), sessionId)
-                    .map(privateKey ->
-                            fiuClient
-                                    .decryptFIFetchResponse(fiFetchResponse, new SerializedKeyPair(privateKey.getEncryptedKey(), fiRequestDTO.getKeyMaterial()))
-                                    .doOnNext(fiFetchResponse1 -> log.debug("data-decrypted:{},{}", consentHandleId, sessionId))
-                                    .doOnNext(decryptedResponse -> easyFIDataStore.deleteKey(fiRequestDTO.getConsentId(), sessionId))
-                                    .doOnNext(decryptedResponse -> consentServiceClient
-                                            .getSignedConsentDetail(fiRequestDTO.getConsentId(), fiRequestDTO.getAaName())
-                                            .subscribe(consentDetail -> {
-                                                if (ConsentMode.get(consentDetail.getConsentMode()) == STORE) {
-                                                    easyFIDataStore.saveFIData(DataSaveRequest.with(decryptedResponse)
-                                                            .aaName(fiRequestDTO.getAaName())
-                                                            .consentId(fiRequestDTO.getConsentId())
-                                                            .consentHandleId(consentHandleId)
-                                                            .sessionId(sessionId)
-                                                            .dataLife(consentDetail.getDataLife())
-                                                            .dataLifeExpireOn(calculateExpireTime.apply(consentDetail.getDataLife()))
-                                                            .build());
-                                                }
-                                            })
-                                    )
-                                    .flatMap(decryptedResponse -> toFIData(decryptedResponse, fiDataOutputFormat)))
-                    .orElseThrow(() -> Errors.InternalError.with(fiFetchResponse.getTxnid(),
+                    .map(privateKey -> fiuClient.decryptFIFetchResponse(fiFetchResponse, new SerializedKeyPair(privateKey.getEncryptedKey(), fiRequestDTO.getKeyMaterial()))
+                            .doOnNext(fiFetchResponse1 -> log.debug("data-decrypted:{},{}", consentHandleId, sessionId))
+                            .doOnNext(decryptedResponse -> consentServiceClient
+                                    .getConsentMeta(fiRequestDTO.getConsentId(), fiRequestDTO.getAaName())
+                                    .subscribe(consentMeta -> {
+                                        if (ConsentMode.get(consentMeta.getMode()) == STORE) {
+                                            final DataLife dataLife = new DataLife(consentMeta.getDataLifeUnit(), consentMeta.getDataLifeValue());
+                                            easyFIDataStore.saveFIData(DataSaveRequest.with(decryptedResponse)
+                                                    .aaName(fiRequestDTO.getAaName())
+                                                    .consentId(fiRequestDTO.getConsentId())
+                                                    .consentHandleId(consentHandleId)
+                                                    .sessionId(sessionId)
+                                                    .dataLife(dataLife)
+                                                    .dataLifeExpireOn(calculateExpireTime.apply(dataLife))
+                                                    .build());
+                                        }
+                                    })
+                            )
+                            .doOnNext(decryptedResponse -> easyFIDataStore.deleteKey(fiRequestDTO.getConsentId(), sessionId))
+                            .flatMap(decryptedResponse -> toFIData(decryptedResponse, fiDataOutputFormat))
+                    ).orElseThrow(() -> Errors.InternalError.with(fiFetchResponse.getTxnid(),
                             "Unable to decode FIFetchResponse, data-key not found for consentId:" + fiRequestDTO.getConsentId() + ", sessionId:" + sessionId));
         };
     }
@@ -258,7 +258,7 @@ public class EasyDataFlowServiceImpl implements EasyDataFlowService {
         return Mono.just(response);
     }
 
-    protected Consumer<FIDataI> updateFetchMetadata(String sessionId, Timestamp fetchDataStartTime) {
+    protected Consumer<FIFetchResponse> updateFetchMetadata(String sessionId, Timestamp fetchDataStartTime) {
         return fiFetchResponse -> {
             var metadataBuilder = FIFetchMetadata.builder()
                     .sessionId(sessionId)
