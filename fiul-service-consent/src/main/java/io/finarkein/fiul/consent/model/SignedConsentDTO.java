@@ -27,15 +27,19 @@ public class SignedConsentDTO implements Serializable {
     @Id
     protected String consentId;
 
+    protected String consentMode;
+
+    protected String dataLifeUnit;
+
+    protected Integer dataLifeValue;
+
     protected Timestamp createTimestamp;
 
     @Convert(converter = ZippedBlobAttrConverter.OfString.class)
-    @Basic(fetch = javax.persistence.FetchType.LAZY)
     @Column(columnDefinition = "BYTEA", nullable = false, updatable = false)
     protected String header;
 
     @Convert(converter = ZippedBlobAttrConverter.OfString.class)
-    @Basic(fetch = javax.persistence.FetchType.LAZY)
     @Column(columnDefinition = "BYTEA", nullable = false, updatable = false)
     protected String payload;
 

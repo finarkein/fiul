@@ -8,6 +8,7 @@ package io.finarkein.fiul.dataflow;
 
 import io.finarkein.api.aa.consent.artefact.SignedConsent;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
+import io.finarkein.fiul.consent.ConsentShortMeta;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +20,8 @@ public interface ConsentServiceClient {
     ConsentStateDTO getConsentStateByConsentId(String consentId);
 
     Mono<SignedConsent> getSignedConsentDetail(String consentId, String aaName);
+
+    Mono<ConsentShortMeta> getConsentMeta(String consentId, String aaName);
 
     Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> customerAAId);
 

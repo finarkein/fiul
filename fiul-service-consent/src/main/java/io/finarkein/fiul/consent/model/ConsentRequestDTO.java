@@ -59,13 +59,11 @@ public class ConsentRequestDTO {
     private String dataConsumerId;
 
     @Convert(converter = JSONAttrConverter.OfTypePurpose.class)
-    @Basic(fetch = javax.persistence.FetchType.LAZY)
     private Purpose purposeJson;
 
     private String dataLifeUnit;
     private int dataLifeValue;
     @Convert(converter = JSONAttrConverter.OfTypeDataFilterList.class)
-    @Basic(fetch = javax.persistence.FetchType.LAZY)
     private List<DataFilter> dataFilterJson;
 
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
