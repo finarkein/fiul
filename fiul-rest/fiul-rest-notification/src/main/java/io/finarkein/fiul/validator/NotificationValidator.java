@@ -42,7 +42,7 @@ public class NotificationValidator {
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Invalid Notifier type");
         }
 
-        if (consentIdPresent(consentNotification.getConsentStatusNotification().getConsentStatus()))
+        if (expectConsentId(consentNotification.getConsentStatusNotification().getConsentStatus()))
             ArgsValidator.isValidUUID(consentNotification.getTxnid(),
                     consentNotification.getConsentStatusNotification().getConsentId(),
                     "ConsentId");
@@ -55,7 +55,7 @@ public class NotificationValidator {
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent notifier Id is invalid");
     }
 
-    private static boolean consentIdPresent(String consentStatus) {
+    private static boolean expectConsentId(String consentStatus) {
         return consentStatus != null && (consentIdValidationOnStatus.contains(consentStatus)
                 || consentIdValidationOnStatus.contains(consentStatus.toUpperCase()));
     }
