@@ -18,10 +18,13 @@ import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NotificationValidator {
 
     private static final String REQUIRED_NOTIFIER_TYPE = "AA";
+    private static final Set<String> consentIdValidationOnStatus = Set.of("ACTIVE", "REVOKED", "PAUSED", "EXPIRED");
 
     public static void validateConsentNotification(ConsentNotification consentNotification, ConsentStateDTO consentStateDTO,
                                                    EntityInfo entityInfo, AaApiKeyBody aaApiKeyBody) {
@@ -38,8 +41,11 @@ public class NotificationValidator {
         if (!consentNotification.getNotifier().getType().equals(REQUIRED_NOTIFIER_TYPE)) {
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Invalid Notifier type");
         }
-        ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getConsentStatusNotification().getConsentId(),
-                "ConsentId");
+
+        if (consentIdPresent(consentNotification.getConsentStatusNotification().getConsentStatus()))
+            ArgsValidator.isValidUUID(consentNotification.getTxnid(),
+                    consentNotification.getConsentStatusNotification().getConsentId(),
+                    "ConsentId");
 
         if (!consentNotification.getConsentStatusNotification().getConsentHandle().equals(consentStateDTO.getConsentHandle()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "ConsentHandle Id is invalid");
@@ -47,6 +53,11 @@ public class NotificationValidator {
 //            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Id is invalid");
         if (!consentNotification.getNotifier().getId().equals(entityInfo.getId()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent notifier Id is invalid");
+    }
+
+    private static boolean consentIdPresent(String consentStatus) {
+        return consentStatus != null && (consentIdValidationOnStatus.contains(consentStatus)
+                || consentIdValidationOnStatus.contains(consentStatus.toUpperCase()));
     }
 
     public static void validateFINotification(FINotification fiNotification, FIRequestState fiRequestState,
