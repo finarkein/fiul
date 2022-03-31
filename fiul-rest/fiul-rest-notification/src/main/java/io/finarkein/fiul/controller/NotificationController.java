@@ -68,7 +68,7 @@ public class NotificationController {
                     .forEach(entity -> processorMap.put(entity, processor));
         }
         applicableProcessors = Collections.unmodifiableMap(processorMap);
-        log.debug("applicableProcessorsMap: {}",applicableProcessors);
+        log.debug("applicableProcessorsMap: {}", applicableProcessors);
     }
 
     @PostMapping("/Consent/Notification")
@@ -87,30 +87,35 @@ public class NotificationController {
         }
 
         ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getTxnid(), "TxnId");
-
-        ConsentStateDTO consentStateDTO = consentService.getConsentStateByConsentHandle(consentNotification.getConsentStatusNotification().getConsentHandle());
+        final String consentHandle = consentNotification.getConsentStatusNotification().getConsentHandle();
+        ConsentStateDTO consentStateDTO = consentService.getConsentStateByConsentHandle(consentHandle);
         if (consentStateDTO == null)
             consentStateDTO = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
 
         if (consentStateDTO != null) {
             try {
+                log.debug("{}: Validating ConsentNotification", consentHandle);
                 NotificationValidator.validateConsentNotification(consentNotification, consentStateDTO,
                         registryService.getEntityInfoByAAName(consentStateDTO.getAaId()), aaApiKeyBody);
 
+                log.debug("{}: ConsentNotification.publishing (consentNotification)", consentHandle);
                 publisher.publishConsentNotification(consentNotification);
-                log.debug("NotificationPublisher.publish(consentNotification) done");
+                log.debug("{}: NotificationPublisher.publish(consentNotification) done", consentHandle);
                 return ResponseEntity.ok().body(Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(),
                         Timestamp.from(Instant.now()))));
             } catch (SystemException e) {
+                log.error("Error while processing ConsentNotification:{}, error:{}", consentNotification, e.getMessage(), e);
                 if (e.errorCode().httpStatusCode() == 404)
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
                 return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
                         Timestamp.from(Instant.now()), e.getMessage())));
             } catch (Exception e) {
-                log.error("Error while publishing ConsentNotification for handling:{}", e.getMessage(), e);
+                log.error("Error while processing ConsentNotification:{}, error:{}", consentNotification, e.getMessage(), e);
                 throw new IllegalStateException(e);
             }
         }
+        log.debug("{}: For ConsentNotification consentState not found returning invalid request", consentHandle);
         return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
                 Timestamp.from(Instant.now()), "Invalid Request")));
     }
@@ -124,7 +129,7 @@ public class NotificationController {
             processorName = fiNotification.getNotifier().getId();
 
         FINotificationProcessor processor = applicableProcessors.get(processorName);
-        if(processor == null) {
+        if (processor == null) {
             processorName = DEFAULT_PROCESSOR_NAME;
             processor = applicableProcessors.get(processorName);
         }
