@@ -15,6 +15,7 @@ import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.AAFIUClient;
+import io.finarkein.fiul.consent.ConsentShortMeta;
 import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentNotificationLog;
 import io.finarkein.fiul.consent.model.ConsentRequestDTO;
@@ -109,29 +110,39 @@ class ConsentServiceImpl implements ConsentService {
         return buildFromConsentState(consentHandle)
                 .get()
                 .map(Mono::just)
-                .orElseGet(() -> aaNameOptional
-                        .or(consentRequestAANameByConsentHandle(consentHandle))
-                        .map(aaName -> aafiuClient.getConsentStatus(consentHandle, aaName)
-                                .flatMap(consentHandleResponse -> {
-                                    final Optional<ConsentStateDTO> optionalConsentState = consentStore
-                                            .getConsentStateByHandle(consentHandle);
-                                    if (optionalConsentState.isPresent()
-                                            && Objects.nonNull(optionalConsentState.get().getPostConsentResponseTimestamp())
-                                            && strToTimeStamp.apply(consentHandleResponse.getTimestamp())
-                                            .before(optionalConsentState.get().getPostConsentResponseTimestamp())) {
-                                        throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
-                                                "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
-                                    }
-                                    return Mono.just(consentHandleResponse);
-                                })
-                        )
-                        .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(), "ConsentHandle not found, try with aaHandle"))
+                .orElseGet(() -> {
+                            if (aaNameOptional.isPresent()) {
+                                String aaName = aaNameOptional.get();
+                                return getConsentHandleResponseMono(consentHandle, aaName);
+                            }
+                            return consentRequestAANameByConsentHandle(consentHandle)
+                                    .flatMap(optionalAAName -> optionalAAName
+                                            .map(aaName -> getConsentHandleResponseMono(consentHandle, aaName))
+                                            .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(), "ConsentHandle not found, try with aaHandle"))
+                                    );
+                        }
                 ).doOnSuccess(consentHandleResponse -> {
                     log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
                     consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(),
                             consentHandleResponse.getConsentStatus().getStatus());
                 })
                 .doOnError(error -> log.error("GetConsentStatus: error:{}", error.getMessage(), error));
+    }
+
+    private Mono<ConsentHandleResponse> getConsentHandleResponseMono(String consentHandle, String aaName) {
+        return aafiuClient.getConsentStatus(consentHandle, aaName)
+                .flatMap(consentHandleResponse -> consentStore.consentStateByHandle(consentHandle)
+                        .flatMap(optionalConsentState -> {
+                            if (optionalConsentState.isPresent()
+                                    && Objects.nonNull(optionalConsentState.get().getPostConsentResponseTimestamp())
+                                    && strToTimeStamp.apply(consentHandleResponse.getTimestamp())
+                                    .before(optionalConsentState.get().getPostConsentResponseTimestamp())) {
+                                throw Errors.InvalidRequest.with(optionalConsentState.get().getTxnId(),
+                                        "Invalid consent handle response timestamp : " + consentHandleResponse.getTimestamp());
+                            }
+                            return Mono.just(consentHandleResponse);
+                        })
+                );
     }
 
     private void consentStateUpdateHelper(String txnId, String consentId, String consentStatus) {
@@ -143,8 +154,10 @@ class ConsentServiceImpl implements ConsentService {
         }
     }
 
-    private Supplier<Optional<String>> consentRequestAANameByConsentHandle(final String consentHandle) {
-        return () -> consentStore.findRequestByConsentHandle(consentHandle).map(ConsentRequestDTO::getAaName);
+    private Mono<Optional<String>> consentRequestAANameByConsentHandle(final String consentHandle) {
+        return consentStore.findRequestByConsentHandle(consentHandle)
+                .map(optionalConsentRequestDTO -> optionalConsentRequestDTO.map(ConsentRequestDTO::getAaName))
+                ;
     }
 
     private Supplier<Optional<String>> consentRequestAANameByConsentId(final String consentId) {
@@ -215,10 +228,10 @@ class ConsentServiceImpl implements ConsentService {
                     return (consentState != null) ?
                             Optional.ofNullable(consentState.getAaId()) : Optional.empty();
                 })
-                .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(),"SignedConsent cannot be found, try with aaHandle")
+                .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(), "SignedConsent cannot be found, try with aaHandle")
                         .params(Map.of("consentId", consentId)));
         return aafiuClient.getConsentArtefact(consentId, aaHandle)
-                .map(consentArtefact -> {
+                .flatMap(consentArtefact -> {
                     SignedConsentDTO signedConsentDTO = new SignedConsentDTO();
                     signedConsentDTO.setConsentId(consentId);
                     signedConsentDTO.setCreateTimestamp(strToTimeStamp.apply(consentArtefact.getCreateTimestamp()));
@@ -228,7 +241,18 @@ class ConsentServiceImpl implements ConsentService {
                     signedConsentDTO.setPayload(tokens[1]);
                     signedConsentDTO.setSignature(tokens[2]);
 
-                    return signedConsentDTO;
+                    if (signedConsentDTO.getPayload() != null) {
+                        try {
+                            final SignedConsent signedConsent = mapper.readValue(signedConsentDTO.getPayload(), SignedConsent.class);
+                            signedConsentDTO.setConsentMode(signedConsent.getConsentMode());
+                            signedConsentDTO.setDataLifeUnit(signedConsent.getDataLife().getUnit());
+                            signedConsentDTO.setDataLifeValue(signedConsent.getDataLife().getValue());
+                        } catch (Exception e) {
+                            return Mono.error(e);
+                        }
+                    }
+
+                    return Mono.just(signedConsentDTO);
                 })
                 .doOnSuccess(consentStore::saveSignedConsent);
     }
@@ -245,15 +269,42 @@ class ConsentServiceImpl implements ConsentService {
         return getSignedConsent(consentId, Optional.ofNullable(aaName))
                 .map(SignedConsentDTO::getPayload)
                 .flatMap(payload -> {
-                    if (payload != null) {
-                        try {
-                            return Mono.just(mapper.readValue(payload, SignedConsent.class));
-                        } catch (Exception e) {
-                            return Mono.error(e);
-                        }
-                    }
-                    return Mono.empty();
+                    SignedConsent signedConsent = deserializeSingedConsent(payload);
+                    if (signedConsent == null)
+                        return Mono.empty();
+                    return Mono.just(signedConsent);
                 }).doOnSuccess(details -> log.debug("GetSignedConsentDetail: success: consentId:{}, aaName:{}", consentId, aaName));
+    }
+
+    SignedConsent deserializeSingedConsent(String json) {
+        if (json != null) {
+            try {
+                return mapper.readValue(json, SignedConsent.class);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Mono<ConsentShortMeta> getConsentMeta(String consentId, String aaName) {
+        return getSignedConsent(consentId, Optional.ofNullable(aaName))
+                .map(signedConsentDTO -> {
+                            if (signedConsentDTO.getConsentMode() == null) {
+                                final SignedConsent signedConsent = deserializeSingedConsent(signedConsentDTO.getPayload());
+                                if (signedConsent != null) {
+                                    signedConsentDTO.setConsentMode(signedConsent.getConsentMode());
+                                    signedConsentDTO.setDataLifeUnit(signedConsent.getDataLife().getUnit());
+                                    signedConsentDTO.setDataLifeValue(signedConsent.getDataLife().getValue());
+                                    consentStore.saveSignedConsent(signedConsentDTO);
+                                }
+                            }
+                            return new ConsentShortMeta(signedConsentDTO.getConsentMode(),
+                                    signedConsentDTO.getDataLifeUnit(),
+                                    signedConsentDTO.getDataLifeValue());
+                        }
+                );
     }
 
     @Override
@@ -264,9 +315,12 @@ class ConsentServiceImpl implements ConsentService {
     @Override
     public Mono<ConsentStateDTO> getConsentState(String consentHandle, Optional<String> aaHandle) {
         log.debug("GetConsentState: start: consentHandle:{}, aaHandle:{}", consentHandle, aaHandle);
-        return consentStore.getConsentStateByHandle(consentHandle)
-                .map(Mono::just)
-                .orElseGet(() -> fetchConsentStatus(consentHandle, aaHandle))
+        return consentStore.consentStateByHandle(consentHandle)
+                .flatMap(optionalConsentStateDTO -> {
+                    if (optionalConsentStateDTO.isEmpty())
+                        return fetchConsentStatus(consentHandle, aaHandle);
+                    return Mono.just(optionalConsentStateDTO.get());
+                })
                 .doOnSuccess(artefact -> log.debug("GetConsentState: success: consentHandle:{}, aaHandle:{}", consentHandle, aaHandle))
                 .doOnError(error -> log.error("GetConsentState: error:{}", error.getMessage(), error));
     }
@@ -300,28 +354,38 @@ class ConsentServiceImpl implements ConsentService {
         consentStore.updateConsentState(consentStateDTO);
     }
 
-    private Mono<ConsentStateDTO> fetchConsentStatus(String consentHandle, Optional<String> aaHandle) {
-        return aaHandle
-                .or(() -> consentStore.findRequestByConsentHandle(consentHandle).map(ConsentRequestDTO::getAaName))
-                .map(aaName ->
-                        aafiuClient
-                                .getConsentStatus(consentHandle, aaName)
-                                .flatMap(consentStatusResponse -> {
-                                    final var state = new ConsentStateDTO();
-                                    state.setConsentHandle(consentStatusResponse.getConsentHandle());
-                                    state.setConsentId(consentStatusResponse.getConsentStatus().getId());
-                                    state.setConsentStatus(consentStatusResponse.getConsentStatus().getStatus());
-                                    state.setTxnId(consentStatusResponse.getTxnid());
-                                    state.setAaId(aaName);
+    private Mono<ConsentStateDTO> fetchConsentStatus(String consentHandle, Optional<String> optionalAaHandle) {
+        if (optionalAaHandle.isPresent()) {
+            String aaName = optionalAaHandle.get();
+            return getConsentStateDTOMono(consentHandle, aaName);
+        }
+        return consentStore
+                .findRequestByConsentHandle(consentHandle)
+                .flatMap(optionalConsentRequest ->
+                        optionalConsentRequest
+                                .map(ConsentRequestDTO::getAaName)
+                                .map(aaName -> getConsentStateDTOMono(consentHandle, aaName))
+                                .orElseThrow(() -> Errors.InvalidRequest.with(UUIDSupplier.get(),
+                                        "Unable to get status for given consentHandle:" + consentHandle + ", try with aaHandle"))
+                );
+    }
 
-                                    //saving consentState
-                                    consentStore.saveConsentState(state);
-                                    return Mono.just(state);
-                                })
-                                .onErrorMap(throwable -> Errors.InvalidRequest.with(UUIDSupplier.get(),
-                                        throwable.getMessage(), throwable))
-                )
-                .orElseThrow(() -> Errors.InvalidRequest.with(UUIDSupplier.get(),
-                        "Unable to get status for given consentHandle:" + consentHandle + ", try with aaHandle"));
+    private Mono<ConsentStateDTO> getConsentStateDTOMono(String consentHandle, String aaName) {
+        return aafiuClient
+                .getConsentStatus(consentHandle, aaName)
+                .flatMap(consentStatusResponse -> {
+                    final var state = new ConsentStateDTO();
+                    state.setConsentHandle(consentStatusResponse.getConsentHandle());
+                    state.setConsentId(consentStatusResponse.getConsentStatus().getId());
+                    state.setConsentStatus(consentStatusResponse.getConsentStatus().getStatus());
+                    state.setTxnId(consentStatusResponse.getTxnid());
+                    state.setAaId(aaName);
+
+                    //saving consentState
+                    consentStore.saveConsentState(state);
+                    return Mono.just(state);
+                })
+                .onErrorMap(throwable -> Errors.InvalidRequest.with(UUIDSupplier.get(),
+                        throwable.getMessage(), throwable));
     }
 }

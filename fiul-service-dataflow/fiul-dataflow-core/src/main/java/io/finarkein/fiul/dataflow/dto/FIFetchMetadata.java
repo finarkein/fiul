@@ -21,7 +21,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Entity
 @Builder(builderClassName = "Builder")
-@Table( name = "FI_FETCH_METADATA",
+@Table(name = "FI_FETCH_METADATA",
         indexes = {
                 @Index(name = "FIFetchMD_Idx1", columnList = "sessionId, fiDataRangeFrom, fiDataRangeTo, fipId, " +
                         "linkRefNumbers, fiFetchSubmittedOn"),

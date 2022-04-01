@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,7 +34,8 @@ import java.time.Instant;
                 @Index(name = "FIDataHeader_Idx6", columnList = "consentHandleId")
         }
 )
-public class FIDataHeader {
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+public class FIDataHeader implements Serializable {
     @Id
     @Column(length = 36)
     private String consentId;
