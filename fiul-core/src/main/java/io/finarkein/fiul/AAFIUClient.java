@@ -88,6 +88,8 @@ public interface AAFIUClient {
      */
     Mono<SerializedKeyPair> generateKeyMaterial();
 
+    SerializedKeyPair getOrCreateKeyMaterial();
+
     default Mono<String> generateJWS(String body) {
         return null;
     }

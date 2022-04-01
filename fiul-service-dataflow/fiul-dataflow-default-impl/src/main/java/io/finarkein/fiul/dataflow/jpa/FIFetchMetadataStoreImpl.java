@@ -6,26 +6,29 @@
  */
 package io.finarkein.fiul.dataflow.jpa;
 
+import io.finarkein.fiul.config.DBCallHandlerSchedulerConfig;
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
 import io.finarkein.fiul.dataflow.store.FIFetchMetadataStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
 
     private final RepoFIFetchMetadata repoFIFetchMetadata;
+    private final DBCallHandlerSchedulerConfig schedulerConfig;
 
     @Autowired
-    FIFetchMetadataStoreImpl(RepoFIFetchMetadata repoFIFetchMetadata) {
+    FIFetchMetadataStoreImpl(RepoFIFetchMetadata repoFIFetchMetadata, DBCallHandlerSchedulerConfig schedulerConfig) {
         this.repoFIFetchMetadata = repoFIFetchMetadata;
+        this.schedulerConfig = schedulerConfig;
     }
 
     @Override
@@ -61,13 +64,23 @@ public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
     }
 
     @Override
-    public Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue,
-                                                              Timestamp toValue, boolean easyDataFlow) {
-        final List<FIFetchMetadata> metadataForGivenWindow = repoFIFetchMetadata.getMetadataForGivenWindow(consentHandleId,
-                fromValue, toValue, easyDataFlow, PageRequest.of(0, 1));
-        if (metadataForGivenWindow == null || metadataForGivenWindow.isEmpty())
-            return Optional.empty();
-        return Optional.of(metadataForGivenWindow.get(0));
+    public Mono<Optional<FIFetchMetadata>> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue,
+                                                                    Timestamp toValue, boolean easyDataFlow) {
+        return Mono.fromCallable(() ->
+                        repoFIFetchMetadata.getMetadataForGivenWindow(
+                                consentHandleId,
+                                fromValue,
+                                toValue,
+                                easyDataFlow,
+                                PageRequest.of(0, 1))
+                ).map(fiFetchMetadata -> {
+                            Optional<FIFetchMetadata> returnValue = Optional.empty();
+                            if (fiFetchMetadata == null || fiFetchMetadata.isEmpty())
+                                return returnValue;
+                            return Optional.of(fiFetchMetadata.get(0));
+                        }
+                )
+                .subscribeOn(schedulerConfig.getScheduler());
     }
 
     @Override

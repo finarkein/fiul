@@ -7,6 +7,7 @@
 package io.finarkein.fiul.dataflow.store;
 
 import io.finarkein.fiul.dataflow.dto.FIFetchMetadata;
+import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public interface FIFetchMetadataStore {
 
     Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId);
 
-    Optional<FIFetchMetadata> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue, Timestamp toValue, boolean easyDataFlow);
+    Mono<Optional<FIFetchMetadata>> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue, Timestamp toValue, boolean easyDataFlow);
 
     Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId, String aaName);
 

@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.finarkein.fiu</groupId>
         <artifactId>fiul</artifactId>
-        <version>0.6.4</version>
+        <version>0.6.5</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -99,7 +99,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>2.11.2</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
@@ -141,6 +140,11 @@
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>4.0.0.RC1</version>
         </dependency>
     </dependencies>
 </project>

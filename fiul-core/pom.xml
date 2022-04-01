@@ -5,13 +5,17 @@
     <parent>
         <artifactId>fiul</artifactId>
         <groupId>io.finarkein.fiu</groupId>
-        <version>0.6.4</version>
+        <version>0.6.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>fiul-core</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-afterburner</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.finarkein.aa</groupId>
             <artifactId>fi-meta</artifactId>

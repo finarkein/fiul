@@ -8,6 +8,7 @@ package io.finarkein.fiul.dataflow.impl;
 
 import io.finarkein.api.aa.consent.artefact.SignedConsent;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
+import io.finarkein.fiul.consent.ConsentShortMeta;
 import io.finarkein.fiul.consent.model.ConsentStateDTO;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.dataflow.ConsentServiceClient;
@@ -53,6 +54,11 @@ public class ConsentServiceClientImpl implements ConsentServiceClient {
     @Override
     public Mono<SignedConsent> getSignedConsentDetail(String consentId, String aaName) {
         return consentService.getSignedConsentDetail(consentId, aaName);
+    }
+
+    @Override
+    public Mono<ConsentShortMeta> getConsentMeta(String consentId, String aaName) {
+        return consentService.getConsentMeta(consentId, aaName);
     }
 
     @Override

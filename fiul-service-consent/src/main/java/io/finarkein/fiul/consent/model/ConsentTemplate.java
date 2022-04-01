@@ -8,17 +8,21 @@ package io.finarkein.fiul.consent.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 
 @Data
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ConsentTemplate {
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+public class ConsentTemplate implements Serializable {
 
     @Id
     @GeneratedValue(generator = "UUIDConsentTemplate")
