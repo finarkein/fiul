@@ -23,7 +23,7 @@
         <version.mockito>3.9.0</version.mockito>
         <version.reactor-core>3.4.0</version.reactor-core>
         <version.reactor-netty>1.0.8</version.reactor-netty>
-        <version.spring-webflux>5.3.8</version.spring-webflux>
+        <version.spring-webflux>5.3.18</version.spring-webflux>
         <version.maven-dependency-plugin>3.1.1</version.maven-dependency-plugin>
         <version.logger>2.17.1</version.logger>
         <version.aa-commons>0.5.1</version.aa-commons>
