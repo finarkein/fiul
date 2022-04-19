@@ -8,7 +8,6 @@ package io.finarkein.fiul.consent;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,17 +26,6 @@ public enum ConsentState {
                 .stream(ConsentState.values())
                 .sequential()
                 .collect(Collectors.toMap(Enum::name, Function.identity()));
-    }
-
-    public static final Set<ConsentState> CONSENT_NEGATIVE_STATUS = Set.of(PAUSED, EXPIRED, REVOKED);
-    public static final Set<ConsentState> CONSENT_CLEANUP_STATUS = Set.of(REJECTED, EXPIRED, REVOKED);
-
-    public boolean isNegativeStatus() {
-        return CONSENT_NEGATIVE_STATUS.contains(this);
-    }
-
-    public boolean isCleanupStatus() {
-        return CONSENT_CLEANUP_STATUS.contains(this);
     }
 
     public static ConsentState get(String stateValue) {
