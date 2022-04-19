@@ -15,20 +15,26 @@ import io.finarkein.fiul.dataflow.EasyDataFlowService;
 import io.finarkein.fiul.dataflow.store.FIRequestStore;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 @Log4j2
 public class DataFlowNotificationHandlerImpl implements DataFlowNotificationHandler {
 
     @Autowired
-    DataFlowService dataFlowService;
+    private DataFlowService dataFlowService;
 
     @Autowired
-    EasyDataFlowService easyDataFlowService;
+    private EasyDataFlowService easyDataFlowService;
 
     @Autowired
-    FIRequestStore fiRequestStore;
+    private FIRequestStore fiRequestStore;
+
+    @Value("${fiul.dataflow.data-cleanup-consent-states}")
+    private Set<String> dataCleanupConsentStates;
 
     @Override
     public void handleFINotification(FINotification fiNotification) {
@@ -41,13 +47,16 @@ public class DataFlowNotificationHandlerImpl implements DataFlowNotificationHand
         final var consentStatus = statusNotification.getConsentStatus();
         final var consentState = ConsentState.get(consentStatus.toUpperCase());
 
-        if (!consentState.isCleanupStatus())
-            return;
-
         log.debug("Handling consentNotification:{}", consentNotification);
-        if (consentState == ConsentState.REVOKED || consentState == ConsentState.EXPIRED) {
+        if (isCleanupRequired(consentState)) {
             easyDataFlowService.deleteData(statusNotification.getConsentId());
             dataFlowService.deleteDataByConsentId(statusNotification.getConsentId());
+            log.debug("Data cleanup done for consentNotification:{}", consentNotification);
         }
+    }
+
+    private boolean isCleanupRequired(ConsentState forConsentState){
+        return dataCleanupConsentStates.contains(forConsentState.name())
+                || dataCleanupConsentStates.contains(forConsentState.name().toLowerCase());
     }
 }
