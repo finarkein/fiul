@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
@@ -96,7 +97,7 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
-    public Mono<Optional<ConsentRequestDTO>> findRequestByConsentHandle(String consentHandle) {
+    public Mono<Optional<ConsentRequestDTO>>  findRequestByConsentHandle(String consentHandle) {
         return Mono.fromCallable(() -> consentRequestDTORepository.findById(consentHandle))
                 .subscribeOn(dbBlockingCallSchedulerConfig.getScheduler());
     }
@@ -111,7 +112,9 @@ class ConsentStoreImpl implements ConsentStore {
         Optional<ConsentStateDTO> optionalConsentState = consentStateRepository.findById(consentNotificationLog.getConsentHandle());
         ConsentStateDTO consentStateDTO = optionalConsentState.orElseGet(ConsentStateDTO::new);
         consentStateDTO.setConsentHandle(consentNotificationLog.getConsentHandle());
-        consentStateDTO.setConsentId(consentNotificationLog.getConsentId());
+
+        if(!Objects.equals(consentNotificationLog.getConsentId(), "null"))
+            consentStateDTO.setConsentId(consentNotificationLog.getConsentId());
         consentStateDTO.setConsentStatus(consentNotificationLog.getConsentState());
         consentStateDTO.setTxnId(consentNotificationLog.getTxnId());
         consentStateDTO.setNotifierId(consentNotificationLog.getNotifierId());
