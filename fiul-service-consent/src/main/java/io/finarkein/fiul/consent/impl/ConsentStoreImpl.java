@@ -97,7 +97,7 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
-    public Mono<Optional<ConsentRequestDTO>>  findRequestByConsentHandle(String consentHandle) {
+    public Mono<Optional<ConsentRequestDTO>> findRequestByConsentHandle(String consentHandle) {
         return Mono.fromCallable(() -> consentRequestDTORepository.findById(consentHandle))
                 .subscribeOn(dbBlockingCallSchedulerConfig.getScheduler());
     }
@@ -109,12 +109,13 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Override
     public void logConsentNotification(ConsentNotificationLog consentNotificationLog) {
+        if (Objects.equals(consentNotificationLog.getConsentId(), "null"))
+            consentNotificationLog.setConsentId(null);
+        
         Optional<ConsentStateDTO> optionalConsentState = consentStateRepository.findById(consentNotificationLog.getConsentHandle());
         ConsentStateDTO consentStateDTO = optionalConsentState.orElseGet(ConsentStateDTO::new);
         consentStateDTO.setConsentHandle(consentNotificationLog.getConsentHandle());
-
-        if(!Objects.equals(consentNotificationLog.getConsentId(), "null"))
-            consentStateDTO.setConsentId(consentNotificationLog.getConsentId());
+        consentStateDTO.setConsentId(consentNotificationLog.getConsentId());
         consentStateDTO.setConsentStatus(consentNotificationLog.getConsentState());
         consentStateDTO.setTxnId(consentNotificationLog.getTxnId());
         consentStateDTO.setNotifierId(consentNotificationLog.getNotifierId());
@@ -172,7 +173,7 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
-    public Mono<ConsentStateDTO> consentStateByTxnId(String txnId){
+    public Mono<ConsentStateDTO> consentStateByTxnId(String txnId) {
         return Mono.fromCallable(() -> consentStateRepository.findByTxnId(txnId).orElse(null))
                 .subscribeOn(dbBlockingCallSchedulerConfig.getScheduler());
     }
