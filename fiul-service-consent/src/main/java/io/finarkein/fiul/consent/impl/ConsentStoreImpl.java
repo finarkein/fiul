@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.finarkein.api.aa.util.Functions.aaNameExtractor;
@@ -108,6 +109,9 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Override
     public void logConsentNotification(ConsentNotificationLog consentNotificationLog) {
+        if (Objects.equals(consentNotificationLog.getConsentId(), "null"))
+            consentNotificationLog.setConsentId(null);
+        
         Optional<ConsentStateDTO> optionalConsentState = consentStateRepository.findById(consentNotificationLog.getConsentHandle());
         ConsentStateDTO consentStateDTO = optionalConsentState.orElseGet(ConsentStateDTO::new);
         consentStateDTO.setConsentHandle(consentNotificationLog.getConsentHandle());
@@ -169,7 +173,7 @@ class ConsentStoreImpl implements ConsentStore {
     }
 
     @Override
-    public Mono<ConsentStateDTO> consentStateByTxnId(String txnId){
+    public Mono<ConsentStateDTO> consentStateByTxnId(String txnId) {
         return Mono.fromCallable(() -> consentStateRepository.findByTxnId(txnId).orElse(null))
                 .subscribeOn(dbBlockingCallSchedulerConfig.getScheduler());
     }
