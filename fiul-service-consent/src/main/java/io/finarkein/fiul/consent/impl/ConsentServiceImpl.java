@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.consent.artefact.ConsentArtefact;
 import io.finarkein.api.aa.consent.artefact.SignedConsent;
 import io.finarkein.api.aa.consent.handle.ConsentHandleResponse;
-import io.finarkein.api.aa.consent.handle.ConsentStatus;
 import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.api.aa.exception.SystemException;
@@ -40,7 +39,6 @@ import java.util.function.Supplier;
 
 import static io.finarkein.api.aa.util.Functions.*;
 import static io.finarkein.fiul.Functions.UUIDSupplier;
-import static io.finarkein.fiul.Functions.currentTimestampSupplier;
 
 @Log4j2
 @Service
@@ -107,21 +105,18 @@ class ConsentServiceImpl implements ConsentService {
     @Override
     public Mono<ConsentHandleResponse> getConsentStatus(String consentHandle, Optional<String> aaNameOptional) {
         log.debug("GetConsentStatus: start: consentHandle:{}, aaHandle:{}", consentHandle, aaNameOptional);
-        return buildFromConsentState(consentHandle)
-                .get()
-                .map(Mono::just)
-                .orElseGet(() -> {
-                            if (aaNameOptional.isPresent()) {
-                                String aaName = aaNameOptional.get();
-                                return getConsentHandleResponseMono(consentHandle, aaName);
-                            }
-                            return consentRequestAANameByConsentHandle(consentHandle)
-                                    .flatMap(optionalAAName -> optionalAAName
-                                            .map(aaName -> getConsentHandleResponseMono(consentHandle, aaName))
-                                            .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(), "ConsentHandle not found, try with aaHandle"))
-                                    );
-                        }
-                ).doOnSuccess(consentHandleResponse -> {
+        Mono<ConsentHandleResponse> consentHandleResponseMono;
+        if (aaNameOptional.isPresent()) {
+            String aaName = aaNameOptional.get();
+            consentHandleResponseMono = getConsentHandleResponseMono(consentHandle, aaName);
+        }else {
+            consentHandleResponseMono =  consentRequestAANameByConsentHandle(consentHandle)
+                    .flatMap(optionalAAName -> optionalAAName
+                            .map(aaName -> getConsentHandleResponseMono(consentHandle, aaName))
+                            .orElseThrow(() -> Errors.NoDataFound.with(UUIDSupplier.get(), "ConsentHandle not found, try with aaHandle"))
+                    );
+        }
+        return consentHandleResponseMono.doOnSuccess(consentHandleResponse -> {
                     log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
                     consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(),
                             consentHandleResponse.getConsentStatus().getStatus());
@@ -162,26 +157,6 @@ class ConsentServiceImpl implements ConsentService {
 
     private Supplier<Optional<String>> consentRequestAANameByConsentId(final String consentId) {
         return () -> consentStore.findRequestByConsentId(consentId).map(ConsentRequestDTO::getAaName);
-    }
-
-    private Supplier<Optional<ConsentHandleResponse>> buildFromConsentState(String consentHandle) {
-        return () -> {
-            final Optional<ConsentStateDTO> consentStateOptional = consentStore.getConsentStateByHandle(consentHandle);
-            return consentStateOptional
-                    .map(consentState -> {
-                                if (consentState.getConsentStatus() == null || consentState.getConsentId() == null)
-                                    return null;
-
-                                return ConsentHandleResponse.builder()
-                                        .txnid(UUIDSupplier.get())
-                                        .consentHandle(consentHandle)
-                                        .ver(ConsentHandleResponse.VERSION)
-                                        .timestamp(currentTimestampSupplier.get())
-                                        .consentStatus(new ConsentStatus(consentState.getConsentId(), consentState.getConsentStatus()))
-                                        .build();
-                            }
-                    );
-        };
     }
 
     @Override
