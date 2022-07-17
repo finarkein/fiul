@@ -47,10 +47,12 @@ public abstract class ConsentTemplateUtils {
         return frequency;
     }
 
-    public static FIDataRange generateFIDataRange(ConsentTemplateDataRange consentTemplateDataRange, String consentStart, String consentExpiry, int currentYear) {
+    public static FIDataRange generateFIDataRange(ConsentTemplateDataRange consentTemplateDataRange,
+                                                  String consentStart, String consentExpiry, int currentYear) {
         switch (consentTemplateDataRange.getDataRangeType()) {
             case FIXED:
-                ArgsValidator.validateDateRange(uuidSupplier.get(), consentTemplateDataRange.getFrom(), consentTemplateDataRange.getTo());
+                ArgsValidator.validateDateRange(uuidSupplier.get(), consentTemplateDataRange.getFrom(),
+                        consentTemplateDataRange.getTo());
                 return new FIDataRange(consentTemplateDataRange.getFrom(), consentTemplateDataRange.getTo());
             case SAME_AS_CONSENT:
                 ArgsValidator.validateDateRange(uuidSupplier.get(), consentStart, consentExpiry);
@@ -65,27 +67,52 @@ public abstract class ConsentTemplateUtils {
                 fiDataRange.setTo(localDate.format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT)));
                 instant = Instant.parse(localDate.getYear() + FINANCIAL_YEAR_START_POST_FIX);
                 localDate = LocalDateTime.ofInstant(instant, ZoneOffset.ofHours(0));
-                fiDataRange.setFrom(localDate.minus(year + 1L, ChronoUnit.YEARS).format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT)));
+                fiDataRange.setFrom(
+                        localDate.minus(year + 1L, ChronoUnit.YEARS)
+                                .format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT)));
                 return fiDataRange;
             case CONSENT_START_RELATIVE:
-                String[] start = extractUnitValue(consentTemplateDataRange.getFrom(), "FIDataRange");
-                String[] expiry = extractUnitValue(consentTemplateDataRange.getTo(), "FIDataRange");
-                if (start[0].equals("INF") || expiry[0].equals("INF"))
-                    throw Errors.InvalidRequest.with(uuidSupplier.get(), "FIDataRange Start or Expiry cannot be infinite");
-                instant = Instant.parse(consentStart);
-                localDate = LocalDateTime.ofInstant(instant, ZoneOffset.ofHours(0));
-                start[0] = start[0] + "S";
-                expiry[0] = expiry[0] + "S";
-                var from = localDate.plus(Integer.parseInt(start[1]), ChronoUnit.valueOf(start[0])).toString();
-                var to = localDate.plus(Integer.parseInt(expiry[1]), ChronoUnit.valueOf(expiry[0])).toString();
-                ArgsValidator.validateDateRange(uuidSupplier.get(), from, to);
-                return new FIDataRange(from, to);
+                return consentRelativeFiDataRangeGeneration(consentTemplateDataRange, consentStart, false);
+            case CONSENT_START_RELATIVE_MONTH_INCLUSIVE:
+                return consentRelativeFiDataRangeGeneration(consentTemplateDataRange, consentStart, true);
             default:
                 throw Errors.InvalidRequest.with(uuidSupplier.get(), "Invalid DataRange Type");
         }
     }
 
-    public static String[] generateConsentDateRange(String consentStartOffset, String consentExpiryDuration, String consentStart) {
+    private static FIDataRange consentRelativeFiDataRangeGeneration(ConsentTemplateDataRange consentTemplateDataRange,
+                                                                    String consentStart, boolean monthInclusive) {
+        LocalDateTime localDate;
+        Instant instant;
+        String[] start = extractUnitValue(consentTemplateDataRange.getFrom(), "FIDataRange");
+        String[] expiry = extractUnitValue(consentTemplateDataRange.getTo(), "FIDataRange");
+        if (start[0].equals("INF") || expiry[0].equals("INF"))
+            throw Errors.InvalidRequest.with(uuidSupplier.get(), "FIDataRange Start or Expiry cannot be infinite");
+        instant = Instant.parse(consentStart);
+        localDate = LocalDateTime.ofInstant(instant, ZoneOffset.ofHours(0));
+        start[0] = start[0] + "S";
+        expiry[0] = expiry[0] + "S";
+        String from;
+        if (monthInclusive) {
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+            from = localDate.plus(Integer.parseInt(start[1]),
+                            ChronoUnit.valueOf(start[0]))
+                    .withDayOfMonth(1)
+                    .withHour(0)
+                    .withMinute(0)
+                    .withSecond(0)
+                    .withNano(0)
+                    .format(formatter);
+        } else
+            from = localDate.plus(Integer.parseInt(start[1]), ChronoUnit.valueOf(start[0])).toString();
+        var to = localDate.plus(Integer.parseInt(expiry[1]), ChronoUnit.valueOf(expiry[0])).toString();
+        ArgsValidator.validateDateRange(uuidSupplier.get(), from, to);
+        return new FIDataRange(from, to);
+    }
+
+    public static String[] generateConsentDateRange(String consentStartOffset,
+                                                    String consentExpiryDuration, String consentStart) {
         String[] start = extractUnitValue(consentStartOffset, "ConsentStartOffset");
         String[] expiry = extractUnitValue(consentExpiryDuration, "ConsentExpiryDuration");
         if (start[0].equals("INF") || expiry[0].equals("INF"))
@@ -130,7 +157,8 @@ public abstract class ConsentTemplateUtils {
                 parse = localDateTime.toInstant(ZoneOffset.ofHours(0));
                 return parse;
             default:
-                throw Errors.InvalidRequest.with(uuidSupplier.get(), "Invalid " +  parameterName + " format in ConsentTemplate");
+                throw Errors.InvalidRequest.with(uuidSupplier.get(),
+                        "Invalid " + parameterName + " format in ConsentTemplate");
         }
     }
 
@@ -146,7 +174,8 @@ public abstract class ConsentTemplateUtils {
 
         String timeDuration = TimeDuration.TIME_DURATION_MAP.get(unit);
         if (timeDuration == null)
-            throw Errors.InvalidRequest.with(uuidSupplier.get(), "Invalid " + parameterName + " format in ConsentTemplate");
+            throw Errors.InvalidRequest.with(uuidSupplier.get(),
+                    "Invalid " + parameterName + " format in ConsentTemplate");
         returnString[0] = timeDuration;
         return returnString;
     }

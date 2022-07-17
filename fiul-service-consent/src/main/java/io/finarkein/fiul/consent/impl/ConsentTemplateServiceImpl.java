@@ -69,7 +69,8 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return Mono.just(consentTemplate)
                 .doOnNext(input -> log.debug("SaveConsentTemplate: start: request:{}", input))
                 .flatMap(this::doSaveConsentTemplate)
-                .doOnSuccess(response -> log.debug("SaveConsentTemplate: success: consentTemplateId:{}", response.getConsentTemplateId()))
+                .doOnSuccess(response -> log.debug("SaveConsentTemplate: success: consentTemplateId:{}",
+                        response.getConsentTemplateId()))
                 .doOnError(error -> log.error("SaveConsentTemplate: error:{}", error.getMessage(), error));
     }
 
@@ -99,7 +100,8 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     private ConsentTemplate getConsentTemplate(ConsentRequestInput consentRequestInput) {
         return consentTemplateRepository
                 .findById(consentRequestInput.getConsentTemplateId())
-                .orElseThrow(() -> Errors.InvalidRequest.with(consentRequestInput.getTxnId(), "ConsentTemplate not found for given consentTemplateId:" + consentRequestInput.getConsentTemplateId()));
+                .orElseThrow(() -> Errors.InvalidRequest.with(consentRequestInput.getTxnId(),
+                        "ConsentTemplate not found for given consentTemplateId:" + consentRequestInput.getConsentTemplateId()));
     }
 
     @Override
@@ -107,8 +109,10 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return Mono.just(consentRequestInput)
                 .doOnNext(input -> log.debug("CreateConsentUsingTemplate: start: request:{}", input))
                 .flatMap(this::doCreateConsentRequestUsingTemplate)
-                .doOnSuccess(response -> log.debug("CreateConsentUsingTemplate: success: consentHandle:{}", response.getConsentHandle()))
-                .doOnError(error -> log.error("CreateConsentUsingTemplate: error:{}", error.getMessage(), error))
+                .doOnSuccess(response -> log.debug("CreateConsentUsingTemplate: success: consentHandle:{}",
+                        response.getConsentHandle()))
+                .doOnError(error -> log.error("CreateConsentUsingTemplate: error:{}",
+                        error.getMessage(), error))
                 ;
     }
 
@@ -117,14 +121,16 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
         var consentTemplate = getConsentTemplate(consentRequestInput);
         final var consentTemplateDefinition = consentTemplate.getConsentTemplateDefinition();
-        var consentDetail = prepareConsentDetailFromTemplate(consentTemplateDefinition, consentRequestInput.getCustomerId());
+        var consentDetail = prepareConsentDetailFromTemplate(consentTemplateDefinition,
+                consentRequestInput.getCustomerId());
 
         return consentService.createConsent(FIUConsentRequest.builder()
                 .ver(consentTemplate.getConsentVersion())
                 .txnId(consentRequestInput.getTxnId())
                 .timestamp(currentTimestampSupplier.get())
                 .consentDetail(consentDetail)
-                .callback(consentRequestInput.getCallback() != null ? consentRequestInput.getCallback() : consentTemplateDefinition.getCallback())
+                .callback(consentRequestInput.getCallback() != null
+                        ? consentRequestInput.getCallback() : consentTemplateDefinition.getCallback())
                 .build());
     }
 
@@ -133,7 +139,8 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         consentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
 
         var consentTemplate = getConsentTemplate(consentRequestInput);
-        return Mono.just(prepareConsentDetailFromTemplate(consentTemplate.getConsentTemplateDefinition(), consentRequestInput.getCustomerId()));
+        return Mono.just(prepareConsentDetailFromTemplate(consentTemplate.getConsentTemplateDefinition(),
+                consentRequestInput.getCustomerId()));
     }
 
     @Override
@@ -141,15 +148,18 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return consentTemplateRepository.getByQuery(tag, consentVersion, pageRequest);
     }
 
-    private ConsentDetail prepareConsentDetailFromTemplate(ConsentTemplateDefinition consentTemplateDefinition, String customerId) {
+    private ConsentDetail prepareConsentDetailFromTemplate(ConsentTemplateDefinition consentTemplateDefinition,
+                                                           String customerId) {
         ConsentDetail consentDetail = new ConsentDetail();
 
         String consentStart = Functions.currentTimestampSupplier.get();
         int currentYear = LocalDateTime.now().getYear();
-        String[] strings = generateConsentDateRange(consentTemplateDefinition.getConsentStartOffset(), consentTemplateDefinition.getConsentExpiryDuration(), consentStart);
+        String[] strings = generateConsentDateRange(consentTemplateDefinition.getConsentStartOffset(),
+                consentTemplateDefinition.getConsentExpiryDuration(), consentStart);
         consentDetail.setConsentStart(strings[0]);
         consentDetail.setConsentExpiry(strings[1]);
-        consentDetail.setFIDataRange(generateFIDataRange(consentTemplateDefinition.getConsentTemplateDataRange(), strings[0], strings[1], currentYear));
+        consentDetail.setFIDataRange(generateFIDataRange(consentTemplateDefinition.getConsentTemplateDataRange(),
+                strings[0], strings[1], currentYear));
         consentDetail.setConsentMode(consentTemplateDefinition.getConsentMode().toString());
         consentDetail.setFetchType(consentTemplateDefinition.getFetchType());
         consentDetail.setConsentTypes(consentTemplateDefinition.getConsentTypes());

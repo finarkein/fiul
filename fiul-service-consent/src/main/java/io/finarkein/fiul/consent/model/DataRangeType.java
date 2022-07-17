@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum DataRangeType {
-    FIXED, SAME_AS_CONSENT, FINANCIAL_YEAR, CONSENT_START_RELATIVE;
+    FIXED, SAME_AS_CONSENT, FINANCIAL_YEAR, CONSENT_START_RELATIVE, CONSENT_START_RELATIVE_MONTH_INCLUSIVE;
 
     private static final Map<String, DataRangeType> lookup;
 
