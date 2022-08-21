@@ -9,6 +9,7 @@ package io.finarkein.fiul.dataflow;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.finarkein.fiul.ext.Callback;
 import lombok.*;
 
@@ -92,8 +93,8 @@ public class DataRequest {
         }
 
         @JsonProperty("callback")
-        public DataRequest.Builder callbackURL(@NonNull final String url) {
-            this.callback = new Callback(url);
+        public DataRequest.Builder callbackURL(@NonNull final String url, final JsonNode addOnParams) {
+            this.callback = new Callback(url, addOnParams);
             return this;
         }
 
