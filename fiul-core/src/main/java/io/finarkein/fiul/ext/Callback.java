@@ -9,13 +9,15 @@ package io.finarkein.fiul.ext;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "url"
+        "url",
+        "addOnParams"
 })
 @Data
 @AllArgsConstructor
@@ -24,5 +26,7 @@ public class Callback {
 
     @JsonProperty("url")
     private String url;
-    
+
+    @JsonProperty("addOnParams")
+    private JsonNode addOnParams;
 }
