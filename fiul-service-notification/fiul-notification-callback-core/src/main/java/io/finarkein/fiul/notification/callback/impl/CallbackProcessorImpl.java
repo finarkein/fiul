@@ -83,6 +83,7 @@ public class CallbackProcessorImpl implements CallbackProcessor {
         String consentStatus = statusNotification.getConsentStatus();
         try {
             statusNotification.setRunId(callback.getRunId());
+            statusNotification.setAaId(callback.getAaId());
             statusNotification.setAddOnParams(callback.getAddOnParams());
             log.debug("Calling ConsentCallback on notification:{}, callback:{}", statusNotification, callback);
             webClient.post()
