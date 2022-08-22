@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "url",
+        "runId",
         "addOnParams"
 })
 @Data
@@ -26,6 +27,9 @@ public class Callback {
 
     @JsonProperty("url")
     private String url;
+
+    @JsonProperty("runId")
+    private String runId;
 
     @JsonProperty("addOnParams")
     private JsonNode addOnParams;

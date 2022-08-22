@@ -93,8 +93,8 @@ public class DataRequest {
         }
 
         @JsonProperty("callback")
-        public DataRequest.Builder callbackURL(@NonNull final String url, final JsonNode addOnParams) {
-            this.callback = new Callback(url, addOnParams);
+        public DataRequest.Builder callbackURL(@NonNull final String url, final String runId, final JsonNode addOnParams) {
+            this.callback = new Callback(url, runId, addOnParams);
             return this;
         }
 
