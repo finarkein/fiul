@@ -6,7 +6,11 @@
  */
 package io.finarkein.fiul.notification.callback.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import lombok.Data;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +21,7 @@ import java.time.Instant;
 
 @Data
 @Entity
+@TypeDef(name = "json", typeClass = JsonType.class)
 public class ConsentCallback {
 
     @Id
@@ -25,6 +30,10 @@ public class ConsentCallback {
 
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp createdOn;
+
+    @Type(type = "json")
+    @Column(name = "add_on_params", columnDefinition = "jsonb")
+    private JsonNode addOnParams;
 
     @PrePersist
     protected void onCreate() {
