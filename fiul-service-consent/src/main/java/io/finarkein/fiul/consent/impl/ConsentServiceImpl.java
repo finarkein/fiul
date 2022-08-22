@@ -78,6 +78,7 @@ class ConsentServiceImpl implements ConsentService {
                             var callback = new ConsentCallback();
                             callback.setConsentHandleId(response.getConsentHandle());
                             callback.setCallbackUrl(consentRequest.getCallback().getUrl());
+                            callback.setAddOnParams(consentRequest.getCallback().getAddOnParams());
                             callbackRegistry.registerConsentCallback(callback);
                         }
                 ).doOnSuccess(response -> {
