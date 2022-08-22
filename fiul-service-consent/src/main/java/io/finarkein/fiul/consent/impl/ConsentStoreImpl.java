@@ -142,6 +142,7 @@ class ConsentStoreImpl implements ConsentStore {
         consentStatusNotification.setConsentHandle(consentNotificationLog.getConsentHandle());
         consentStatusNotification.setConsentStatus(consentNotificationLog.getConsentState());
         consentStatusNotification.setConsentId(consentNotificationLog.getConsentId());
+        consentStatusNotification.setAaId(consentNotificationLog.getAaId());
         consentNotification.setConsentStatusNotification(consentStatusNotification);
         return consentNotification;
     }
