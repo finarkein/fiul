@@ -14,13 +14,20 @@ import io.finarkein.fiul.notification.callback.CallbackProcessor;
 import io.finarkein.fiul.notification.callback.CallbackRegistry;
 import io.finarkein.fiul.notification.callback.model.ConsentCallback;
 import io.finarkein.fiul.notification.callback.model.FICallback;
+import io.netty.handler.ssl.SslHandshakeTimeoutException;
+import io.netty.handler.timeout.TimeoutException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,6 +44,15 @@ public class CallbackProcessorImpl implements CallbackProcessor {
 
     protected final CallbackRegistry registry;
     protected final WebClient webClient;
+
+    @Value("${consent.callback.retry.count:3}")
+    private int consentCallbackRetryCount;
+
+    @Value("${consent.callback.timeout.in.seconds:10}")
+    private int consentCallbackTimeoutInSeconds;
+
+    @Value("${consent.callback.retry.delay.seconds:5}")
+    private int consentCallbackRetryDelayInSeconds;
 
     @Autowired
     protected CallbackProcessorImpl(@Qualifier(WEBHOOK_QUALIFIER_SUPPLIER_METHOD) WebClient webClient,
@@ -66,12 +82,43 @@ public class CallbackProcessorImpl implements CallbackProcessor {
         // call back revoke on ACTIVE, PENDING, PAUSED, REJECTED, EXPIRED, REVOKED
         String consentStatus = statusNotification.getConsentStatus();
         try {
-            log.debug("Calling ConsentCallback on notification:{}, callback-url:{}", statusNotification,
-                    callback.getCallbackUrl());
+            statusNotification.setAddOnParams(callback.getAddOnParams());
+            log.debug("Calling ConsentCallback on notification:{}, callback:{}", statusNotification, callback);
             webClient.post()
                     .uri(callback.getCallbackUrl())
                     .body(Mono.just(statusNotification), ConsentStatusNotification.class)
-                    .exchange().block();
+                    .retrieve()
+                    .onStatus(
+                            status -> status.is5xxServerError() || status.value() == 408 || status.value() == 429,
+                            response -> {
+                                String message = String.format("Error %d-%s, while sending consent status " +
+                                                "notification, object is '%s'",
+                                        response.rawStatusCode(), response.statusCode().getReasonPhrase(),
+                                        statusNotification);
+                                return Mono.error(new CallbackServiceException(message));
+                            })
+                    .bodyToMono(String.class)
+                    .timeout(Duration.ofSeconds(consentCallbackTimeoutInSeconds))
+
+                    .onErrorMap(java.util.concurrent.TimeoutException.class, ex -> logAndCreateException("java.util.concurrent.TimeoutException", ex))
+                    .onErrorMap(TimeoutException.class, ex -> logAndCreateException("Channel TimeoutException", ex))
+                    .onErrorMap(SslHandshakeTimeoutException.class, ex -> logAndCreateException("SslHandshakeTimeout", ex))
+                    .onErrorMap(WebClientRequestException.class, ex -> logAndCreateException("WebClientRequestException", ex))
+
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .publishOn(Schedulers.boundedElastic())
+                    .doOnSuccess(string -> log.debug("Notification sent Successfully {} :" +
+                            " response string is '{}'", statusNotification, string))
+                    .doOnError(error -> log.error("Failed to send notification {}", statusNotification, error))
+                    .retryWhen(
+                            Retry.backoff(consentCallbackRetryCount, Duration.ofSeconds(consentCallbackRetryDelayInSeconds))
+                                    .jitter(0.6)
+                                    .filter(throwable -> throwable instanceof CallbackServiceException)
+                                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
+                                            new IllegalStateException(
+                                                    "Failed to send consent notification to '" + callback.getCallbackUrl() + "'" +
+                                                            " after " + retrySignal.totalRetries() + " attempts, notification object : " + statusNotification)))
+                    .subscribe();
         } catch (Exception e) {
             log.error("Error while calling ConsentCallback on notification:{}, callback-url:{}", statusNotification,
                     callback.getCallbackUrl(), e);
@@ -126,5 +173,16 @@ public class CallbackProcessorImpl implements CallbackProcessor {
             }
         }
         log.debug("FINotification handling done, notification:{}", notification);
+    }
+
+    private Throwable logAndCreateException(String message, Throwable error) {
+        log.debug("Encountered '{}' error while calling external callback api : ", message, error);
+        return new CallbackServiceException(message);
+    }
+
+    static class CallbackServiceException extends Exception {
+        CallbackServiceException(String message) {
+            super(message);
+        }
     }
 }
