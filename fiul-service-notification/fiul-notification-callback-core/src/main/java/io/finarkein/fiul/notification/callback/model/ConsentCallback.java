@@ -35,7 +35,9 @@ public class ConsentCallback {
     @Column(name = "add_on_params", columnDefinition = "jsonb")
     private JsonNode addOnParams;
 
+    private String aaId;
     private String runId;
+
     @PrePersist
     protected void onCreate() {
         createdOn = Timestamp.from(Instant.now());
