@@ -82,6 +82,8 @@ public class CallbackProcessorImpl implements CallbackProcessor {
         // call back revoke on ACTIVE, PENDING, PAUSED, REJECTED, EXPIRED, REVOKED
         String consentStatus = statusNotification.getConsentStatus();
         try {
+            statusNotification.setRunId(callback.getRunId());
+            statusNotification.setAaId(callback.getAaId());
             statusNotification.setAddOnParams(callback.getAddOnParams());
             log.debug("Calling ConsentCallback on notification:{}, callback:{}", statusNotification, callback);
             webClient.post()
