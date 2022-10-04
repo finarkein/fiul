@@ -11,7 +11,6 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -26,12 +25,10 @@ import javax.jms.ConnectionFactory;
 
 @Configuration
 @ConditionalOnProperty(name = ServiceConstants.NOTIFICATION_Q_TYPE_PROPERTY, havingValue = ServiceConstants.IN_MEM, matchIfMissing = true)
-@RefreshScope
 public class ConfigForInMem {
     public static final String FIUL_EVENT_FACTORY = "fiul-events-factory";
 
     @Bean(FIUL_EVENT_FACTORY)
-    @RefreshScope
     public JmsListenerContainerFactory<?> fiuEventFactory(@Qualifier("notificationConnection") ConnectionFactory connectionFactory,
                                                           DefaultJmsListenerContainerFactoryConfigurer configurer) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
@@ -42,7 +39,6 @@ public class ConfigForInMem {
 
     @Bean
     @Qualifier("JacksonMessageConverter")
-    @RefreshScope
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
@@ -53,7 +49,6 @@ public class ConfigForInMem {
     @Primary
     @Bean
     @Qualifier("notification")
-    @RefreshScope
     public JmsTemplate inMemJmsTemplate(@Qualifier("notificationConnection") ConnectionFactory connectionFactory) {
         JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory);
         jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
@@ -62,7 +57,6 @@ public class ConfigForInMem {
 
     @Bean
     @Qualifier("notificationConnection")
-    @RefreshScope
     public ConnectionFactory connectionFactoryNotification() {
         return new ActiveMQConnectionFactory("vm://localhost");
     }
