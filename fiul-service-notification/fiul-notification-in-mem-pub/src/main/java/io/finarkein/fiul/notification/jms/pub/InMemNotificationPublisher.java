@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,6 @@ import static io.finarkein.fiul.notification.ServiceConstants.NOTIFICATION_Q_TYP
 @Log4j2
 @Service
 @ConditionalOnProperty(name = NOTIFICATION_Q_TYPE_PROPERTY, havingValue = IN_MEM, matchIfMissing = true)
-@RefreshScope
 class InMemNotificationPublisher implements NotificationPublisher {
 
     protected final JmsTemplate jms;

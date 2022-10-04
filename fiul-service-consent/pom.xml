@@ -41,9 +41,5 @@
             <groupId>io.finarkein.fiu</groupId>
             <artifactId>fiul-notification-callbacks-jpa</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
     </dependencies>
 </project>
