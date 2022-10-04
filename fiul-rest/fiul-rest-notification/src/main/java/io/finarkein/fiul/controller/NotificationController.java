@@ -22,7 +22,6 @@ import io.finarkein.fiul.notification.NotificationPublisher;
 import io.finarkein.fiul.validator.NotificationValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +36,6 @@ import static io.finarkein.fiul.controller.DefaultFINotificationProcessor.DEFAUL
 @RestController
 @RequestMapping("/")
 @Log4j2
-@RefreshScope
 public class NotificationController {
 
     private final NotificationPublisher publisher;
