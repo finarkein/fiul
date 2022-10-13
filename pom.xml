@@ -10,7 +10,7 @@
 
     <groupId>io.finarkein.fiu</groupId>
     <artifactId>fiul</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.1</version>
     <packaging>pom</packaging>
 
     <name>fiul</name>
@@ -18,16 +18,17 @@
 
     <properties>
         <java.version>11</java.version>
-        <version.spring-boot>2.5.12</version.spring-boot>
+        <version.spring-boot>2.7.0</version.spring-boot>
         <!--mockito version according to spring-boot-test.mockito -->
         <version.mockito>3.9.0</version.mockito>
-        <version.reactor-core>3.4.0</version.reactor-core>
-        <version.reactor-netty>1.0.8</version.reactor-netty>
-        <version.spring-webflux>5.3.18</version.spring-webflux>
+        <version.reactor-core>3.4.23</version.reactor-core>
+        <version.reactor-netty>1.0.20</version.reactor-netty>
+        <version.spring-webflux>5.3.20</version.spring-webflux>
         <version.maven-dependency-plugin>3.1.1</version.maven-dependency-plugin>
-        <version.logger>2.17.1</version.logger>
-        <version.aa-commons>0.5.7</version.aa-commons>
-        <version.fi-meta>1.0.4</version.fi-meta>
+        <version.logger>2.17.2</version.logger>
+        <version.aa-commons>0.5.8</version.aa-commons>
+        <version.fi-meta>1.0.5</version.fi-meta>
+        <version.jackson>2.14.0-rc1</version.jackson>
 
         <version.maven-compiler>3.8.1</version.maven-compiler>
         <version.plugin-deploy>3.0.0-M1</version.plugin-deploy>
@@ -50,7 +51,6 @@
 
         <pmd.skip>false</pmd.skip>
         <pmd.failOnViolation>false</pmd.failOnViolation>
-        <spring-cloud.version>2020.0.3</spring-cloud.version>
     </properties>
 
     <modules>
@@ -128,11 +128,6 @@
                 <version>${version.aa-commons}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.finarkein.aa</groupId>
-                <artifactId>aa-webclient-core</artifactId>
-                <version>${version.aa-commons}</version>
             </dependency>
             <dependency>
                 <groupId>io.finarkein.fiu</groupId>
@@ -247,13 +242,6 @@
                 <artifactId>mockito-core</artifactId>
                 <version>${version.mockito}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
