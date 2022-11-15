@@ -70,7 +70,7 @@ public class NotificationController {
     }
 
     @PostMapping("/Consent/Notification")
-    public ResponseEntity<Mono<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification,
+    public Mono<ResponseEntity<NotificationResponse>> consentResponseMono(@RequestBody ConsentNotification consentNotification,
                                                                           @RequestHeader("aa_api_key") String aaApiKey) {
         log.debug("ConsentNotification received:{}", consentNotification);
 
@@ -81,12 +81,19 @@ public class NotificationController {
         try {
             aaApiKeyBody = objectMapper.readValue(payload, AaApiKeyBody.class);
         } catch (JsonProcessingException e) {
-            return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+            return Mono.just(ResponseEntity.badRequest().body(NotificationResponse
+                    .invalidResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
         }
 
         ArgsValidator.isValidUUID(consentNotification.getTxnid(), consentNotification.getTxnid(), "TxnId");
         final String consentHandle = consentNotification.getConsentStatusNotification().getConsentHandle();
-        ConsentStateDTO consentStateDTO = consentService.getConsentStateByConsentHandle(consentHandle);
+        ConsentStateDTO consentStateDTO;
+        if (consentHandle != null)
+            consentStateDTO = consentService.getConsentStateByConsentHandle(consentHandle);
+        else
+            consentStateDTO = consentService.getConsentStateByConsentId(consentNotification.getConsentStatusNotification()
+                    .getConsentId());
+
         if (consentStateDTO == null)
             consentStateDTO = consentService.getConsentStateByTxnId(consentNotification.getTxnid());
 
@@ -96,17 +103,41 @@ public class NotificationController {
                 NotificationValidator.validateConsentNotification(consentNotification, consentStateDTO,
                         registryService.getEntityInfoByAAName(consentStateDTO.getAaId()), aaApiKeyBody);
 
+                if (consentStateDTO.getConsentHandleStatus() != null
+                        && consentStateDTO.getConsentHandleStatus().equalsIgnoreCase("FAILED")
+                        && consentNotification.getConsentStatusNotification().getConsentStatus().equalsIgnoreCase("ACTIVE")) {
+                    log.error("{} : Invalid notification, consentHandle status is FAILED and consent notification" +
+                            "status is active", consentHandle);
+                    return Mono.just(ResponseEntity.badRequest().body(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
+                            Timestamp.from(Instant.now()), "Invalid Request")));
+                }
                 log.debug("{}: ConsentNotification.publishing (consentNotification)", consentHandle);
                 publisher.publishConsentNotification(consentNotification);
                 log.debug("{}: NotificationPublisher.publish(consentNotification) done", consentHandle);
-                return ResponseEntity.ok().body(Mono.just(NotificationResponse.okResponse(consentNotification.getTxnid(),
+                return Mono.just(ResponseEntity.ok(NotificationResponse.okResponse(consentNotification.getTxnid(),
                         Timestamp.from(Instant.now()))));
+//                Mono<SignedConsentDTO> signedConsent = consentService
+//                        .getSignedConsent(consentNotification.getConsentStatusNotification().getConsentId(),
+//                                Optional.of(consentStateDTO.getAaId()));
+//                return signedConsent
+//                        .map(signedConsentDTO -> {
+//                            log.debug("{}: ConsentNotification.publishing (consentNotification)", consentHandle);
+//                            publisher.publishConsentNotification(consentNotification);
+//                            log.debug("{}: NotificationPublisher.publish(consentNotification) done", consentHandle);
+//                            return NotificationResponse.okResponse(consentNotification.getTxnid(),
+//                                    Timestamp.from(Instant.now()));
+//                        })
+//                        .map(notificationResponseMono -> ResponseEntity.ok().body(notificationResponseMono))
+//                        .onErrorResume(throwable -> Mono.just(ResponseEntity.badRequest()
+//                                .body(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
+//                                        Timestamp.from(Instant.now()), "Invalid Request"))))
+//                        ;
             } catch (SystemException e) {
                 log.error("Error while processing ConsentNotification:{}, error:{}", consentNotification, e.getMessage(), e);
                 if (e.errorCode().httpStatusCode() == 404)
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(Mono.just(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
-                return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
+                    return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(NotificationResponse.notFoundResponse(consentNotification.getTxnid(), Timestamp.from(Instant.now()), e.getMessage())));
+                return Mono.just(ResponseEntity.badRequest().body(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
                         Timestamp.from(Instant.now()), e.getMessage())));
             } catch (Exception e) {
                 log.error("Error while processing ConsentNotification:{}, error:{}", consentNotification, e.getMessage(), e);
@@ -114,7 +145,7 @@ public class NotificationController {
             }
         }
         log.debug("{}: For ConsentNotification consentState not found returning invalid request", consentHandle);
-        return ResponseEntity.badRequest().body(Mono.just(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
+        return Mono.just(ResponseEntity.badRequest().body(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
                 Timestamp.from(Instant.now()), "Invalid Request")));
     }
 

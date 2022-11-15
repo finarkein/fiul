@@ -122,7 +122,7 @@ class ConsentServiceImpl implements ConsentService {
         return consentHandleResponseMono.doOnSuccess(consentHandleResponse -> {
                     log.debug("GetConsentStatus: success: response:{}", consentHandleResponse);
                     consentStateUpdateHelper(consentHandleResponse.getTxnid(), consentHandleResponse.getConsentStatus().getId(),
-                            consentHandleResponse.getConsentStatus().getStatus());
+                            consentHandleResponse.getConsentStatus().getStatus(), consentHandleResponse.getConsentHandle());
                 })
                 .doOnError(error -> log.error("GetConsentStatus: error:{}", error.getMessage(), error));
     }
@@ -143,11 +143,13 @@ class ConsentServiceImpl implements ConsentService {
                 );
     }
 
-    private void consentStateUpdateHelper(String txnId, String consentId, String consentStatus) {
+    private void consentStateUpdateHelper(String txnId, String consentId, String consentHandleStatus, String consentHandle) {
         ConsentStateDTO consentStateDTO = consentStore.getConsentStateByTxnId(txnId);
+        if (consentStateDTO == null)
+            consentStateDTO = consentStore.getConsentStateByHandle(consentHandle).orElse(null);
         if (consentStateDTO != null) {
             consentStateDTO.setConsentId(consentId);
-            consentStateDTO.setConsentStatus(consentStatus);
+            consentStateDTO.setConsentHandleStatus(consentHandleStatus);
             consentStore.updateConsentState(consentStateDTO);
         }
     }
