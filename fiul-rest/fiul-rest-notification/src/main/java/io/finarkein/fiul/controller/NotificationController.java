@@ -111,6 +111,15 @@ public class NotificationController {
                     return Mono.just(ResponseEntity.badRequest().body(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
                             Timestamp.from(Instant.now()), "Invalid Request")));
                 }
+
+                if (consentStateDTO.getGetConsentArtefactSuccessful() != null
+                        && !consentStateDTO.getGetConsentArtefactSuccessful()
+                        && !Objects.equals(consentNotification.getConsentStatusNotification().getConsentStatus(), "ACTIVE")) {
+                    log.error("{} : Invalid notification, getGetConsentArtefactSuccessful  is false"
+                            , consentHandle);
+                    return Mono.just(ResponseEntity.badRequest().body(NotificationResponse.invalidResponse(consentNotification.getTxnid(),
+                            Timestamp.from(Instant.now()), "Invalid Request")));
+                }
                 log.debug("{}: ConsentNotification.publishing (consentNotification)", consentHandle);
                 publisher.publishConsentNotification(consentNotification);
                 log.debug("{}: NotificationPublisher.publish(consentNotification) done", consentHandle);
