@@ -16,7 +16,8 @@ public enum ConsentState {
     PAUSED,
     EXPIRED,
     REVOKED,
-    REJECTED;
+    REJECTED,
+    FAILED;
 
     private static final Map<String, ConsentState> lookup;
 
