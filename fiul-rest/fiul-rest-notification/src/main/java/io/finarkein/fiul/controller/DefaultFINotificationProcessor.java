@@ -44,9 +44,9 @@ public class DefaultFINotificationProcessor implements FINotificationProcessor {
 
     @Autowired
     protected DefaultFINotificationProcessor(NotificationPublisher publisher,
-                                   final DataFlowService dataFlowService,
-                                   RegistryService registryService,
-                                   ObjectMapper objectMapper) {
+                                             final DataFlowService dataFlowService,
+                                             RegistryService registryService,
+                                             ObjectMapper objectMapper) {
         this.publisher = publisher;
         this.dataFlowService = dataFlowService;
         this.registryService = registryService;
@@ -75,6 +75,8 @@ public class DefaultFINotificationProcessor implements FINotificationProcessor {
 
         final String sessionId = fiNotification.getFIStatusNotification().getSessionId();
         Optional<FIRequestState> optionalFIRequestState = retrieveFIRequestState(fiNotification);
+        if (optionalFIRequestState.isEmpty())
+            optionalFIRequestState = dataFlowService.getFIRequestStateBySessionId(fiNotification.getFIStatusNotification().getSessionId());
         if (optionalFIRequestState.isPresent()) {
             try {
                 log.debug("{}: Validating FINotification", sessionId);
