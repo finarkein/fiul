@@ -32,7 +32,6 @@ import io.finarkein.fiul.validation.FIRequestValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -41,7 +40,6 @@ import static io.finarkein.fiul.Functions.UUIDSupplier;
 import static io.finarkein.fiul.Functions.fiFetchResponseDecoder;
 
 @Log4j2
-@Service
 class AAClientService implements AAFIUClient {
 
     private final AAClient aaClient;
