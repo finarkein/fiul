@@ -10,7 +10,7 @@
 
     <groupId>io.finarkein.fiu</groupId>
     <artifactId>fiul</artifactId>
-    <version>0.7.1</version>
+    <version>0.7.2</version>
     <packaging>pom</packaging>
 
     <name>fiul</name>
@@ -18,17 +18,17 @@
 
     <properties>
         <java.version>11</java.version>
-        <version.spring-boot>2.7.0</version.spring-boot>
+        <version.spring-boot>2.7.5</version.spring-boot>
         <!--mockito version according to spring-boot-test.mockito -->
         <version.mockito>3.9.0</version.mockito>
         <version.reactor-core>3.4.23</version.reactor-core>
-        <version.reactor-netty>1.0.20</version.reactor-netty>
-        <version.spring-webflux>5.3.20</version.spring-webflux>
+        <version.reactor-netty>1.0.24</version.reactor-netty>
+        <version.spring-webflux>5.3.23</version.spring-webflux>
         <version.maven-dependency-plugin>3.1.1</version.maven-dependency-plugin>
         <version.logger>2.17.2</version.logger>
-        <version.aa-commons>0.5.8</version.aa-commons>
+        <version.aa-commons>0.5.9</version.aa-commons>
         <version.fi-meta>1.0.5</version.fi-meta>
-        <version.jackson>2.14.0-rc1</version.jackson>
+        <version.jackson>2.14.1</version.jackson>
 
         <version.maven-compiler>3.8.1</version.maven-compiler>
         <version.plugin-deploy>3.0.0-M1</version.plugin-deploy>
@@ -47,7 +47,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <version.junit-jupiter>5.3.1</version.junit-jupiter>
-        <version.mockito>3.2.0</version.mockito>
 
         <pmd.skip>false</pmd.skip>
         <pmd.failOnViolation>false</pmd.failOnViolation>
