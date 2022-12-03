@@ -34,6 +34,8 @@ public class ConsentStateDTO {
     @Id
     private String consentHandle;
     private String consentId;
+    private String consentHandleStatus;
+    private Boolean getConsentArtefactSuccessful;
     private String consentStatus;
     private String txnId;
     private Boolean isPostConsentSuccessful;

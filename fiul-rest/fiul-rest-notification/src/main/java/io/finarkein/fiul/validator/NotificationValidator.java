@@ -18,6 +18,7 @@ import io.finarkein.fiul.dataflow.dto.FIRequestState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
 import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -47,11 +48,12 @@ public class NotificationValidator {
                     consentNotification.getConsentStatusNotification().getConsentId(),
                     "ConsentId");
 
-        if (!consentNotification.getConsentStatusNotification().getConsentHandle().equals(consentStateDTO.getConsentHandle()))
+        if (consentNotification.getConsentStatusNotification().getConsentHandle() != null
+                && !Objects.equals(consentNotification.getConsentStatusNotification().getConsentHandle(), consentStateDTO.getConsentHandle()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "ConsentHandle Id is invalid");
 //        if (!consentNotification.getConsentStatusNotification().getConsentId().equals(consentState.getConsentId()))
 //            throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent Id is invalid");
-        if (!consentNotification.getNotifier().getId().equals(entityInfo.getId()))
+        if (!Objects.equals(consentNotification.getNotifier().getId(), entityInfo.getId()))
             throw Errors.InvalidRequest.with(consentNotification.getTxnid(), "Consent notifier Id is invalid");
     }
 

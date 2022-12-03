@@ -43,3 +43,9 @@ build/
 ### Known Credential Files ###
 *credentials.json
 *.db
+
+### Local application properties
+*-local.properties
+*-local.yaml
+*-local.yml
+*.free
