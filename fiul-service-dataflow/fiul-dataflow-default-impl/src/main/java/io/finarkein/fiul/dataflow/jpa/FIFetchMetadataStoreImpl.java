@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
@@ -61,6 +62,11 @@ public class FIFetchMetadataStoreImpl implements FIFetchMetadataStore {
     @Override
     public Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId) {
         return repoFIFetchMetadata.findById(sessionId);
+    }
+
+    @Override
+    public Set<String> completedSessionIds(Set<String> sessionIds) {
+        return repoFIFetchMetadata.completedSessionIds(sessionIds);
     }
 
     @Override
