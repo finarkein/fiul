@@ -18,9 +18,14 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface RepoFIFetchMetadata extends JpaRepository<FIFetchMetadata, String> {
+
+    @Query("Select t.sessionId from FIFetchMetadata t where t.fiFetchCompletedOn IS NOT NULL" +
+            " and (t.sessionId in (:sessionIds))")
+    Set<String> completedSessionIds(@Param("sessionIds") Set<String> sessionIds);
 
     @Query("Select t from FIFetchMetadata t where" +
             " t.fiFetchCompletedOn IS NOT NULL" +
