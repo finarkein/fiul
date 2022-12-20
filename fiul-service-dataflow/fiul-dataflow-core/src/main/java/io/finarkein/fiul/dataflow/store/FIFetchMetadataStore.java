@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.Set;
 
 public interface FIFetchMetadataStore {
 
@@ -25,6 +26,8 @@ public interface FIFetchMetadataStore {
     int updateSuccessFetchMetadata(FIFetchMetadata fetchMetadata);
 
     Optional<FIFetchMetadata> getFIFetchMetadata(String sessionId);
+
+    Set<String> completedSessionIds(Set<String> sessionIds);
 
     Mono<Optional<FIFetchMetadata>> getLatestFIFetchMetadata(String consentHandleId, Timestamp fromValue, Timestamp toValue, boolean easyDataFlow);
 
