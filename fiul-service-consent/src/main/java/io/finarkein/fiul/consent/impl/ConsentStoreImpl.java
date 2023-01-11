@@ -186,6 +186,10 @@ class ConsentStoreImpl implements ConsentStore {
 
     @Override
     public void saveSignedConsent(SignedConsentDTO signedConsentDTO) {
-        repoSignedConsent.save(signedConsentDTO);
+        try {
+            repoSignedConsent.save(signedConsentDTO);
+        } catch (Exception e){
+            log.error("Error while saving consentArtefact, error:{}, ignoring the error", e.getMessage());
+        }
     }
 }
