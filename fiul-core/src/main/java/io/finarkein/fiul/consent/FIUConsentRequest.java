@@ -22,7 +22,8 @@ import java.util.List;
         "timestamp",
         "txnid",
         "ConsentDetail",
-        "callback"
+        "callback",
+        "webhooks"
 })
 @Data
 @EqualsAndHashCode(callSuper = true)
