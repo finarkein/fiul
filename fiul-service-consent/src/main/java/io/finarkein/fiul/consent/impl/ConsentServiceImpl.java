@@ -77,32 +77,8 @@ class ConsentServiceImpl implements ConsentService {
         return aafiuClient.createConsent(consentRequest)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnSuccess(response -> {
-                            if (Objects.nonNull(consentRequest.getCallback()) && Objects.nonNull(consentRequest.getCallback().getUrl())) {
-                                var callback = new ConsentCallback();
-                                callback.setConsentHandleId(response.getConsentHandle());
-                                callback.setCallbackUrl(consentRequest.getCallback().getUrl());
-                                callback.setRunId(consentRequest.getCallback().getRunId());
-                                callback.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
-                                callback.setAddOnParams(consentRequest.getCallback().getAddOnParams());
-                                log.debug("Registering callback for consentHandle:{}, webhooks:{}", response.getConsentHandle(), callback);
-                                callbackRegistry.registerConsentCallback(callback);
-                            }
-
-                            if (consentRequest.getWebhooks() != null && !consentRequest.getWebhooks().isEmpty()) {
-                                final List<ConsentWebhook> consentWebhooks = consentRequest.getWebhooks()
-                                        .stream()
-                                        .map(callback -> {
-                                            var webhook = new ConsentWebhook();
-                                            webhook.setConsentHandle(response.getConsentHandle());
-                                            webhook.setCallbackUrl(callback.getUrl());
-                                            webhook.setRunId(callback.getRunId());
-                                            webhook.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
-                                            webhook.setAddOnParams(callback.getAddOnParams());
-                                            return webhook;
-                                        }).collect(Collectors.toList());
-                                log.debug("Registering webhooks for consentHandle:{}, webhooks:{}", response.getConsentHandle(), consentWebhooks);
-                                callbackRegistry.registerConsentWebhooks(consentWebhooks);
-                            }
+                            saveConsentNotificationCallback(consentRequest, response);
+                            saveConsentNotificationWebhooks(consentRequest, response);
                         }
                 )
                 .publishOn(Schedulers.boundedElastic())
@@ -126,6 +102,37 @@ class ConsentServiceImpl implements ConsentService {
                                         .build());
                         }
                 );
+    }
+
+    private void saveConsentNotificationCallback(FIUConsentRequest consentRequest, ConsentResponse response) {
+        if (Objects.nonNull(consentRequest.getCallback()) && Objects.nonNull(consentRequest.getCallback().getUrl())) {
+            var callback = new ConsentCallback();
+            callback.setConsentHandleId(response.getConsentHandle());
+            callback.setCallbackUrl(consentRequest.getCallback().getUrl());
+            callback.setRunId(consentRequest.getCallback().getRunId());
+            callback.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
+            callback.setAddOnParams(consentRequest.getCallback().getAddOnParams());
+            log.debug("Registering callback for consentHandle:{}, webhooks:{}", response.getConsentHandle(), callback);
+            callbackRegistry.registerConsentCallback(callback);
+        }
+    }
+
+    private void saveConsentNotificationWebhooks(FIUConsentRequest consentRequest, ConsentResponse response) {
+        if (consentRequest.getWebhooks() != null && !consentRequest.getWebhooks().isEmpty()) {
+            final List<ConsentWebhook> consentWebhooks = consentRequest.getWebhooks()
+                    .stream()
+                    .map(callback -> {
+                        var webhook = new ConsentWebhook();
+                        webhook.setConsentHandle(response.getConsentHandle());
+                        webhook.setCallbackUrl(callback.getUrl());
+                        webhook.setRunId(callback.getRunId());
+                        webhook.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
+                        webhook.setAddOnParams(callback.getAddOnParams());
+                        return webhook;
+                    }).collect(Collectors.toList());
+            log.debug("Registering webhooks for consentHandle:{}, webhooks:{}", response.getConsentHandle(), consentWebhooks);
+            callbackRegistry.registerConsentWebhooks(consentWebhooks);
+        }
     }
 
     @Override
