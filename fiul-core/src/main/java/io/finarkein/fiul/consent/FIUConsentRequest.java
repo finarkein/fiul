@@ -14,6 +14,8 @@ import io.finarkein.api.aa.consent.request.ConsentRequest;
 import io.finarkein.fiul.ext.Callback;
 import lombok.*;
 
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "ver",
@@ -32,10 +34,18 @@ public class FIUConsentRequest extends ConsentRequest {
     @JsonProperty("callback")
     protected Callback callback;
 
+    protected List<Callback> webhooks;
+
     @Builder(builderClassName = "FIUConsentRequestBuilder",access = AccessLevel.PUBLIC, builderMethodName = "builder")
-    public FIUConsentRequest(final String ver, final String timestamp, final String txnId, final ConsentDetail consentDetail, Callback callback) {
+    public FIUConsentRequest(final String ver,
+                             final String timestamp,
+                             final String txnId,
+                             final ConsentDetail consentDetail,
+                             Callback callback,
+                             List<Callback> webhooks) {
         super(ver, timestamp, txnId, consentDetail);
         this.callback = callback;
+        this.webhooks = webhooks;
     }
 
     public ConsentRequest toAAConsentRequest() {
