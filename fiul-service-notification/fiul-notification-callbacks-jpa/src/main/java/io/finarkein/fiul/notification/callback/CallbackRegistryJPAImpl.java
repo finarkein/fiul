@@ -7,20 +7,26 @@
 package io.finarkein.fiul.notification.callback;
 
 import io.finarkein.fiul.notification.callback.model.ConsentCallback;
+import io.finarkein.fiul.notification.callback.model.ConsentWebhook;
 import io.finarkein.fiul.notification.callback.model.FICallback;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CallbackRegistryJPAImpl implements CallbackRegistry{
+public class CallbackRegistryJPAImpl implements CallbackRegistry {
 
     @Autowired
     private RepoFICallback repoFICallback;
 
     @Autowired
     private RepoConsentCallback repoConsentCallback;
+
+    @Autowired
+    private RepoConsentWebhook repoConsentWebhook;
 
     @Override
     public void registerFICallback(FICallback fiCallback) {
@@ -33,9 +39,21 @@ public class CallbackRegistryJPAImpl implements CallbackRegistry{
     }
 
     @Override
+    public void registerConsentWebhooks(List<ConsentWebhook> consentWebhooks) {
+        repoConsentWebhook.saveAll(consentWebhooks);
+    }
+
+    @Override
     public ConsentCallback consentCallback(String consentHandleId) {
         final Optional<ConsentCallback> optional = repoConsentCallback.findById(consentHandleId);
         return optional.orElse(null);
+    }
+
+    @Override
+    public List<ConsentWebhook> consentWebhooks(String consentHandleId) {
+        ConsentWebhook consentWebhook = new ConsentWebhook();
+        consentWebhook.setConsentHandle(consentHandleId);
+        return repoConsentWebhook.findAll(Example.of(consentWebhook));
     }
 
     @Override
@@ -57,5 +75,6 @@ public class CallbackRegistryJPAImpl implements CallbackRegistry{
     @Override
     public void deleteConsentCallback(String consentHandleId) {
         repoConsentCallback.deleteById(consentHandleId);
+        repoConsentWebhook.deleteByConsentHandle(consentHandleId);
     }
 }
