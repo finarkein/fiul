@@ -7,7 +7,10 @@
 package io.finarkein.fiul.notification.callback;
 
 import io.finarkein.fiul.notification.callback.model.ConsentCallback;
+import io.finarkein.fiul.notification.callback.model.ConsentWebhook;
 import io.finarkein.fiul.notification.callback.model.FICallback;
+
+import java.util.List;
 
 /**
  * Class to actively maintain registry of callbacks.
@@ -18,7 +21,11 @@ public interface CallbackRegistry {
 
     void registerConsentCallback(ConsentCallback consentCallback);
 
+    void registerConsentWebhooks(List<ConsentWebhook> consentWebhooks);
+
     ConsentCallback consentCallback(String consentHandleId);
+
+    List<ConsentWebhook> consentWebhooks(String consentHandleId);
 
     void deleteFICallbackByConsentId(String consentHandleId);
 

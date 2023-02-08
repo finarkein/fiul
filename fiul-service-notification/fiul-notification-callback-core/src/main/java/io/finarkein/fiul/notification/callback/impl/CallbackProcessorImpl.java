@@ -13,6 +13,7 @@ import io.finarkein.api.aa.notification.FIStatusNotification;
 import io.finarkein.fiul.notification.callback.CallbackProcessor;
 import io.finarkein.fiul.notification.callback.CallbackRegistry;
 import io.finarkein.fiul.notification.callback.model.ConsentCallback;
+import io.finarkein.fiul.notification.callback.model.ConsentWebhook;
 import io.finarkein.fiul.notification.callback.model.FICallback;
 import io.netty.handler.ssl.SslHandshakeTimeoutException;
 import io.netty.handler.timeout.TimeoutException;
@@ -23,13 +24,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuples;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.finarkein.api.aa.common.ConsentStateMachine.*;
 import static io.finarkein.fiul.notification.callback.CallbackWebClientConfig.WEBHOOK_QUALIFIER_SUPPLIER_METHOD;
@@ -56,7 +61,7 @@ public class CallbackProcessorImpl implements CallbackProcessor {
 
     @Autowired
     protected CallbackProcessorImpl(@Qualifier(WEBHOOK_QUALIFIER_SUPPLIER_METHOD) WebClient webClient,
-                                 CallbackRegistry registry) {
+                                    CallbackRegistry registry) {
         this.webClient = webClient;
         this.registry = registry;
     }
@@ -69,62 +74,32 @@ public class CallbackProcessorImpl implements CallbackProcessor {
         doHandleFINotification(notification);
     }
 
-    protected void doHandleConsentNotification(ConsentNotification notification){
+    protected void doHandleConsentNotification(ConsentNotification notification) {
         log.debug("ConsentNotification received:{}", notification);
         ConsentStatusNotification statusNotification = notification.getConsentStatusNotification();
-        String consentHandleId = statusNotification.getConsentHandle();
-        ConsentCallback callback = registry.consentCallback(consentHandleId);
-        if (Objects.isNull(callback))
-            return;
-
-        // post consent HANDLE - CALL BACK URL
-        // call back web client send finarkein creds
-        // call back revoke on ACTIVE, PENDING, PAUSED, REJECTED, EXPIRED, REVOKED
         String consentStatus = statusNotification.getConsentStatus();
-        try {
+        String consentHandleId = statusNotification.getConsentHandle();
+
+        ConsentCallback callback = registry.consentCallback(consentHandleId);
+        boolean doCleanup = false;
+        if (Objects.nonNull(callback)) {
+            statusNotification.setConsentHandle(consentHandleId);
             statusNotification.setRunId(callback.getRunId());
             statusNotification.setAaId(callback.getAaId());
             statusNotification.setAddOnParams(callback.getAddOnParams());
-            log.debug("Calling ConsentCallback on notification:{}, callback:{}", statusNotification, callback);
-            webClient.post()
-                    .uri(callback.getCallbackUrl())
-                    .body(Mono.just(statusNotification), ConsentStatusNotification.class)
-                    .retrieve()
-                    .onStatus(
-                            status -> status.is5xxServerError() || status.value() == 408 || status.value() == 429,
-                            response -> {
-                                String message = String.format("Error %d-%s, while sending consent status " +
-                                                "notification, object is '%s'",
-                                        response.rawStatusCode(), response.statusCode().getReasonPhrase(),
-                                        statusNotification);
-                                return Mono.error(new CallbackServiceException(message));
-                            })
-                    .bodyToMono(String.class)
-                    .timeout(Duration.ofSeconds(consentCallbackTimeoutInSeconds))
+            handleConsentCallback(statusNotification, callback.getCallbackUrl());
+            doCleanup = true;
+        } else
+            log.debug("no callback registered for consentNotification, consentHandle:{}", statusNotification.getConsentHandle());
+        final List<ConsentWebhook> consentWebhooks = registry.consentWebhooks(statusNotification.getConsentHandle());
+        if (consentWebhooks != null && !consentWebhooks.isEmpty()) {
+            handleConsentWebhooks(statusNotification, consentWebhooks);
+            doCleanup = true;
+        } else
+            log.debug("no webhook registered for consentNotification, consentHandle:{}", statusNotification.getConsentHandle());
 
-                    .onErrorMap(java.util.concurrent.TimeoutException.class, ex -> logAndCreateException("java.util.concurrent.TimeoutException", ex))
-                    .onErrorMap(TimeoutException.class, ex -> logAndCreateException("Channel TimeoutException", ex))
-                    .onErrorMap(SslHandshakeTimeoutException.class, ex -> logAndCreateException("SslHandshakeTimeout", ex))
-                    .onErrorMap(WebClientRequestException.class, ex -> logAndCreateException("WebClientRequestException", ex))
-
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .publishOn(Schedulers.boundedElastic())
-                    .doOnSuccess(string -> log.debug("Notification sent Successfully {} :" +
-                            " response string is '{}'", statusNotification, string))
-                    .doOnError(error -> log.error("Failed to send notification {}", statusNotification, error))
-                    .retryWhen(
-                            Retry.backoff(consentCallbackRetryCount, Duration.ofSeconds(consentCallbackRetryDelayInSeconds))
-                                    .jitter(0.6)
-                                    .filter(throwable -> throwable instanceof CallbackServiceException)
-                                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
-                                            new IllegalStateException(
-                                                    "Failed to send consent notification to '" + callback.getCallbackUrl() + "'" +
-                                                            " after " + retrySignal.totalRetries() + " attempts, notification object : " + statusNotification)))
-                    .subscribe();
-        } catch (Exception e) {
-            log.error("Error while calling ConsentCallback on notification:{}, callback-url:{}", statusNotification,
-                    callback.getCallbackUrl(), e);
-        }
+        if (!doCleanup)
+            return;
 
         if (CONSENT_NEGATIVE_STATUS.contains(consentStatus)) {
             // Clean up FI callbacks
@@ -145,7 +120,40 @@ public class CallbackProcessorImpl implements CallbackProcessor {
         log.debug("ConsentNotification handling done, notification:{}", notification);
     }
 
-    protected void doHandleFINotification(FINotification notification){
+    private boolean handleConsentCallback(ConsentStatusNotification statusNotification, String callbackUrl) {
+
+        try {
+            // post consent HANDLE - CALL BACK URL
+            // call back web client send finarkein creds
+            // call back revoke on ACTIVE, PENDING, PAUSED, REJECTED, EXPIRED, REVOKED
+            log.debug("Calling ConsentCallback on notification:{}, callback:{}", statusNotification, callbackUrl);
+            processCallback(statusNotification, callbackUrl).subscribe();
+        } catch (Exception e) {
+            log.error("Error while calling ConsentCallback on notification:{}, callback-url:{}", statusNotification,
+                    callbackUrl, e);
+        }
+        return false;
+    }
+
+    private Mono<String> processCallback(ConsentStatusNotification statusNotification, String callbackUrl) {
+        return configureRetry(webClient.post()
+                        .uri(callbackUrl)
+                        .body(Mono.just(statusNotification), ConsentStatusNotification.class)
+                        .retrieve()
+                        .onStatus(
+                                status -> status.is5xxServerError() || status.value() == 408 || status.value() == 429,
+                                response -> {
+                                    String message = String.format("Error %d-%s, while sending consent status " +
+                                                    "notification, object is '%s'",
+                                            response.rawStatusCode(), response.statusCode().getReasonPhrase(),
+                                            statusNotification);
+                                    return Mono.error(new CallbackServiceException(message));
+                                })
+                        .bodyToMono(String.class)
+                , statusNotification, callbackUrl);
+    }
+
+    protected void doHandleFINotification(FINotification notification) {
         log.debug("handleFINotification: notification:{}", notification);
         FIStatusNotification statusNotification = notification.getFIStatusNotification();
         String sessionId = statusNotification.getSessionId();
@@ -160,7 +168,8 @@ public class CallbackProcessorImpl implements CallbackProcessor {
             webClient.post()
                     .uri(callback.getCallbackUrl())
                     .body(Mono.just(statusNotification), FINotification.class)
-                    .exchange().block();
+                    .exchange()
+                    .block();
         } catch (Exception e) {
             log.error("Error while calling FICallback on notification:{}, callback-url:{}", statusNotification,
                     callback.getCallbackUrl(), e);
@@ -186,5 +195,62 @@ public class CallbackProcessorImpl implements CallbackProcessor {
         CallbackServiceException(String message) {
             super(message);
         }
+    }
+
+    private boolean handleConsentWebhooks(ConsentStatusNotification statusNotification, List<ConsentWebhook> consentWebhooks) {
+
+        final List<String> webhookUrls = consentWebhooks.stream()
+                .map(ConsentWebhook::getCallbackUrl)
+                .collect(Collectors.toList());
+        try {
+            log.debug("Calling ConsentWebhook on ConsentNotification:{}, webhookUrls:{}", statusNotification, webhookUrls);
+            Flux.fromIterable(consentWebhooks)
+                    .map(consentWebhook -> {
+                        ConsentStatusNotification notification = new ConsentStatusNotification();
+                        notification.setConsentHandle(consentWebhook.getConsentHandle());
+                        notification.setConsentId(statusNotification.getConsentId());
+                        notification.setAaId(consentWebhook.getAaId());
+                        notification.setRunId(consentWebhook.getRunId());
+                        notification.setAddOnParams(consentWebhook.getAddOnParams());
+                        notification.setConsentStatus(statusNotification.getConsentStatus());
+                        return Tuples.of(consentWebhook, notification);
+                    })
+                    .publishOn(Schedulers.boundedElastic())
+                    .flatMap(objects -> processCallback(objects.getT2(), objects.getT1().getCallbackUrl()))
+                    .collectList()
+                    .map(responses -> {
+                        log.debug("webhook responses:{}", responses);
+                        return responses;
+                    })
+                    .subscribe()
+            ;
+        } catch (Exception e) {
+            log.error("Error while calling ConsentWebhook on notification:{}, urls:{}", statusNotification,
+                    webhookUrls, e);
+        }
+        return true;
+    }
+
+    public <T> Mono<T> configureRetry(Mono<T> inputMono, Object statusNotification, String url) {
+        return inputMono
+                .timeout(Duration.ofSeconds(consentCallbackTimeoutInSeconds))
+                .onErrorMap(java.util.concurrent.TimeoutException.class, ex -> logAndCreateException("java.util.concurrent.TimeoutException", ex))
+                .onErrorMap(TimeoutException.class, ex -> logAndCreateException("Channel TimeoutException", ex))
+                .onErrorMap(SslHandshakeTimeoutException.class, ex -> logAndCreateException("SslHandshakeTimeout", ex))
+                .onErrorMap(WebClientRequestException.class, ex -> logAndCreateException("WebClientRequestException", ex))
+
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(string -> log.debug("Notification sent Successfully {} :" +
+                        " response string is '{}'", statusNotification, string))
+                .doOnError(error -> log.error("Failed to send notification {}, error:{}", statusNotification, error.getMessage(), error))
+                .retryWhen(
+                        Retry.backoff(consentCallbackRetryCount, Duration.ofSeconds(consentCallbackRetryDelayInSeconds))
+                                .jitter(0.6)
+                                .filter(throwable -> throwable instanceof CallbackServiceException)
+                                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
+                                        new IllegalStateException(
+                                                "Failed to send consent notification to '" + url + "'" +
+                                                        " after " + retrySignal.totalRetries() + " attempts, notification object : " + statusNotification)));
     }
 }
