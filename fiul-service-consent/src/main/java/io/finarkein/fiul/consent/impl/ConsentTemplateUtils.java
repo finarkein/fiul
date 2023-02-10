@@ -93,9 +93,9 @@ public abstract class ConsentTemplateUtils {
         start[0] = start[0] + "S";
         expiry[0] = expiry[0] + "S";
         String from;
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         if (monthInclusive) {
-            DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
             from = localDate.plus(Integer.parseInt(start[1]),
                             ChronoUnit.valueOf(start[0]))
                     .withDayOfMonth(1)
@@ -105,8 +105,8 @@ public abstract class ConsentTemplateUtils {
                     .withNano(0)
                     .format(formatter);
         } else
-            from = localDate.plus(Integer.parseInt(start[1]), ChronoUnit.valueOf(start[0])).toString();
-        var to = localDate.plus(Integer.parseInt(expiry[1]), ChronoUnit.valueOf(expiry[0])).toString();
+            from = localDate.plus(Integer.parseInt(start[1]), ChronoUnit.valueOf(start[0])).atZone(ZoneOffset.UTC).format(formatter);
+        var to = localDate.plus(Integer.parseInt(expiry[1]), ChronoUnit.valueOf(expiry[0])).atZone(ZoneOffset.UTC).format(formatter);
         ArgsValidator.validateDateRange(uuidSupplier.get(), from, to);
         return new FIDataRange(from, to);
     }

@@ -10,7 +10,7 @@
 
     <groupId>io.finarkein.fiu</groupId>
     <artifactId>fiul</artifactId>
-    <version>0.7.5</version>
+    <version>0.7.6</version>
     <packaging>pom</packaging>
 
     <name>fiul</name>
