@@ -95,7 +95,7 @@ public abstract class ConsentTemplateUtils {
         String from;
         if (monthInclusive) {
             DateTimeFormatter formatter =
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             from = localDate.plus(Integer.parseInt(start[1]),
                             ChronoUnit.valueOf(start[0]))
                     .withDayOfMonth(1)
