@@ -29,7 +29,7 @@ public class ConsentController {
     private final ConsentService consentService;
 
     @Autowired
-    ConsentController(ConsentService consentService) {
+    public ConsentController(ConsentService consentService) {
         this.consentService = consentService;
     }
 
