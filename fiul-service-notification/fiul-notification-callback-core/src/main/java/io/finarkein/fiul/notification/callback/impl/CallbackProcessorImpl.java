@@ -54,7 +54,7 @@ public class CallbackProcessorImpl implements CallbackProcessor {
     @Value("${consent.callback.retry.count:3}")
     protected int consentCallbackRetryCount;
 
-    @Value("${consent.callback.timeout.in.seconds:10}")
+    @Value("${consent.callback.timeout.in.seconds:40}")
     protected int consentCallbackTimeoutInSeconds;
 
     @Value("${consent.callback.retry.delay.seconds:5}")
