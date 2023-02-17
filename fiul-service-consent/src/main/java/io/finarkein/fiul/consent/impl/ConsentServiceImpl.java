@@ -91,6 +91,9 @@ class ConsentServiceImpl implements ConsentService {
                             .customerAAId(consentRequest.getConsentDetail().getCustomer().getId())
                             .consentHandle(response.getConsentHandle())
                             .postConsentResponseTimestamp(strToTimeStamp.apply(response.getTimestamp()))
+                            .tenant(consentRequest.getTenant())
+                            .workspace(consentRequest.getWorkspace())
+                            .keyIdentifier(consentRequest.getKeyIdentifier())
                             .build());
                 }).doOnError(SystemException.class, e -> {
                             if (e.getParamValue("consentHandle") != null)
@@ -99,6 +102,7 @@ class ConsentServiceImpl implements ConsentService {
                                         .txnId(consentRequest.getTxnid())
                                         .isPostConsentSuccessful(false)
                                         .aaId(aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId()))
+                                        .keyIdentifier(consentRequest.getKeyIdentifier())
                                         .build());
                         }
                 );
@@ -112,6 +116,8 @@ class ConsentServiceImpl implements ConsentService {
             callback.setRunId(consentRequest.getCallback().getRunId());
             callback.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
             callback.setAddOnParams(consentRequest.getCallback().getAddOnParams());
+            callback.setFiuId(consentRequest.getConsentDetail().getDataConsumer().getId());
+            callback.setEncrypt(consentRequest.getCallback().getEncrypt());
             log.debug("Registering callback for consentHandle:{}, webhooks:{}", response.getConsentHandle(), callback);
             callbackRegistry.registerConsentCallback(callback);
         }
@@ -128,6 +134,8 @@ class ConsentServiceImpl implements ConsentService {
                         webhook.setRunId(callback.getRunId());
                         webhook.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
                         webhook.setAddOnParams(callback.getAddOnParams());
+                        webhook.setFiuId(consentRequest.getConsentDetail().getDataConsumer().getId());
+                        webhook.setEncrypt(callback.getEncrypt());
                         return webhook;
                     }).collect(Collectors.toList());
             log.debug("Registering webhooks for consentHandle:{}, webhooks:{}", response.getConsentHandle(), consentWebhooks);

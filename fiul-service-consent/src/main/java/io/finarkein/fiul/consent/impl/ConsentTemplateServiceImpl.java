@@ -126,6 +126,9 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
                 .consentDetail(consentDetail)
                 .callback(consentRequestInput.getCallback() != null ? consentRequestInput.getCallback() : consentTemplateDefinition.getCallback())
                 .webhooks(consentRequestInput.getWebhooks())
+                .keyIdentifier(consentRequestInput.getKeyIdentifier())
+                .tenant(consentRequestInput.getTenant())
+                .workspace(consentRequestInput.getWorkspace())
                 .build());
     }
 

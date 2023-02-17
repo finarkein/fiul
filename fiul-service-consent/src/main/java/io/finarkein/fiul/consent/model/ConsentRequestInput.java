@@ -22,4 +22,8 @@ public class ConsentRequestInput {
     private Callback callback;
 
     protected List<Callback> webhooks;
+
+    private String tenant;
+    private String workspace;
+    private String keyIdentifier;
 }

@@ -27,7 +27,9 @@ import java.time.Instant;
         indexes = {
                 @Index(name = "cs_consentId_idx", columnList = "consentId"),
                 @Index(name = "cs_consentStatus_idx", columnList = "consentStatus"),
-                @Index(name = "cs_txnId_idx", columnList = "txnId")
+                @Index(name = "cs_txnId_idx", columnList = "txnId"),
+                @Index(name = "cs_tenant_idx", columnList = "tenant"),
+                @Index(name = "cs_wp_idx", columnList = "workspace")
         })
 public class ConsentStateDTO {
 
@@ -42,6 +44,10 @@ public class ConsentStateDTO {
     private String aaId;
     private String customerAAId;
     private String notifierId;
+
+    private String tenant;
+    private String workspace;
+    private String keyIdentifier;
 
     @LastModifiedDate
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
