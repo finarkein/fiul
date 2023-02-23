@@ -175,6 +175,8 @@ public abstract class Functions {
         return jws.substring(lastIndexOf + 1);
     }
 
+    private static final Pattern addressPattern = Pattern.compile("((address=\")[^\"]*)");
+    private static final Pattern addressTextPattern = Pattern.compile("(address=\")");
     private static final Pattern narrationPattern = Pattern.compile("((narration=\")[^\"]*)");
     private static final Pattern narrationTextPattern = Pattern.compile("(narration=\")");
     private static final List<String[]> escapeCharPairs = Arrays.asList(new String[]{"<", "&lt;"},
@@ -205,6 +207,18 @@ public abstract class Functions {
                 .map(textPair -> strContainer[0] = strContainer[0].replaceAll(textPair[0], textPair[1]))
                 .count()
         ;
+        addressPattern.matcher(xmlString)
+                .results()
+                .map(matchResult -> matchResult.group(0))
+                .filter(address -> escapeCharPairs.stream().anyMatch(escapeChar -> address.indexOf(escapeChar[0]) > 0))
+                .map(address -> addressTextPattern.matcher(address).replaceAll(""))
+                .map(addressText -> {
+                    String[] textPair = new String[]{addressText, addressText};
+                    escapeCharPairs.stream().forEach(escapeChar -> textPair[1] = textPair[1].replaceAll(escapeChar[0], escapeChar[1]));
+                    return textPair;
+                })
+                .map(textPair -> strContainer[0] = strContainer[0].replaceAll(textPair[0], textPair[1]))
+                .count();
         return strContainer[0];
     }
 }
