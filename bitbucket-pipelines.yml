@@ -151,15 +151,15 @@ pipelines:
       - step: *setup-auth
       - step: *maven-verify
       - step: *maven-pkg-image-artifacts
-      - step: *build-docker # check if docker image builds properly
+#      - step: *build-docker # check if docker image builds properly
       - step: *maven-deploy-feature 
   branches:
     main:
       - step: *lint-dockerfile
       - step: *setup-auth
       - step: *maven-pkg-image-artifacts
-      - step: *build-save-docker
-      - step: *branch-aws-ecr-push
+#      - step: *build-save-docker
+#      - step: *branch-aws-ecr-push
       - step: *maven-deploy-release
     develop:
       - step: *lint-dockerfile
@@ -167,12 +167,12 @@ pipelines:
       - step: *maven-pkg-image-artifacts
       - step: *maven-deploy-snapshot
       - step: *build-dev-docker
-      - step:
-          <<: *branch-aws-ecr-push
-          deployment: aws-ecr-dev
+#      - step:
+#          <<: *branch-aws-ecr-push
+#          deployment: aws-ecr-dev
   tags:
     v*:
       - step: *setup-auth
       - step: *maven-pkg-image-artifacts
-      - step: *build-save-docker
-      - step: *aws-ecr-push
+#      - step: *build-save-docker
+#      - step: *aws-ecr-push
