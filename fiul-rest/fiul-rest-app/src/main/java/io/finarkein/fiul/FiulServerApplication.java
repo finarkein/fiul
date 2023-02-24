@@ -11,12 +11,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 @Log4j2
 @EntityScan(basePackages = {"io.finarkein.fiul", "io.finarkein.api.aa"})
 @ComponentScan(basePackages = {"io.finarkein.fiul", "io.finarkein.api.aa","io.finarkein.aa"})
 @SpringBootApplication(exclude = ReactiveUserDetailsServiceAutoConfiguration.class)
+@EnableConfigurationProperties(CryptoServiceConfig.class)
 public class FiulServerApplication {
 
     public static void main(String[] args) {

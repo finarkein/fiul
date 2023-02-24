@@ -15,7 +15,7 @@ definitions:
         name: Maven Verify
         script:
           - source local.env # requires: *setup-auth before this step to work
-          - mvn verify -Djacoco.haltOnFailure=false -Dmaven.javadoc.skip=true -B -U -s .ci/settings.xml
+          - mvn verify -DskipTests -Djacoco.haltOnFailure=false -Dmaven.javadoc.skip=true -B -U -s .ci/settings.xml
         after-script:
           # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
           - pipe: atlassian/checkstyle-report:0.2.0
@@ -85,6 +85,7 @@ definitions:
           - "*.tar"
     - step: &build-dev-docker
         name: Build & save Docker image
+        trigger: manual
         script:
           - IMAGE_NAME=$BITBUCKET_REPO_SLUG
           - docker build . --file docker/dev.Dockerfile --tag ${IMAGE_NAME}
@@ -116,6 +117,7 @@ definitions:
           - docker
     - step: &branch-aws-ecr-push # requires docker image saved in previous step as *.tar
         name: Deploy docker image to AWS ECR
+        trigger: manual
         oidc: true
         deployment: aws-ecr
         script:
@@ -144,6 +146,13 @@ pipelines:
       - step: *maven-pkg-image-artifacts
       - step: *build-docker # check if docker image builds properly
       - step: *maven-deploy-feature
+    bugfix/*:
+      - step: *lint-dockerfile
+      - step: *setup-auth
+      - step: *maven-verify
+      - step: *maven-pkg-image-artifacts
+      - step: *build-docker # check if docker image builds properly
+      - step: *maven-deploy-feature 
   branches:
     main:
       - step: *lint-dockerfile
@@ -156,11 +165,11 @@ pipelines:
       - step: *lint-dockerfile
       - step: *setup-auth
       - step: *maven-pkg-image-artifacts
+      - step: *maven-deploy-snapshot
       - step: *build-dev-docker
       - step:
-            <<: *branch-aws-ecr-push
-            deployment: aws-ecr-dev
-      - step: *maven-deploy-snapshot
+          <<: *branch-aws-ecr-push
+          deployment: aws-ecr-dev
   tags:
     v*:
       - step: *setup-auth

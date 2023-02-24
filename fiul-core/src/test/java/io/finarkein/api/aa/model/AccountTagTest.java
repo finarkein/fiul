@@ -78,4 +78,17 @@ class AccountTagTest {
             Assertions.assertNotNull(account);
         }
     }
+
+    @Test
+    void testXmlEscape2() throws Exception {
+        final var file = new File(getClass().getClassLoader().getResource("sbi-xml-escape.xml").getFile());
+        try(final var inputStream = new FileInputStream(file)) {
+            var xmlString = inputStreamToString(inputStream);
+
+            final var escapedXML = Functions.escapeNarrationAttrInFIXml(xmlString);
+            final var accountTag = AccountTag.readFromXml(escapedXML);
+            final var account = XmlToBeanConverters.getConverter(accountTag.getType(), accountTag.getVersion()).converter().apply(escapedXML);
+            Assertions.assertNotNull(account);
+        }
+    }
 }
