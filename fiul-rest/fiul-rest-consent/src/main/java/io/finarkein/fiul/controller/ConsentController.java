@@ -14,12 +14,14 @@ import io.finarkein.fiul.consent.model.ConsentState;
 import io.finarkein.fiul.consent.service.ConsentService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
 @RestController
+@ConditionalOnProperty(value="fiu.controller", havingValue = "fiul", matchIfMissing = true)
 @RequestMapping("/")
 @Log4j2
 public class ConsentController {
@@ -27,7 +29,7 @@ public class ConsentController {
     private final ConsentService consentService;
 
     @Autowired
-    ConsentController(ConsentService consentService) {
+    public ConsentController(ConsentService consentService) {
         this.consentService = consentService;
     }
 

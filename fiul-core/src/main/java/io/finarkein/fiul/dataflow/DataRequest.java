@@ -43,7 +43,7 @@ public class DataRequest {
     @JsonProperty("callback")
     protected Callback callback;
 
-    protected DataRequest(DataRequest dataRequest){
+    protected DataRequest(DataRequest dataRequest) {
         consentHandle = dataRequest.getConsentHandle();
         customerAAId = dataRequest.getCustomerAAId();
         dataRangeFrom = dataRequest.dataRangeFrom;
@@ -94,7 +94,14 @@ public class DataRequest {
 
         @JsonProperty("callback")
         public DataRequest.Builder callbackURL(@NonNull final String url, final String runId, final JsonNode addOnParams) {
-            this.callback = new Callback(url, runId, addOnParams);
+            this.callback = new Callback(url, runId, addOnParams, null);
+            return this;
+        }
+
+        @JsonProperty("callback")
+        public DataRequest.Builder callbackURL(@NonNull final String url, final String runId, final JsonNode addOnParams
+                , Boolean encrypt) {
+            this.callback = new Callback(url, runId, addOnParams, encrypt);
             return this;
         }
 

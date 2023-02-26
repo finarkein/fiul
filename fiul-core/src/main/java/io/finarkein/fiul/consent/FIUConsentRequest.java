@@ -37,16 +37,26 @@ public class FIUConsentRequest extends ConsentRequest {
 
     protected List<Callback> webhooks;
 
+    protected String tenant;
+    protected String workspace;
+    protected String keyIdentifier;
+
     @Builder(builderClassName = "FIUConsentRequestBuilder",access = AccessLevel.PUBLIC, builderMethodName = "builder")
     public FIUConsentRequest(final String ver,
                              final String timestamp,
                              final String txnId,
                              final ConsentDetail consentDetail,
                              Callback callback,
-                             List<Callback> webhooks) {
+                             List<Callback> webhooks,
+                             String keyIdentifier,
+                             String tenant,
+                             String workspace) {
         super(ver, timestamp, txnId, consentDetail);
         this.callback = callback;
         this.webhooks = webhooks;
+        this.keyIdentifier = keyIdentifier;
+        this.tenant = tenant;
+        this.workspace = workspace;
     }
 
     public ConsentRequest toAAConsentRequest() {

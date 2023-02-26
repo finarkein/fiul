@@ -28,4 +28,6 @@ public class Callback {
 
     @JsonProperty("addOnParams")
     private JsonNode addOnParams;
+
+    private Boolean encrypt;
 }
