@@ -30,4 +30,10 @@ public class Callback {
     private JsonNode addOnParams;
 
     private Boolean encrypt;
+
+    public Callback(String url, String runId, JsonNode addOnParams) {
+        this.url = url;
+        this.runId = runId;
+        this.addOnParams = addOnParams;
+    }
 }
