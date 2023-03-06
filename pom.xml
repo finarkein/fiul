@@ -50,6 +50,7 @@
 
         <pmd.skip>false</pmd.skip>
         <pmd.failOnViolation>false</pmd.failOnViolation>
+        <version.tenant-config-cache>0.2.0-SNAPSHOT</version.tenant-config-cache>
     </properties>
 
     <modules>
@@ -241,6 +242,11 @@
                 <artifactId>mockito-core</artifactId>
                 <version>${version.mockito}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.finarkein.tenant-manager</groupId>
+                <artifactId>tenant-config-cache</artifactId>
+                <version>${version.tenant-config-cache}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

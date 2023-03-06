@@ -21,7 +21,7 @@ public interface ConsentTemplateService {
 
     Mono<ConsentTemplateResponse> saveConsentTemplate(ConsentTemplate consentTemplate);
 
-    Optional<ConsentTemplate> getConsentTemplate(String id);
+    Mono<ConsentTemplate> getConsentTemplate(String id);
 
     Mono<Page<ConsentTemplate>> getAllConsentTemplates(Pageable pageable);
 

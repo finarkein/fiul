@@ -46,7 +46,7 @@ public class ConsentTemplateController {
     }
 
     @GetMapping("/consent/template/{consentTemplateId}")
-    public Optional<ConsentTemplate> getConsentTemplate(@PathVariable String consentTemplateId) {
+    public Mono<ConsentTemplate> getConsentTemplate(@PathVariable String consentTemplateId) {
         return consentTemplateService.getConsentTemplate(consentTemplateId);
     }
 
