@@ -6,7 +6,7 @@
  */
 package io.finarkein.fiul.consent.validators;
 
-import io.finarkein.fiul.consent.model.ConsentTemplateDefinition;
+import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 
 public interface ConsentTemplateDefinitionValidator {
     void validateConsentTemplateDefinition(ConsentTemplateDefinition consentTemplateDefinition, String txnId);

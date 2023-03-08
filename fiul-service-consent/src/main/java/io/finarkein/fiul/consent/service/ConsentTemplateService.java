@@ -11,11 +11,10 @@ import io.finarkein.api.aa.consent.request.ConsentResponse;
 import io.finarkein.fiul.consent.model.ConsentRequestInput;
 import io.finarkein.fiul.consent.model.ConsentTemplate;
 import io.finarkein.fiul.consent.model.ConsentTemplateDeleteResponse;
+import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 public interface ConsentTemplateService {
 
@@ -31,5 +30,8 @@ public interface ConsentTemplateService {
 
     Mono<ConsentDetail> prepareConsentDetailsFromTemplate(ConsentRequestInput consentRequestInput);
 
-    Page<ConsentTemplate> getConsentTemplatesByQuery(String tag, String consentVersion, Pageable pageRequest);
+    Mono<Page<ConsentTemplate>> getConsentTemplatesByQuery(String tag, String consentVersion, Pageable pageRequest);
+
+    ConsentTemplateDefinition mergeConsentTemplates(ConsentTemplateDefinition baseConsentTemplateDefinition,
+                                                    ConsentTemplateDefinition overridingConsentTemplateDefinition);
 }

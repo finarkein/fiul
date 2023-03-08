@@ -21,8 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/")
 @Log4j2
@@ -51,10 +49,10 @@ public class ConsentTemplateController {
     }
 
     @GetMapping("/consent/template/q")
-    public Page<ConsentTemplate> getConsentTemplateByQuery(@RequestParam(value = "tag", required = false) String tag,
-                                                           @RequestParam(value = "consentVersion", required = false) String consentVersion,
-                                                           @RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                                           @RequestParam(value = "pageNumber", required = false) Integer pageNumber
+    public Mono<Page<ConsentTemplate>> getConsentTemplateByQuery(@RequestParam(value = "tag", required = false) String tag,
+                                                                 @RequestParam(value = "consentVersion", required = false) String consentVersion,
+                                                                 @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                                 @RequestParam(value = "pageNumber", required = false) Integer pageNumber
     ) {
         return consentTemplateService.getConsentTemplatesByQuery(tag,
                 consentVersion,

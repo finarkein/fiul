@@ -11,7 +11,7 @@ import io.finarkein.api.aa.common.FIDataRange;
 import io.finarkein.api.aa.consent.DataLife;
 import io.finarkein.api.aa.consent.Frequency;
 import io.finarkein.api.aa.exception.Errors;
-import io.finarkein.fiul.consent.model.ConsentTemplateDataRange;
+import io.finarkein.fiul.dto.ConsentTemplateDataRange;
 import io.finarkein.fiul.consent.model.TimeDuration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
