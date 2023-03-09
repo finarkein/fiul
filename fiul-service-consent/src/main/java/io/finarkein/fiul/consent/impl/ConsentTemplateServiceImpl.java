@@ -317,9 +317,13 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     public ConsentTemplateDefinition mergeConsentTemplates(ConsentTemplateDefinition baseConsentTemplateDefinition,
                                                            ConsentTemplateDefinition overridingConsentTemplateDefinition) {
 
-        if (overridingConsentTemplateDefinition.getConsentStartOffset() != null)
+        if (overridingConsentTemplateDefinition == null)
+            return baseConsentTemplateDefinition;
+        if (overridingConsentTemplateDefinition.getConsentStartOffset() != null
+                && !overridingConsentTemplateDefinition.getConsentStartOffset().isEmpty())
             baseConsentTemplateDefinition.setConsentStartOffset(overridingConsentTemplateDefinition.getConsentStartOffset());
-        if (overridingConsentTemplateDefinition.getConsentExpiryDuration() != null)
+        if (overridingConsentTemplateDefinition.getConsentExpiryDuration() != null
+                && !overridingConsentTemplateDefinition.getConsentExpiryDuration().isEmpty())
             baseConsentTemplateDefinition.setConsentExpiryDuration(overridingConsentTemplateDefinition.getConsentExpiryDuration());
         if (overridingConsentTemplateDefinition.getConsentMode() != null)
             baseConsentTemplateDefinition.setConsentMode(overridingConsentTemplateDefinition.getConsentMode());
@@ -327,13 +331,17 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
             baseConsentTemplateDefinition.setConsentTypes(overridingConsentTemplateDefinition.getConsentTypes());
         if (overridingConsentTemplateDefinition.getFiTypes() != null)
             baseConsentTemplateDefinition.setFiTypes(overridingConsentTemplateDefinition.getFiTypes());
-        if (overridingConsentTemplateDefinition.getPurposeCode() != null)
+        if (overridingConsentTemplateDefinition.getPurposeCode() != null
+                && !overridingConsentTemplateDefinition.getPurposeCode().isEmpty())
             baseConsentTemplateDefinition.setPurposeCode(overridingConsentTemplateDefinition.getPurposeCode());
-        if (overridingConsentTemplateDefinition.getFetchType() != null)
+        if (overridingConsentTemplateDefinition.getFetchType() != null
+                && !overridingConsentTemplateDefinition.getFetchType().isEmpty())
             baseConsentTemplateDefinition.setFetchType(overridingConsentTemplateDefinition.getFetchType());
-        if (overridingConsentTemplateDefinition.getFrequency() != null)
+        if (overridingConsentTemplateDefinition.getFrequency() != null
+                && !overridingConsentTemplateDefinition.getFrequency().isEmpty())
             baseConsentTemplateDefinition.setFrequency(overridingConsentTemplateDefinition.getFrequency());
-        if (overridingConsentTemplateDefinition.getDataLife() != null)
+        if (overridingConsentTemplateDefinition.getDataLife() != null
+                && !overridingConsentTemplateDefinition.getDataLife().isEmpty())
             baseConsentTemplateDefinition.setDataLife(overridingConsentTemplateDefinition.getDataLife());
         if (overridingConsentTemplateDefinition.getConsentTemplateDataRange() != null)
             baseConsentTemplateDefinition.setConsentTemplateDataRange(overridingConsentTemplateDefinition.getConsentTemplateDataRange());
