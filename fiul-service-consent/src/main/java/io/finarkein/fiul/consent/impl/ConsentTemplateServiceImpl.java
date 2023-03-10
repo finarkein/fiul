@@ -17,6 +17,7 @@ import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.consent.model.ConsentRequestInput;
 import io.finarkein.fiul.consent.model.ConsentTemplate;
 import io.finarkein.fiul.consent.model.ConsentTemplateDeleteResponse;
+import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
 import io.finarkein.fiul.consent.service.ConsentService;
 import io.finarkein.fiul.consent.service.ConsentTemplateResponse;
 import io.finarkein.fiul.consent.service.ConsentTemplateService;
@@ -38,11 +39,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.finarkein.fiul.Functions.UUIDSupplier;
@@ -69,7 +68,13 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     private ConsentService consentService;
 
     @Autowired
-    TenantManagerConfigCacheService tenantManagerConfigCacheService;
+    private ConsentTemplateRepository consentTemplateRepository;
+
+    private final TenantManagerConfigCacheService tenantManagerConfigCacheService;
+
+    private final String consentTemplateDefaultOrg;
+
+    private final String consentTemplateDefaultWorkspace;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -77,13 +82,17 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
     @Autowired
     public ConsentTemplateServiceImpl(@Value("${fiul.entity_id}") String dataConsumerId,
-                                      @Value("${tnt-mgr.base-url:http://localhost:13500}") String tenantCfgServiceBaseUrl) {
+                                      @Value("${tnt-mgr.base-url:http://localhost:13500}") String tenantCfgServiceBaseUrl,
+                                      @Value("${consent.template.default.org:#{null}}") String consentTemplateDefaultOrg,
+                                      @Value("${consent.template.default.workspace:#{null}}") String consentTemplateDefaultWorkspace) {
         this.dataConsumerId = dataConsumerId;
         tenantManagerConfigCacheService = TenantConfigCacheBuilder.createNew()
                 .tenantManagerBaseUrl(tenantCfgServiceBaseUrl)
                 .cacheType("caffeine")
                 .useFinarkeinCreds(true)
                 .build();
+        this.consentTemplateDefaultOrg = consentTemplateDefaultOrg;
+        this.consentTemplateDefaultWorkspace = consentTemplateDefaultWorkspace;
     }
 
     @Override
@@ -117,15 +126,48 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
                                     return Mono.just(map);
                                 }))
                                 .flatMap(stringObjectMap ->
+
                                         tenantManagerConfigCacheService
                                                 .saveTenantConfig(TenantConfigSaveRequest.builder()
-                                                        .tenantId(tenantInfo.getOrg())
-                                                        .workspaceId(tenantInfo.getWorkspace())
+                                                        .tenantId(Objects.requireNonNull(consentTemplateDefaultOrg, tenantInfo.getOrg()))
+                                                        .workspaceId(Objects.requireNonNull(consentTemplateDefaultWorkspace, tenantInfo.getWorkspace()))
                                                         .configId(CONSENT_TEMPLATE)
                                                         .config(stringObjectMap)
                                                         .build())
                                                 .map(tenantConfigCrudResponse -> new ConsentTemplateResponse(consentTemplate.getId()))
                                 )
+                );
+    }
+
+    private Mono<Boolean> saveConsentTemplates(List<ConsentTemplate> consentTemplates) {
+
+        return tenantManagerConfigCacheService
+                .getTenantConfigById(null, null, CONSENT_TEMPLATE)
+                .map(tenantConfig -> {
+
+                    HashMap<String, Object> map = new HashMap<>();
+                    if (tenantConfig.getConfig() != null)
+                        map.putAll(tenantConfig.getConfig());
+                    tenantConfig.setConfig(map);
+                    return tenantConfig.getConfig();
+                })
+                .switchIfEmpty(Mono.defer(() -> {
+                    HashMap<String, Object> map = new HashMap<>();
+                    return Mono.just(map);
+                }))
+                .flatMap(stringObjectMap -> {
+
+                            consentTemplates.forEach(consentTemplate ->
+                                    stringObjectMap.put(consentTemplate.getId(), consentTemplate));
+                            return tenantManagerConfigCacheService
+                                    .saveTenantConfig(TenantConfigSaveRequest.builder()
+                                            .tenantId(consentTemplateDefaultOrg)
+                                            .workspaceId(consentTemplateDefaultWorkspace)
+                                            .configId(CONSENT_TEMPLATE)
+                                            .config(stringObjectMap)
+                                            .build())
+                                    .map(tenantConfigCrudResponse -> true);
+                        }
                 );
     }
 
@@ -380,5 +422,20 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         consentDetail.setDataFilter(consentTemplateDefinition.getDataFilter());
 
         return consentDetail;
+    }
+
+    @PostConstruct
+    void pushConsentTemplateToConfigManager() {
+
+        List<ConsentTemplate> consentTemplates = consentTemplateRepository.findAll();
+        if (consentTemplates.isEmpty()) {
+            log.debug("No consent templates found in local storage");
+            return;
+        }
+        saveConsentTemplates(consentTemplates)
+                .subscribe(saveSuccessful -> {
+                    log.debug("Consent template push successful, deleting the local templates");
+                    consentTemplateRepository.deleteAll();
+                });
     }
 }
