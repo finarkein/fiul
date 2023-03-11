@@ -12,16 +12,16 @@ import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 
 @Data
 @Entity
 @TypeDef(name = "json", typeClass = JsonType.class)
+@Table(indexes = {
+        @Index(name = "cs_cb_idx1", columnList = "fiuId")
+})
 public class ConsentCallback {
 
     @Id
@@ -37,6 +37,11 @@ public class ConsentCallback {
 
     private String aaId;
     private String runId;
+
+    protected String fiuId;
+
+    @Column(columnDefinition = "boolean default false")
+    private Boolean encrypt;
 
     @PrePersist
     protected void onCreate() {

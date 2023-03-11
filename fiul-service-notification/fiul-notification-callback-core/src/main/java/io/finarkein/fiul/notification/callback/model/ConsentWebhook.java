@@ -20,7 +20,8 @@ import java.time.Instant;
 @Entity
 @TypeDef(name = "json", typeClass = JsonType.class)
 @Table(indexes = {
-        @Index(name = "cs_callback_idx1", columnList = "consentHandle")
+        @Index(name = "cs_callback_idx1", columnList = "consentHandle"),
+        @Index(name = "cs_wh_idx1", columnList = "fiuId")
 })
 public class ConsentWebhook {
 
@@ -41,6 +42,11 @@ public class ConsentWebhook {
 
     private String aaId;
     private String runId;
+
+    protected String fiuId;
+
+    @Column(columnDefinition = "boolean default false")
+    private Boolean encrypt;
 
     @PrePersist
     protected void onCreate() {

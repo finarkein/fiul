@@ -21,6 +21,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -39,8 +40,8 @@ import java.util.stream.Collectors;
 import static io.finarkein.api.aa.common.ConsentStateMachine.*;
 import static io.finarkein.fiul.notification.callback.CallbackWebClientConfig.WEBHOOK_QUALIFIER_SUPPLIER_METHOD;
 
-
 @Log4j2
+@ConditionalOnProperty(name = "fiul-callback-processor", havingValue = "default", matchIfMissing = true)
 @Service
 public class CallbackProcessorImpl implements CallbackProcessor {
     protected static final Set<String> CONSENT_NEGATIVE_STATUS = Set.of(PAUSED.name(), EXPIRED.name(), REVOKED.name());
@@ -51,13 +52,13 @@ public class CallbackProcessorImpl implements CallbackProcessor {
     protected final WebClient webClient;
 
     @Value("${consent.callback.retry.count:3}")
-    private int consentCallbackRetryCount;
+    protected int consentCallbackRetryCount;
 
-    @Value("${consent.callback.timeout.in.seconds:10}")
-    private int consentCallbackTimeoutInSeconds;
+    @Value("${consent.callback.timeout.in.seconds:40}")
+    protected int consentCallbackTimeoutInSeconds;
 
     @Value("${consent.callback.retry.delay.seconds:5}")
-    private int consentCallbackRetryDelayInSeconds;
+    protected int consentCallbackRetryDelayInSeconds;
 
     @Autowired
     protected CallbackProcessorImpl(@Qualifier(WEBHOOK_QUALIFIER_SUPPLIER_METHOD) WebClient webClient,
@@ -254,3 +255,4 @@ public class CallbackProcessorImpl implements CallbackProcessor {
                                                         " after " + retrySignal.totalRetries() + " attempts, notification object : " + statusNotification)));
     }
 }
+
