@@ -28,7 +28,6 @@ import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 import io.finarkein.platform.tenant.TenantInfoHolder;
 import io.finarkein.tenantmanager.cache.service.TenantConfigCacheBuilder;
 import io.finarkein.tenantmanager.cache.service.TenantManagerConfigCacheService;
-import io.finarkein.tenantmanager.dto.TenantConfig;
 import io.finarkein.tenantmanager.dto.TenantConfigSaveRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +41,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static io.finarkein.fiul.Functions.UUIDSupplier;
@@ -52,8 +52,7 @@ import static io.finarkein.fiul.consent.impl.ConsentTemplateUtils.*;
 @Log4j2
 class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
-    public static final String CONSENT_TEMPLATE = "consent-template";
-    public static final String EMPTY = "Empty";
+    public static final String CONFIG_TYPE = "consentTemplate";
 
     @Autowired
     private PurposeFetcher purposeFetcher;
@@ -100,7 +99,8 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return Mono.just(consentTemplate)
                 .doOnNext(input -> log.debug("SaveConsentTemplate: start: request:{}", input))
                 .flatMap(this::doSaveConsentTemplate)
-                .doOnSuccess(response -> log.debug("SaveConsentTemplate: success: consentTemplateId:{}", response.getConsentTemplateId()))
+                .doOnSuccess(response -> log.debug("SaveConsentTemplate: success: consentTemplateId:{}",
+                        response.getConsentTemplateId()))
                 .doOnError(error -> log.error("SaveConsentTemplate: error:{}", error.getMessage(), error));
     }
 
@@ -110,28 +110,25 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo ->
                         tenantManagerConfigCacheService
-                                .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), CONSENT_TEMPLATE)
-                                .map(tenantConfig -> {
-
-                                    HashMap<String, Object> map = new HashMap<>();
-                                    if (tenantConfig.getConfig() != null)
-                                        map.putAll(tenantConfig.getConfig());
-                                    map.put(consentTemplate.getId(), consentTemplate);
-                                    tenantConfig.setConfig(map);
-                                    return tenantConfig.getConfig();
-                                })
-                                .switchIfEmpty(Mono.defer(() -> {
-                                    HashMap<String, Object> map = new HashMap<>();
-                                    map.put(consentTemplate.getId(), consentTemplate);
-                                    return Mono.just(map);
-                                }))
+                                .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), consentTemplate.getId())
+                                .map(tenantConfig ->
+                                        getConfigMap(consentTemplate)
+                                )
+                                .switchIfEmpty(Mono.defer(() ->
+                                        Mono.just(getConfigMap(consentTemplate))
+                                ))
                                 .flatMap(stringObjectMap ->
 
                                         tenantManagerConfigCacheService
                                                 .saveTenantConfig(TenantConfigSaveRequest.builder()
-                                                        .tenantId(Objects.requireNonNull(consentTemplateDefaultOrg, tenantInfo.getOrg()))
-                                                        .workspaceId(Objects.requireNonNull(consentTemplateDefaultWorkspace, tenantInfo.getWorkspace()))
-                                                        .configId(CONSENT_TEMPLATE)
+                                                        .tenantId(Objects
+                                                                .requireNonNull(consentTemplateDefaultOrg,
+                                                                        tenantInfo.getOrg()))
+                                                        .workspaceId(Objects
+                                                                .requireNonNull(consentTemplateDefaultWorkspace,
+                                                                        tenantInfo.getWorkspace()))
+                                                        .configId(consentTemplate.getId())
+                                                        .configType(CONFIG_TYPE)
                                                         .config(stringObjectMap)
                                                         .build())
                                                 .map(tenantConfigCrudResponse -> new ConsentTemplateResponse(consentTemplate.getId()))
@@ -139,36 +136,25 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
                 );
     }
 
+    private Map<String, Object> getConfigMap(ConsentTemplate consentTemplate) {
+        Map<String, Object> map = new ConcurrentHashMap<>();
+        map.put(consentTemplate.getId(), consentTemplate);
+        return map;
+    }
+
     private Mono<Boolean> saveConsentTemplates(List<ConsentTemplate> consentTemplates) {
 
-        return tenantManagerConfigCacheService
-                .getTenantConfigById(null, null, CONSENT_TEMPLATE)
-                .map(tenantConfig -> {
+        List<TenantConfigSaveRequest> saveRequests = new ArrayList<>();
 
-                    HashMap<String, Object> map = new HashMap<>();
-                    if (tenantConfig.getConfig() != null)
-                        map.putAll(tenantConfig.getConfig());
-                    tenantConfig.setConfig(map);
-                    return tenantConfig.getConfig();
-                })
-                .switchIfEmpty(Mono.defer(() -> {
-                    HashMap<String, Object> map = new HashMap<>();
-                    return Mono.just(map);
-                }))
-                .flatMap(stringObjectMap -> {
+        consentTemplates.forEach(consentTemplate -> saveRequests.add(TenantConfigSaveRequest.builder()
+                .tenantId(consentTemplateDefaultOrg)
+                .workspaceId(consentTemplateDefaultWorkspace)
+                .configId(consentTemplate.getId())
+                .config(getConfigMap(consentTemplate))
+                .configType(CONFIG_TYPE)
+                .build()));
 
-                            consentTemplates.forEach(consentTemplate ->
-                                    stringObjectMap.put(consentTemplate.getId(), consentTemplate));
-                            return tenantManagerConfigCacheService
-                                    .saveTenantConfig(TenantConfigSaveRequest.builder()
-                                            .tenantId(consentTemplateDefaultOrg)
-                                            .workspaceId(consentTemplateDefaultWorkspace)
-                                            .configId(CONSENT_TEMPLATE)
-                                            .config(stringObjectMap)
-                                            .build())
-                                    .map(tenantConfigCrudResponse -> true);
-                        }
-                );
+        return tenantManagerConfigCacheService.saveTenantConfig(saveRequests).map(tenantConfigCrudResponse -> true);
     }
 
     @Override
@@ -176,7 +162,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
         return TenantInfoHolder.getTenantInfo().flatMap(tenantInfo ->
                 tenantManagerConfigCacheService
-                        .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), CONSENT_TEMPLATE)
+                        .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), id)
                         .flatMap(tenantConfig ->
                                 tenantConfig.getConfig().get(id) != null
                                         ? Mono.just(tenantConfig.getConfig().get(id)) : Mono.empty()
@@ -199,25 +185,29 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo ->
                         tenantManagerConfigCacheService
-                                .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), CONSENT_TEMPLATE)
-                                .switchIfEmpty(Mono.defer(() ->
-                                        Mono.just(new TenantConfig())
-                                ))
-                                .map(tenantConfig -> {
-                                    if (tenantConfig.getConfig() != null)
-                                        return tenantConfig.getConfig().values();
-                                    else
-                                        return Collections.emptyList();
+                                .getTenantConfigByIds(tenantInfo.getOrg(),
+                                        tenantInfo.getWorkspace(),
+                                        null,
+                                        Set.of(CONFIG_TYPE))
+                                .map(tenantConfigs -> {
+
+                                    List<ConsentTemplate> consentTemplates = new ArrayList<>();
+                                    tenantConfigs.getConfigs().values()
+                                            .forEach(tenantConfigBase -> {
+                                                Collection<Object> objects = tenantConfigBase.getConfig().values();
+
+                                                objects.forEach(o -> {
+                                                    if (o instanceof Map)
+                                                        consentTemplates.add(objectMapper.convertValue(o, ConsentTemplate.class));
+                                                    else
+                                                        consentTemplates.add((ConsentTemplate) o);
+                                                });
+                                            });
+                                    return consentTemplates;
                                 })
-                                .map(objects -> objects.stream()
-                                        .map(o -> {
-                                            if (o instanceof Map)
-                                                return objectMapper.convertValue(o, ConsentTemplate.class);
-                                            return (ConsentTemplate) o;
-                                        })
-                                        .collect(Collectors.toList()))
-                                .map(PageImpl::new)
-                );
+                )
+                .map(consentTemplates -> new PageImpl(consentTemplates, pageable, consentTemplates.size()))
+                ;
     }
 
     @Override
@@ -225,34 +215,9 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
         return TenantInfoHolder.getTenantInfo().flatMap(tenantInfo ->
 
-                tenantManagerConfigCacheService.getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), CONSENT_TEMPLATE)
-                        .map(tenantConfig -> {
-
-                            HashMap<String, Object> map = new HashMap<>();
-                            if (tenantConfig.getConfig() != null)
-                                map.putAll(tenantConfig.getConfig());
-                            Object remove = map.remove(id);
-                            if (remove == null) {
-                                HashMap<String, Object> hashMap = new HashMap<>();
-                                hashMap.put(EMPTY, EMPTY);
-                                return hashMap;
-                            }
-                            tenantConfig.setConfig(map);
-                            return tenantConfig.getConfig();
-                        })
-                        .flatMap(stringObjectMap -> {
-                                    if (!stringObjectMap.containsKey(EMPTY))
-                                        return tenantManagerConfigCacheService
-                                                .saveTenantConfig(TenantConfigSaveRequest.builder()
-                                                        .tenantId(tenantInfo.getOrg())
-                                                        .workspaceId(tenantInfo.getWorkspace())
-                                                        .configId(CONSENT_TEMPLATE)
-                                                        .config(stringObjectMap)
-                                                        .build())
-                                                .map(tenantConfigCrudResponse -> new ConsentTemplateDeleteResponse(id, true));
-                                    return Mono.just(new ConsentTemplateDeleteResponse(id, false));
-                                }
-                        )
+                tenantManagerConfigCacheService.deleteTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), id)
+                        .map(tenantConfigCrudResponse -> new ConsentTemplateDeleteResponse(id, true))
+                        .switchIfEmpty(Mono.just(new ConsentTemplateDeleteResponse(id, false)))
         );
     }
 
@@ -320,23 +285,20 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo ->
                         tenantManagerConfigCacheService
-                                .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), CONSENT_TEMPLATE)
-                                .switchIfEmpty(Mono.defer(() ->
-                                        Mono.just(new TenantConfig())
-                                ))
-                                .map(tenantConfig -> {
-                                    if (tenantConfig.getConfig() != null)
-                                        return tenantConfig.getConfig().values();
-                                    else
-                                        return Collections.emptyList();
-                                })
-                                .map(Collection::stream)
-                                .map(objectStream ->
-                                        objectStream
-                                                .map(o -> {
-                                                    if (o instanceof Map)
-                                                        return objectMapper.convertValue(o, ConsentTemplate.class);
-                                                    return (ConsentTemplate) o;
+                                .getTenantConfigByIds(tenantInfo.getOrg(), tenantInfo.getWorkspace(), null, Set.of(CONFIG_TYPE))
+                                .map(tenantConfigs ->
+                                        tenantConfigs.getConfigs().values()
+                                                .stream()
+                                                .flatMap(tenantConfigBase -> {
+                                                    List<ConsentTemplate> consentTemplates = new ArrayList<>();
+                                                    tenantConfigBase.getConfig().values().forEach(o -> {
+
+                                                        if (o instanceof Map)
+                                                            consentTemplates.add(objectMapper.convertValue(o, ConsentTemplate.class));
+                                                        else
+                                                            consentTemplates.add((ConsentTemplate) o);
+                                                    });
+                                                    return consentTemplates.stream();
                                                 })
                                                 .filter(consentTemplate -> {
                                                     if (tag == null)
@@ -349,10 +311,9 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
                                                     return consentTemplate.getConsentVersion().matches(".*" + consentVersion + ".*");
                                                 })
                                                 .collect(Collectors.toList())
-
                                 )
-                                .map(PageImpl::new)
-                );
+                )
+                .map(consentTemplates -> new PageImpl(consentTemplates, pageRequest, consentTemplates.size()));
     }
 
     @Override

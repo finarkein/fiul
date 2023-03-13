@@ -50,7 +50,7 @@
 
         <pmd.skip>false</pmd.skip>
         <pmd.failOnViolation>false</pmd.failOnViolation>
-        <version.tenant-config-cache>0.2.0-SNAPSHOT</version.tenant-config-cache>
+        <version.tenant-config-cache>0.3.0-SNAPSHOT</version.tenant-config-cache>
     </properties>
 
     <modules>
