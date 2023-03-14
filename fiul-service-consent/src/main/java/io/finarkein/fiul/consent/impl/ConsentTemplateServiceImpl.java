@@ -41,7 +41,6 @@ import reactor.core.publisher.Mono;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static io.finarkein.fiul.Functions.UUIDSupplier;
@@ -141,7 +140,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     private Map<String, Object> getConfigMap(ConsentTemplate consentTemplate) {
-        Map<String, Object> map = new ConcurrentHashMap<>();
+        Map<String, Object> map = new HashMap<>(2);
         map.put(consentTemplate.getId(), consentTemplate);
         return map;
     }
