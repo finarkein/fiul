@@ -110,7 +110,11 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo ->
                         tenantManagerConfigCacheService
-                                .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), consentTemplate.getId())
+                                .getTenantConfigById(Objects
+                                        .requireNonNull(consentTemplateDefaultOrg,
+                                                tenantInfo.getOrg()), Objects
+                                        .requireNonNull(consentTemplateDefaultWorkspace,
+                                                tenantInfo.getWorkspace()), consentTemplate.getId())
                                 .map(tenantConfig ->
                                         getConfigMap(consentTemplate)
                                 )
@@ -162,7 +166,11 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
         return TenantInfoHolder.getTenantInfo().flatMap(tenantInfo ->
                 tenantManagerConfigCacheService
-                        .getTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), id)
+                        .getTenantConfigById(Objects
+                                .requireNonNull(consentTemplateDefaultOrg,
+                                        tenantInfo.getOrg()), Objects
+                                .requireNonNull(consentTemplateDefaultWorkspace,
+                                        tenantInfo.getWorkspace()), id)
                         .flatMap(tenantConfig ->
                                 tenantConfig.getConfig().get(id) != null
                                         ? Mono.just(tenantConfig.getConfig().get(id)) : Mono.empty()
@@ -185,8 +193,12 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo ->
                         tenantManagerConfigCacheService
-                                .getTenantConfigByIds(tenantInfo.getOrg(),
-                                        tenantInfo.getWorkspace(),
+                                .getTenantConfigByIds(Objects
+                                                .requireNonNull(consentTemplateDefaultOrg,
+                                                        tenantInfo.getOrg()),
+                                        Objects
+                                                .requireNonNull(consentTemplateDefaultWorkspace,
+                                                        tenantInfo.getWorkspace()),
                                         null,
                                         Set.of(CONFIG_TYPE))
                                 .map(tenantConfigs -> {
@@ -215,7 +227,11 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
         return TenantInfoHolder.getTenantInfo().flatMap(tenantInfo ->
 
-                tenantManagerConfigCacheService.deleteTenantConfigById(tenantInfo.getOrg(), tenantInfo.getWorkspace(), id)
+                tenantManagerConfigCacheService.deleteTenantConfigById(Objects
+                                .requireNonNull(consentTemplateDefaultOrg,
+                                        tenantInfo.getOrg()), Objects
+                                .requireNonNull(consentTemplateDefaultWorkspace,
+                                        tenantInfo.getWorkspace()), id)
                         .map(tenantConfigCrudResponse -> new ConsentTemplateDeleteResponse(id, true))
                         .switchIfEmpty(Mono.just(new ConsentTemplateDeleteResponse(id, false)))
         );
@@ -285,7 +301,11 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo ->
                         tenantManagerConfigCacheService
-                                .getTenantConfigByIds(tenantInfo.getOrg(), tenantInfo.getWorkspace(), null, Set.of(CONFIG_TYPE))
+                                .getTenantConfigByIds(Objects
+                                        .requireNonNull(consentTemplateDefaultOrg,
+                                                tenantInfo.getOrg()), Objects
+                                        .requireNonNull(consentTemplateDefaultWorkspace,
+                                                tenantInfo.getWorkspace()), null, Set.of(CONFIG_TYPE))
                                 .map(tenantConfigs ->
                                         tenantConfigs.getConfigs().values()
                                                 .stream()
