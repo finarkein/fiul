@@ -8,6 +8,7 @@ package io.finarkein.fiul.consent.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.fiul.common.JSONAttrConverter;
+import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Converter;

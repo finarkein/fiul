@@ -6,6 +6,7 @@
  */
 package io.finarkein.fiul.consent.model;
 
+import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 import io.finarkein.fiul.ext.Callback;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,4 +27,5 @@ public class ConsentRequestInput {
     private String tenant;
     private String workspace;
     private String keyIdentifier;
+    private ConsentTemplateDefinition consentTemplateDefinition;
 }

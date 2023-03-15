@@ -41,5 +41,9 @@
             <groupId>io.finarkein.fiu</groupId>
             <artifactId>fiul-notification-callbacks-jpa</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.finarkein.tenant-manager</groupId>
+            <artifactId>tenant-config-cache</artifactId>
+        </dependency>
     </dependencies>
 </project>

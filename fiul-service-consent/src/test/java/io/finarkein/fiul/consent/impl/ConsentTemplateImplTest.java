@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -71,8 +72,8 @@ class ConsentTemplateImplTest {
         final ConsentTemplate consentTemplate = createConsentTemplate();
         when(consentTemplateRepository.findById(consentTemplate.getId())).thenReturn(Optional.of(consentTemplate));
 
-        ConsentTemplate returnedConsentTemplate = consentTemplateManagerImpl.getConsentTemplate(consentTemplate.getId()).get();
-        Assertions.assertEquals(returnedConsentTemplate, consentTemplate);
+        Mono<ConsentTemplate> returnedConsentTemplate = consentTemplateManagerImpl.getConsentTemplate(consentTemplate.getId());
+        returnedConsentTemplate.subscribe(consentTemplate1 -> Assertions.assertEquals(consentTemplate1, consentTemplate));
     }
 
     @Test

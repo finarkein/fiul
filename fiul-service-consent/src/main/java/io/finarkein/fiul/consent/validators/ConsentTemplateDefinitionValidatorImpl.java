@@ -9,9 +9,9 @@ package io.finarkein.fiul.consent.validators;
 import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.api.aa.consent.DataFilter;
 import io.finarkein.api.aa.exception.Errors;
-import io.finarkein.fiul.consent.model.ConsentTemplateDataRange;
-import io.finarkein.fiul.consent.model.ConsentTemplateDefinition;
-import io.finarkein.fiul.consent.model.DataRangeType;
+import io.finarkein.fiul.dto.ConsentTemplateDataRange;
+import io.finarkein.fiul.dto.ConsentTemplateDefinition;
+import io.finarkein.fiul.dto.DataRangeType;
 import io.finarkein.fiul.validation.ConsentValidatorImpl;
 import org.springframework.stereotype.Component;
 

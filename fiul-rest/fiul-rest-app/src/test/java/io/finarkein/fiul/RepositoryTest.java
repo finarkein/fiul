@@ -12,6 +12,7 @@ import io.finarkein.fiul.consent.repo.ConsentNotificationLogRepository;
 import io.finarkein.fiul.consent.repo.ConsentRequestDTORepository;
 import io.finarkein.fiul.consent.repo.ConsentStateRepository;
 import io.finarkein.fiul.consent.repo.ConsentTemplateRepository;
+import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 import io.finarkein.fiul.notification.callback.RepoConsentCallback;
 import io.finarkein.fiul.notification.callback.RepoFICallback;
 import io.finarkein.fiul.notification.callback.model.ConsentCallback;
