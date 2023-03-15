@@ -385,10 +385,10 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     private String decideTenant(TenantInfo tenantInfo) {
-        return Objects.requireNonNull(consentTemplateDefaultOrg, tenantInfo.getOrg());
+        return Objects.requireNonNullElse(consentTemplateDefaultOrg, tenantInfo.getOrg());
     }
 
     private String decideWorkspace(TenantInfo tenantInfo) {
-        return Objects.requireNonNull(consentTemplateDefaultWorkspace, tenantInfo.getWorkspace());
+        return Objects.requireNonNullElse(consentTemplateDefaultWorkspace, tenantInfo.getWorkspace());
     }
 }
