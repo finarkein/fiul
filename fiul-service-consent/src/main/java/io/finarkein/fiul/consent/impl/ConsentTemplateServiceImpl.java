@@ -155,7 +155,9 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
                 .flatMap(tenantInfo ->
                         tenantConfigService.getTenantConfigById(decideTenant(tenantInfo), decideWorkspace(tenantInfo), id)
                                 .flatMap(tenantConfig ->
-                                        tenantConfig.getConfig().get(id) != null ? Mono.just(tenantConfig.getConfig().get(id)) : Mono.empty()
+                                        tenantConfig.getConfig().get(id) != null
+                                                ? Mono.just(tenantConfig.getConfig().get(id))
+                                                : Mono.empty()
                                 )
                                 .switchIfEmpty(Mono.defer(() -> {
                                     throw Errors.InvalidRequest.with(UUIDSupplier.get(),
