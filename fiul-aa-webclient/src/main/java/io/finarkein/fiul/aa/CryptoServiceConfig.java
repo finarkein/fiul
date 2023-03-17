@@ -30,9 +30,13 @@ public class CryptoServiceConfig {
     @Value("${forwardsecrecy.ecc.keyExpiryHrs:24}")
     private String keyExpiry;
 
+    @Value("${forwardsecrecy.ignoreKeyExpiration:false}")
+    private Boolean ignoreKeyExpiration;
+
     public Properties getAllProperties() {
         //TODO fill properties, find better way
         Properties properties = new Properties();
+        properties.put("ignoreKeyExpiration", ignoreKeyExpiration.toString());
         return properties;
     }
 }
