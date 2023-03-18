@@ -36,4 +36,11 @@ public class Callback {
         this.runId = runId;
         this.addOnParams = addOnParams;
     }
+
+    public Callback(Callback other) {
+        this.url = other.getUrl();
+        this.runId = other.getRunId();
+        this.addOnParams = other.getAddOnParams();
+        this.encrypt = other.getEncrypt();
+    }
 }
