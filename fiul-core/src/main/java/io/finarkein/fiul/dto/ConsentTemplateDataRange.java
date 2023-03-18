@@ -24,4 +24,12 @@ public class ConsentTemplateDataRange implements Serializable {
     private String year;
     private String from;
     private String to;
+
+    public ConsentTemplateDataRange(ConsentTemplateDataRange other) {
+
+        this.dataRangeType = other.getDataRangeType();
+        this.year = other.getYear();
+        this.from = other.getFrom();
+        this.to = other.getTo();
+    }
 }

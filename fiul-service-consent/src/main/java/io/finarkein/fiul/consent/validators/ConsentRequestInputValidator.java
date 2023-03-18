@@ -6,8 +6,24 @@
  */
 package io.finarkein.fiul.consent.validators;
 
+import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.fiul.consent.model.ConsentRequestInput;
+import lombok.experimental.UtilityClass;
 
-public interface ConsentRequestInputValidator {
-    void validateConsentRequestInput(ConsentRequestInput consentRequestInput);
+@UtilityClass
+public class ConsentRequestInputValidator {
+
+    private static void nullValidations(ConsentRequestInput consentRequestInput) {
+        ArgsValidator.checkNotEmpty(consentRequestInput.getTxnId(), consentRequestInput.getConsentTemplateId(), "Template Id");
+        ArgsValidator.checkNotEmpty(consentRequestInput.getTxnId(), consentRequestInput.getCustomerId(), "Customer Id");
+    }
+
+    private static void valueValidations(ConsentRequestInput consentRequestInput) {
+        ArgsValidator.validateTxnId(consentRequestInput.getTxnId());
+    }
+
+    public static void validateConsentRequestInput(ConsentRequestInput consentRequestInput) {
+        nullValidations(consentRequestInput);
+        valueValidations(consentRequestInput);
+    }
 }

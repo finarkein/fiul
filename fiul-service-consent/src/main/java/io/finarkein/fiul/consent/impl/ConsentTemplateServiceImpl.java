@@ -58,12 +58,6 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     private PurposeFetcher purposeFetcher;
 
     @Autowired
-    private ConsentRequestInputValidator consentRequestInputValidator;
-
-    @Autowired
-    private ConsentTemplateValidator consentTemplateValidator;
-
-    @Autowired
     private ConsentService consentService;
 
     @Autowired
@@ -107,7 +101,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     private Mono<ConsentTemplateResponse> doSaveConsentTemplate(ConsentTemplate consentTemplate) {
-        consentTemplateValidator.validateConsentTemplate(consentTemplate, Functions.UUIDSupplier.get());
+        ConsentTemplateValidator.validateConsentTemplate(consentTemplate, Functions.UUIDSupplier.get());
         consentTemplate.setId(UUIDSupplier.get());
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo -> tenantConfigService
@@ -234,7 +228,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     private Mono<ConsentResponse> doCreateConsentRequestUsingTemplate(ConsentRequestInput consentRequestInput) {
-        consentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
+        ConsentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
 
         Mono<ConsentTemplate> templateMono;
 
@@ -266,7 +260,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
     @Override
     public Mono<ConsentDetail> prepareConsentDetailsFromTemplate(ConsentRequestInput consentRequestInput) {
-        consentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
+        ConsentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
 
         var templateMono = getConsentTemplate(consentRequestInput);
         return templateMono.map(consentTemplate ->
@@ -300,46 +294,6 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
                         )
                 )
                 .map(consentTemplates -> new PageImpl<ConsentTemplate>(consentTemplates, pageRequest, consentTemplates.size()));
-    }
-
-    @Override
-    public ConsentTemplateDefinition mergeConsentTemplates(ConsentTemplateDefinition baseConsentTemplateDefinition,
-                                                           ConsentTemplateDefinition overridingConsentTemplateDefinition) {
-
-        if (overridingConsentTemplateDefinition == null)
-            return baseConsentTemplateDefinition;
-        if (overridingConsentTemplateDefinition.getConsentStartOffset() != null
-                && !overridingConsentTemplateDefinition.getConsentStartOffset().isEmpty())
-            baseConsentTemplateDefinition.setConsentStartOffset(overridingConsentTemplateDefinition.getConsentStartOffset());
-        if (overridingConsentTemplateDefinition.getConsentExpiryDuration() != null
-                && !overridingConsentTemplateDefinition.getConsentExpiryDuration().isEmpty())
-            baseConsentTemplateDefinition.setConsentExpiryDuration(overridingConsentTemplateDefinition.getConsentExpiryDuration());
-        if (overridingConsentTemplateDefinition.getConsentMode() != null)
-            baseConsentTemplateDefinition.setConsentMode(overridingConsentTemplateDefinition.getConsentMode());
-        if (overridingConsentTemplateDefinition.getConsentTypes() != null)
-            baseConsentTemplateDefinition.setConsentTypes(overridingConsentTemplateDefinition.getConsentTypes());
-        if (overridingConsentTemplateDefinition.getFiTypes() != null)
-            baseConsentTemplateDefinition.setFiTypes(overridingConsentTemplateDefinition.getFiTypes());
-        if (overridingConsentTemplateDefinition.getPurposeCode() != null
-                && !overridingConsentTemplateDefinition.getPurposeCode().isEmpty())
-            baseConsentTemplateDefinition.setPurposeCode(overridingConsentTemplateDefinition.getPurposeCode());
-        if (overridingConsentTemplateDefinition.getFetchType() != null
-                && !overridingConsentTemplateDefinition.getFetchType().isEmpty())
-            baseConsentTemplateDefinition.setFetchType(overridingConsentTemplateDefinition.getFetchType());
-        if (overridingConsentTemplateDefinition.getFrequency() != null
-                && !overridingConsentTemplateDefinition.getFrequency().isEmpty())
-            baseConsentTemplateDefinition.setFrequency(overridingConsentTemplateDefinition.getFrequency());
-        if (overridingConsentTemplateDefinition.getDataLife() != null
-                && !overridingConsentTemplateDefinition.getDataLife().isEmpty())
-            baseConsentTemplateDefinition.setDataLife(overridingConsentTemplateDefinition.getDataLife());
-        if (overridingConsentTemplateDefinition.getConsentTemplateDataRange() != null)
-            baseConsentTemplateDefinition.setConsentTemplateDataRange(overridingConsentTemplateDefinition.getConsentTemplateDataRange());
-        if (overridingConsentTemplateDefinition.getDataFilter() != null)
-            baseConsentTemplateDefinition.setDataFilter(overridingConsentTemplateDefinition.getDataFilter());
-        if (overridingConsentTemplateDefinition.getCallback() != null)
-            baseConsentTemplateDefinition.setCallback(overridingConsentTemplateDefinition.getCallback());
-
-        return baseConsentTemplateDefinition;
     }
 
     private ConsentDetail prepareConsentDetailFromTemplate(ConsentTemplateDefinition consentTemplateDefinition, String customerId) {
