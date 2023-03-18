@@ -58,12 +58,6 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     private PurposeFetcher purposeFetcher;
 
     @Autowired
-    private ConsentRequestInputValidator consentRequestInputValidator;
-
-    @Autowired
-    private ConsentTemplateValidator consentTemplateValidator;
-
-    @Autowired
     private ConsentService consentService;
 
     @Autowired
@@ -107,7 +101,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     private Mono<ConsentTemplateResponse> doSaveConsentTemplate(ConsentTemplate consentTemplate) {
-        consentTemplateValidator.validateConsentTemplate(consentTemplate, Functions.UUIDSupplier.get());
+        ConsentTemplateValidator.validateConsentTemplate(consentTemplate, Functions.UUIDSupplier.get());
         consentTemplate.setId(UUIDSupplier.get());
         return TenantInfoHolder.getTenantInfo()
                 .flatMap(tenantInfo -> tenantConfigService
@@ -234,7 +228,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
     }
 
     private Mono<ConsentResponse> doCreateConsentRequestUsingTemplate(ConsentRequestInput consentRequestInput) {
-        consentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
+        ConsentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
 
         Mono<ConsentTemplate> templateMono;
 
@@ -266,7 +260,7 @@ class ConsentTemplateServiceImpl implements ConsentTemplateService {
 
     @Override
     public Mono<ConsentDetail> prepareConsentDetailsFromTemplate(ConsentRequestInput consentRequestInput) {
-        consentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
+        ConsentRequestInputValidator.validateConsentRequestInput(consentRequestInput);
 
         var templateMono = getConsentTemplate(consentRequestInput);
         return templateMono.map(consentTemplate ->

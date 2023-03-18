@@ -27,7 +27,6 @@ import io.finarkein.fiul.consent.FIUConsentRequest;
 import io.finarkein.fiul.dataflow.FIUFIRequest;
 import io.finarkein.fiul.dataflow.FetchDataRequest;
 import io.finarkein.fiul.validation.ConsentValidator;
-import io.finarkein.fiul.validation.ConsentValidatorImpl;
 import io.finarkein.fiul.validation.FIRequestValidator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,6 @@ class AAClientService implements AAFIUClient {
     private final AAClient aaClient;
     private final RequestUpdater requestUpdater;
     private final CryptoServiceAdapter crypto;
-    private final ConsentValidator consentValidator = new ConsentValidatorImpl();
     private final FIRequestValidator fiRequestValidator = new FIRequestValidator();
     protected SerializedKeyPair cachedK;
 
@@ -79,7 +77,7 @@ class AAClientService implements AAFIUClient {
         requestUpdater.updateTxnIdIfNeeded(consentRequest);
         requestUpdater.updateTimestampIfNeeded(consentRequest);
 
-        consentValidator.validateCreateConsent(consentRequest);
+        ConsentValidator.validateCreateConsent(consentRequest);
         String aaName = io.finarkein.api.aa.util.Functions.aaNameExtractor.apply(consentRequest.getConsentDetail().getCustomer().getId());
         return aaClient.createConsentRequest(consentRequest.toAAConsentRequest(), aaName);
     }

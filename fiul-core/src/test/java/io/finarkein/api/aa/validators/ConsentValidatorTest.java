@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.consent.request.ConsentRequest;
 import io.finarkein.api.aa.exception.SystemException;
 import io.finarkein.fiul.Functions;
-import io.finarkein.fiul.validation.ConsentValidatorImpl;
+import io.finarkein.fiul.validation.ConsentValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,8 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ConsentValidatorTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final ConsentValidatorImpl consentValidator = new ConsentValidatorImpl();
-
     private static String readFile(String path) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, StandardCharsets.UTF_8);
@@ -47,7 +45,7 @@ public class ConsentValidatorTest {
     @Test
     @DisplayName("Testing Files Read Stream")
     void testReadAsStream() throws IOException {
-        try(InputStream is = this.getClass().getResourceAsStream("/consenttestcases/NullVersion.txt")) {
+        try (InputStream is = this.getClass().getResourceAsStream("/consenttestcases/NullVersion.txt")) {
             assertNotNull(is);
         }
     }
@@ -59,43 +57,43 @@ public class ConsentValidatorTest {
         String content = returnString(filePath);
         List<String> requestBodies = Arrays.asList(content.split("\\*"));
         requestBodies.forEach(e -> {
-            assertThrows(SystemException.class, () -> consentValidator.validateCreateConsent(objectMapper.readValue(e , ConsentRequest.class)));
+            assertThrows(SystemException.class, () -> ConsentValidator.validateCreateConsent(objectMapper.readValue(e, ConsentRequest.class)));
         });
     }
 
     @ParameterizedTest(name = "{index} - {1}")
     @MethodSource("invalidArgumentProvider")
     @DisplayName("Invalid Consent Value Validators Test")
-    void invalidValueTest(String filePath, String nameOfTest) throws IOException{
+    void invalidValueTest(String filePath, String nameOfTest) throws IOException {
         String content = returnString(filePath);
         List<String> requestBodies = Arrays.asList(content.split("\\*"));
-        requestBodies.forEach(e ->{
-            assertThrows(SystemException.class,() -> consentValidator.validateCreateConsent(objectMapper.readValue(e, ConsentRequest.class)));
+        requestBodies.forEach(e -> {
+            assertThrows(SystemException.class, () -> ConsentValidator.validateCreateConsent(objectMapper.readValue(e, ConsentRequest.class)));
         });
     }
 
     @Test
     @DisplayName("ConsentState Validator Test")
-    void consentStateValidator(){
+    void consentStateValidator() {
         List<String> Status = new ArrayList<>();
-        Status.addAll(Arrays.asList("ACTIVEs","EXPIREd","PAUSEd","REVOKEd"));
-        for( String status : Status){
+        Status.addAll(Arrays.asList("ACTIVEs", "EXPIREd", "PAUSEd", "REVOKEd"));
+        for (String status : Status) {
             String txnId = Functions.UUIDSupplier.get();
-            assertThrows(SystemException.class,() ->consentValidator.validateStatus(txnId,status));
+            assertThrows(SystemException.class, () -> ConsentValidator.validateStatus(txnId, status));
         }
     }
 
-    private static Stream<Arguments> argumentProvider(){
+    private static Stream<Arguments> argumentProvider() {
         return Stream.of(
-                Arguments.of("src/test/resources/consenttestcases/NullVersion.txt","Null Version Cases"),
-                Arguments.of("src/test/resources/consenttestcases/NullTxnId.txt","Null Txn Id Cases"),
-                Arguments.of("src/test/resources/consenttestcases/NullTimestamp.txt","Null Time Stamp Cases"),
-                Arguments.of("src/test/resources/consenttestcases/NullConsentDetail.txt","Null Consent Detail Cases")
+                Arguments.of("src/test/resources/consenttestcases/NullVersion.txt", "Null Version Cases"),
+                Arguments.of("src/test/resources/consenttestcases/NullTxnId.txt", "Null Txn Id Cases"),
+                Arguments.of("src/test/resources/consenttestcases/NullTimestamp.txt", "Null Time Stamp Cases"),
+                Arguments.of("src/test/resources/consenttestcases/NullConsentDetail.txt", "Null Consent Detail Cases")
         );
     }
 
-    private static Stream<Arguments> invalidArgumentProvider(){
-        return  Stream.of(
+    private static Stream<Arguments> invalidArgumentProvider() {
+        return Stream.of(
                 Arguments.of("src/test/resources/consenttestcases/InvalidConsentCases.txt", "Invalid Consent Cases")
         );
     }
