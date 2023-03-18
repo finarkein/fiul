@@ -4,7 +4,7 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.consent.validators;
+package io.finarkein.fiul.validation;
 
 import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.api.aa.consent.DataFilter;
@@ -12,7 +12,6 @@ import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.fiul.dto.ConsentTemplateDataRange;
 import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 import io.finarkein.fiul.dto.DataRangeType;
-import io.finarkein.fiul.validation.ConsentValidator;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;

@@ -9,6 +9,7 @@ package io.finarkein.fiul.consent.validators;
 import io.finarkein.aa.validators.ArgsValidator;
 import io.finarkein.api.aa.exception.Errors;
 import io.finarkein.fiul.consent.model.ConsentTemplate;
+import io.finarkein.fiul.validation.ConsentTemplateDefinitionValidator;
 import io.finarkein.fiul.validation.ValidatorCommons;
 import lombok.experimental.UtilityClass;
 
