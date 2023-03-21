@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Callback {
 
     @JsonAlias({"consentStatus"})
@@ -36,6 +38,13 @@ public class Callback {
         this.url = url;
         this.runId = runId;
         this.addOnParams = addOnParams;
+    }
+
+    public Callback(String url, String runId, JsonNode addOnParams, Boolean encrypt) {
+        this.url = url;
+        this.runId = runId;
+        this.addOnParams = addOnParams;
+        this.encrypt = encrypt;
     }
 
     public Callback(Callback other) {
