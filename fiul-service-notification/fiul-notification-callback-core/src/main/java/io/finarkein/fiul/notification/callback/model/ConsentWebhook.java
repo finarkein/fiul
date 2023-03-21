@@ -33,6 +33,7 @@ public class ConsentWebhook {
     protected String consentHandle;
     protected String callbackUrl;
 
+    protected String requestId;
     @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected Timestamp createdOn;
 

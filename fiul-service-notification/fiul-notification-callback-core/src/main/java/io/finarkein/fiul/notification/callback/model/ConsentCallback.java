@@ -35,6 +35,7 @@ public class ConsentCallback {
     @Column(name = "add_on_params", columnDefinition = "jsonb")
     private JsonNode addOnParams;
 
+    private String requestId;
     private String aaId;
     private String runId;
 
