@@ -131,7 +131,7 @@ class ConsentServiceImpl implements ConsentService {
                     .map(callback -> {
                         var webhook = new ConsentWebhook();
                         webhook.setConsentHandle(response.getConsentHandle());
-                        webhook.setRequestId(consentRequest.getCallback().getRequestId());
+                        webhook.setRequestId(callback.getRequestId());
                         webhook.setCallbackUrl(callback.getUrl());
                         webhook.setRunId(callback.getRunId());
                         webhook.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
