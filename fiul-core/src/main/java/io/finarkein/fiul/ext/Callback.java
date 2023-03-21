@@ -25,11 +25,12 @@ public class Callback {
 
     @JsonProperty("runId")
     private String runId;
-
     @JsonProperty("addOnParams")
     private JsonNode addOnParams;
 
     private Boolean encrypt;
+
+    private String requestId;
 
     public Callback(String url, String runId, JsonNode addOnParams) {
         this.url = url;
@@ -42,5 +43,6 @@ public class Callback {
         this.runId = other.getRunId();
         this.addOnParams = other.getAddOnParams();
         this.encrypt = other.getEncrypt();
+        this.requestId = other.getRequestId();
     }
 }

@@ -93,15 +93,16 @@ public class DataRequest {
         }
 
         @JsonProperty("callback")
-        public DataRequest.Builder callbackURL(@NonNull final String url, final String runId, final JsonNode addOnParams) {
-            this.callback = new Callback(url, runId, addOnParams, null);
+        public DataRequest.Builder callbackURL(@NonNull final String url, final String runId, final JsonNode addOnParams,
+                                               final String requestId) {
+            this.callback = new Callback(url, runId, addOnParams, null, requestId);
             return this;
         }
 
         @JsonProperty("callback")
-        public DataRequest.Builder callbackURL(@NonNull final String url, final String runId, final JsonNode addOnParams
-                , Boolean encrypt) {
-            this.callback = new Callback(url, runId, addOnParams, encrypt);
+        public DataRequest.Builder callbackURL(@NonNull final String url, final String runId, final JsonNode addOnParams,
+                                               Boolean encrypt, final String requestId) {
+            this.callback = new Callback(url, runId, addOnParams, encrypt, requestId);
             return this;
         }
 
