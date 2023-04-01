@@ -169,7 +169,7 @@ pipelines:
       - step: *maven-pkg-image-artifacts
 #      - step: *build-save-docker
 #      - step: *branch-aws-ecr-push
-      - step: *maven-deploy-release2
+      - step: *maven-deploy-release
     develop:
       - step: *lint-dockerfile
       - step: *setup-auth
