@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.finarkein.api.aa.common.FIDataRange;
 import io.finarkein.fiul.consent.model.ConsentTemplate;
-import io.finarkein.fiul.consent.model.DataRangeType;
+import io.finarkein.fiul.dto.DataRangeType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

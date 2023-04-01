@@ -112,6 +112,7 @@ class ConsentServiceImpl implements ConsentService {
         if (Objects.nonNull(consentRequest.getCallback()) && Objects.nonNull(consentRequest.getCallback().getUrl())) {
             var callback = new ConsentCallback();
             callback.setConsentHandleId(response.getConsentHandle());
+            callback.setRequestId(consentRequest.getCallback().getRequestId());
             callback.setCallbackUrl(consentRequest.getCallback().getUrl());
             callback.setRunId(consentRequest.getCallback().getRunId());
             callback.setAaId(consentRequest.getConsentDetail().getCustomer().getId());
@@ -130,6 +131,7 @@ class ConsentServiceImpl implements ConsentService {
                     .map(callback -> {
                         var webhook = new ConsentWebhook();
                         webhook.setConsentHandle(response.getConsentHandle());
+                        webhook.setRequestId(callback.getRequestId());
                         webhook.setCallbackUrl(callback.getUrl());
                         webhook.setRunId(callback.getRunId());
                         webhook.setAaId(consentRequest.getConsentDetail().getCustomer().getId());

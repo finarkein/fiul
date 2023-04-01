@@ -31,14 +31,10 @@ public class ValidatorsTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final ConsentRequestInputValidator consentRequestInputValidator = new ConsentRequestInputValidatorImpl();
-
-    private final ConsentTemplateValidator consentTemplateValidator = new ConsentTemplateValidatorImpl();
-
     @Test
     @DisplayName("Testing Files Read Stream")
     void testReadAsStream() throws IOException {
-        try(InputStream is = this.getClass().getResourceAsStream("/validatorstestcase/invalidConsentRequestTestCases.txt")) {
+        try (InputStream is = this.getClass().getResourceAsStream("/validatorstestcase/invalidConsentRequestTestCases.txt")) {
             assertNotNull(is);
         }
     }
@@ -50,7 +46,7 @@ public class ValidatorsTest {
         String content = returnString(filePath);
         List<String> requestBodies = Arrays.asList(content.split("\\*"));
         requestBodies.forEach(e -> {
-            assertThrows(SystemException.class, () -> consentRequestInputValidator.validateConsentRequestInput(objectMapper.readValue(e , ConsentRequestInput.class)));
+            assertThrows(SystemException.class, () -> ConsentRequestInputValidator.validateConsentRequestInput(objectMapper.readValue(e, ConsentRequestInput.class)));
         });
     }
 
@@ -62,18 +58,18 @@ public class ValidatorsTest {
         String content = returnString(filePath);
         List<String> requestBodies = Arrays.asList(content.split("\\*"));
         requestBodies.forEach(e -> {
-            assertThrows(SystemException.class, () -> consentTemplateValidator.validateConsentTemplate(objectMapper.readValue(e , ConsentTemplate.class), Functions.UUIDSupplier.get()));
+            assertThrows(SystemException.class, () -> ConsentTemplateValidator.validateConsentTemplate(objectMapper.readValue(e, ConsentTemplate.class), Functions.UUIDSupplier.get()));
         });
     }
 
-    private static Stream<Arguments> consentRequestInputArgumentProvider(){
+    private static Stream<Arguments> consentRequestInputArgumentProvider() {
         return Stream.of(
-                Arguments.of("src/test/resources/validatorstestcase/invalidConsentRequestTestCases.txt","Invalid ConsentRequestInput Cases")
+                Arguments.of("src/test/resources/validatorstestcase/invalidConsentRequestTestCases.txt", "Invalid ConsentRequestInput Cases")
         );
     }
 
-    private static Stream<Arguments> consentTemplateArgumentProvider(){
-        return  Stream.of(
+    private static Stream<Arguments> consentTemplateArgumentProvider() {
+        return Stream.of(
                 Arguments.of("src/test/resources/validatorstestcase/invalidConsentTemplateTestCases.txt", "Invalid ConsentTemplate Cases")
         );
     }

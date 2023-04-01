@@ -7,6 +7,7 @@
 package io.finarkein.fiul.consent.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.finarkein.fiul.dto.ConsentTemplateDefinition;
 import lombok.Data;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;

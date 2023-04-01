@@ -4,7 +4,7 @@
  * You shall not disclose such confidential information and shall use it only in accordance with the terms of the license
  * agreement you entered into with Finarkein Analytics Pvt. Ltd.
  */
-package io.finarkein.fiul.consent.model;
+package io.finarkein.fiul.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,4 +24,12 @@ public class ConsentTemplateDataRange implements Serializable {
     private String year;
     private String from;
     private String to;
+
+    public ConsentTemplateDataRange(ConsentTemplateDataRange other) {
+
+        this.dataRangeType = other.getDataRangeType();
+        this.year = other.getYear();
+        this.from = other.getFrom();
+        this.to = other.getTo();
+    }
 }

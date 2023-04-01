@@ -15,13 +15,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 public interface ConsentTemplateService {
 
     Mono<ConsentTemplateResponse> saveConsentTemplate(ConsentTemplate consentTemplate);
 
-    Optional<ConsentTemplate> getConsentTemplate(String id);
+    Mono<ConsentTemplate> getConsentTemplate(String id);
 
     Mono<Page<ConsentTemplate>> getAllConsentTemplates(Pageable pageable);
 
@@ -31,5 +29,5 @@ public interface ConsentTemplateService {
 
     Mono<ConsentDetail> prepareConsentDetailsFromTemplate(ConsentRequestInput consentRequestInput);
 
-    Page<ConsentTemplate> getConsentTemplatesByQuery(String tag, String consentVersion, Pageable pageRequest);
+    Mono<Page<ConsentTemplate>> getConsentTemplatesByQuery(String tag, String consentVersion, Pageable pageRequest);
 }
