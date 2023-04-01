@@ -27,6 +27,15 @@ definitions:
         script:
           - source local.env # requires: *setup-auth step before this step to work
           - mvn deploy $DEPLOY_FLAGS -B -U -s .ci/settings.xml -DaltDeploymentRepository="maven-releases::$MVN_REPO_RELEASES"
+    - step: &maven-deploy-release2
+        caches:
+          - maven
+        name: Maven Deploy Release
+        deployment: mvn-releases
+        script:
+          - source local.env # requires: *setup-auth step before this step to work
+          - mvn -B release:prepare $DEPLOY_FLAGS -U -s .ci/settings.xml -DaltDeploymentRepository="maven-releases::$MVN_REPO_RELEASES"
+          - mvn -B release:perform $DEPLOY_FLAGS -U -s .ci/settings.xml -DaltDeploymentRepository="maven-releases::$MVN_REPO_RELEASES"
     - step: &maven-deploy-snapshot
         caches:
           - maven
@@ -160,7 +169,7 @@ pipelines:
       - step: *maven-pkg-image-artifacts
 #      - step: *build-save-docker
 #      - step: *branch-aws-ecr-push
-      - step: *maven-deploy-release
+      - step: *maven-deploy-release2
     develop:
       - step: *lint-dockerfile
       - step: *setup-auth
